@@ -4,7 +4,6 @@ using FsCheck.Xunit;
 using Results.Immutable.Extensions;
 using Results.Immutable.Tests.Extensions;
 using static Results.Immutable.Tests.Generators.IntegerResultGenerator;
-using Result = Results.Immutable.Factories.Result;
 
 namespace Results.Immutable.Tests;
 

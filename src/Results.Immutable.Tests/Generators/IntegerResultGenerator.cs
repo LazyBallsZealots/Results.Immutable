@@ -1,5 +1,4 @@
 ﻿using FsCheck;
-using Result = Results.Immutable.Factories.Result;
 
 namespace Results.Immutable.Tests.Generators;
 
