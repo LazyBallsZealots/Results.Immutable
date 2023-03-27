@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using Result = Results.Immutable.Factories.Result;
 
 namespace Results.Immutable.Tests;
 
