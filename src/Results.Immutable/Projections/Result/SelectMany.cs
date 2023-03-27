@@ -84,9 +84,8 @@ public readonly partial record struct Result<T>
         Func<IOption<T>, Result<T2>> secondCombinator,
         Func<IOption<T>, Result<T3>> thirdCombinator,
         Func<IOption<T>, Result<T4>> fourthCombinator,
-        Func<IOption<T>, IOption<T1>, IOption<T2>, IOption<T3>, IOption<T4>, Result<TOut>> selector)
-    {
-        return Select<TOut>(
+        Func<IOption<T>, IOption<T1>, IOption<T2>, IOption<T3>, IOption<T4>, Result<TOut>> selector) =>
+        Select(
             value => firstCombinator(value)
                 .Select(
                     secondValue => secondCombinator(value)
@@ -101,7 +100,6 @@ public readonly partial record struct Result<T>
                                                 thirdValue,
                                                 fourthValue,
                                                 finalValue))))));
-    }
 
     /// <param name="fifthCombinator">
     ///     Delegate used to obtain a <see cref="Immutable.Result{T}" />
@@ -115,7 +113,7 @@ public readonly partial record struct Result<T>
         Func<IOption<T>, Result<T4>> fourthCombinator,
         Func<IOption<T>, Result<T5>> fifthCombinator,
         Func<IOption<T>, IOption<T1>, IOption<T2>, IOption<T3>, IOption<T4>, IOption<T5>, Result<TOut>> selector) =>
-        Select<TOut>(
+        Select(
             value => firstCombinator(value)
                 .Select(
                     secondValue => secondCombinator(value)

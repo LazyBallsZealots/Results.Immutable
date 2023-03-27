@@ -32,23 +32,11 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
 
     public static bool operator !=(Unit _1, Unit _2) => false;
 
-    public static bool operator <(Unit left, Unit right)
-    {
-        return left.CompareTo(right) < 0;
-    }
+    public static bool operator <(Unit left, Unit right) => left.CompareTo(right) < 0;
 
-    public static bool operator <=(Unit left, Unit right)
-    {
-        return left.CompareTo(right) <= 0;
-    }
+    public static bool operator <=(Unit left, Unit right) => left.CompareTo(right) <= 0;
 
-    public static bool operator >(Unit left, Unit right)
-    {
-        return left.CompareTo(right) > 0;
-    }
+    public static bool operator >(Unit left, Unit right) => left.CompareTo(right) > 0;
 
-    public static bool operator >=(Unit left, Unit right)
-    {
-        return left.CompareTo(right) >= 0;
-    }
+    public static bool operator >=(Unit left, Unit right) => left.CompareTo(right) >= 0;
 }
