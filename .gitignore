@@ -357,3 +357,6 @@ MigrationBackup/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Rider
+.idea
