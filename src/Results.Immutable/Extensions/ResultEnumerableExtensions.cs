@@ -11,5 +11,5 @@ public static class ResultEnumerableExtensions
     /// <inheritdoc cref="Result.Merge{T,TResult}" />
     /// .
     public static Result<IEnumerable<T>> Merge<T>(this IEnumerable<Result<T>> results) =>
-        Result.Merge<T, Result<T>>(results.ToList());
+        Factories.Result.Merge<T, Result<T>>(results.ToList());
 }
