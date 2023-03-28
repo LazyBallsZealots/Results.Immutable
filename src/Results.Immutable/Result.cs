@@ -11,11 +11,18 @@ namespace Results.Immutable;
 /// <typeparam name="T">Type of the value associated with this <see cref="Result{T}" />.</typeparam>
 public readonly partial record struct Result<T> : IImmutableResult<T>
 {
+    private readonly ImmutableList<Reason>? reasons;
+
+    private readonly IOption<T>? value;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
     /// </summary>
     public Result()
-        : this(None<T>(), Enumerable.Empty<Reason>())
+        : this(
+            null,
+            null,
+            false)
     {
     }
 
@@ -26,8 +33,11 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     ///     A collection of <see cref="Reason" />s
     ///     to associate with the <see cref="Result{T}" />.
     /// </param>
-    internal Result(IEnumerable<Reason> reasons)
-        : this(None<T>(), reasons)
+    internal Result(IEnumerable<Reason>? reasons, bool isAFailure)
+        : this(
+            null,
+            reasons,
+            isAFailure)
     {
     }
 
@@ -39,7 +49,10 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     ///     to associate with the <see cref="Result{T}" />.
     /// </param>
     internal Result(T value)
-        : this(value, Enumerable.Empty<Reason>())
+        : this(
+            value,
+            null,
+            false)
     {
     }
 
@@ -56,8 +69,12 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// </param>
     internal Result(
         T value,
-        IEnumerable<Reason> reasons)
-        : this(Some(value), reasons)
+        IEnumerable<Reason>? reasons,
+        bool isAFailure)
+        : this(
+            Some(value),
+            reasons,
+            isAFailure)
     {
     }
 
@@ -73,15 +90,17 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     ///     to associate with the <see cref="Result{T}" />.
     /// </param>
     private Result(
-        IOption<T> value,
-        IEnumerable<Reason> reasons)
+        IOption<T>? value,
+        IEnumerable<Reason>? reasons,
+        bool isAFailure)
     {
-        Value = value;
-        Reasons = reasons.ToImmutableList();
+        this.value = value;
+        this.reasons = reasons?.ToImmutableList();
+        IsAFailure = isAFailure;
     }
 
     /// <inheritdoc />
-    public bool IsAFailure => Errors.Any();
+    public bool IsAFailure { get; }
 
     /// <inheritdoc />
     public bool IsSuccessful => !IsAFailure;
@@ -93,10 +112,10 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     public ImmutableList<Success> Successes => GetReasonsOfType<Success>();
 
     /// <inheritdoc />
-    public ImmutableList<Reason> Reasons { get; internal init; }
+    public ImmutableList<Reason> Reasons => reasons ?? ImmutableList<Reason>.Empty;
 
     /// <inheritdoc />
-    public IOption<T> Value { get; internal init; }
+    public IOption<T> Value => value ?? None<T>();
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with a provided <paramref name="reason" />.
@@ -107,7 +126,11 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="reason" />.
     /// </returns>
-    public Result<T> WithReason(Reason reason) => new(Value, Reasons.Add(reason));
+    public Result<T> WithReason(Reason reason) =>
+        new(
+            Value,
+            reasons?.Add(reason) ?? ImmutableList.Create(reason),
+            reason is Error);
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with provided <paramref name="reasons" />.
@@ -118,11 +141,12 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="reasons" />.
     /// </returns>
-    public Result<T> WithReasons(IEnumerable<Reason> reasons) =>
-        this with
-        {
-            Reasons = Reasons.AddRange(reasons),
-        };
+    public Result<T> WithReasons(IEnumerable<Reason> reasons)
+    {
+        var newReasons = this.reasons?.AddRange(reasons) ?? ImmutableList.CreateRange(reasons);
+
+        return new(newReasons, IsAFailure || (newReasons?.Any(static r => r is Error) ?? false));
+    }
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with an <see cref="Error" />,
@@ -146,10 +170,7 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="error" />.
     /// </returns>
-    public Result<T> WithError(Error error) =>
-        WithReasons(
-            error.Yield()
-                .Flatten(static e => e.Errors));
+    public Result<T> WithError(Error error) => WithReason(error);
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with <see cref="Error" />s
@@ -164,9 +185,7 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     ///     built from <paramref name="errorMessages" />.
     /// </returns>
     public Result<T> WithErrors(IEnumerable<string> errorMessages) =>
-        WithReasons(
-            errorMessages.Select(static message => new Error(message))
-                .ToArray());
+        WithReasons(errorMessages.Select(static message => new Error(message)));
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with provided <paramref name="errors" />.
@@ -188,10 +207,7 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="success" />.
     /// </returns>
-    public Result<T> WithSuccess(Success success) =>
-        WithReasons(
-            success.Yield()
-                .Flatten(static e => e.Successes));
+    public Result<T> WithSuccess(Success success) => WithReason(success);
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with provided <paramref name="successes" />.

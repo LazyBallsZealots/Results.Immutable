@@ -1,8 +1,7 @@
 ﻿using Results.Immutable.Contracts;
-using Results.Immutable.Extensions;
 using Results.Immutable.Metadata;
 
-namespace Results.Immutable.Factories;
+namespace Results.Immutable;
 
 public readonly record struct Result
 {
@@ -45,7 +44,10 @@ public readonly record struct Result
     public static Result<T> Ok<T>(
         T value,
         IEnumerable<Success> successes) =>
-        new(value, successes);
+        new(
+            value,
+            successes,
+            false);
 
     /// <summary>
     ///     Creates a successful <see cref="Result{T}" />
@@ -97,17 +99,14 @@ public readonly record struct Result
     ///     An <see cref="Error" /> to be associated
     ///     with the failed <see cref="Result{T}" />.
     /// </param>
-    public static Result<Unit> Fail(Error error) =>
-        new(
-            error.Yield()
-                .ToList());
+    public static Result<Unit> Fail(Error error) => new(ImmutableList.Create<Reason>(error), true);
 
     /// <inheritdoc cref="Fail(Error)" />
     /// <param name="errors">
     ///     A collection of <see cref="Error" />s
     ///     to be associated with the failed <see cref="Result{T}" />.
     /// </param>
-    public static Result<Unit> Fail(IEnumerable<Error> errors) => new(errors);
+    public static Result<Unit> Fail(IEnumerable<Error> errors) => new(errors, true);
 
     /// <inheritdoc cref="Fail(string)" />
     /// <typeparam name="T">Expected type of the value.</typeparam>
@@ -115,14 +114,11 @@ public readonly record struct Result
 
     /// <inheritdoc cref="Fail(Error)" />
     /// <typeparam name="T">Expected type of the value.</typeparam>
-    public static Result<T> Fail<T>(Error error) =>
-        new(
-            error.Yield()
-                .ToList());
+    public static Result<T> Fail<T>(Error error) => new(ImmutableList.Create<Reason>(error), true);
 
     /// <inheritdoc cref="Fail(IEnumerable{Error})" />
     /// <typeparam name="T">Expected type of the value.</typeparam>
-    public static Result<T> Fail<T>(IEnumerable<Error> errors) => new(errors);
+    public static Result<T> Fail<T>(IEnumerable<Error> errors) => new(errors, true);
 
     /// <summary>
     ///     Creates a failed <see cref="Result{T}" />
@@ -200,7 +196,8 @@ public readonly record struct Result
                 .Select(static r => r.Value)
                 .Cast<Some<T>>()
                 .Select(static s => s.Value),
-            results.SelectMany(static r => r.Reasons));
+            results.SelectMany(static r => r.Reasons),
+            results.Any(static r => r.IsAFailure));
 
     /// <summary>
     ///     Attempts to perform a <paramref name="func" />;
