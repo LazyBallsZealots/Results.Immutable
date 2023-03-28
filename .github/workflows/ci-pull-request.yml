@@ -1,0 +1,47 @@
+name: PR build
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths: ["src/**/*"]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Install dependencies
+        run: dotnet restore Results.Immutable.sln
+        working-directory: src
+
+      - name: Build
+        run: dotnet build Results.Immutable.sln --configuration Debug --no-restore
+        working-directory: src
+        
+      - name: Test & analyze coverage
+        run: dotnet test Results.Immutable.sln --no-build --collect:"XPlat Code Coverage" --results-directory ./coverage
+        working-directory: src
+        
+      - name: Coverage Summary Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+            filename: src/coverage/**/coverage.cobertura.xml
+            badge: true
+            fail_below_min: true
+            format: markdown
+            hide_complexity: true
+            output: both
+            thresholds: '80 95'
+            
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: code-coverage-results.md
