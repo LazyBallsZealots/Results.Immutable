@@ -1,6 +1,7 @@
 ﻿using FsCheck;
 using FsCheck.Xunit;
 using Results.Immutable.Tests.Extensions;
+using Result = Results.Immutable.Factories.Result;
 using static FluentAssertions.FluentActions;
 using static Results.Immutable.Tests.Generators.IntegerResultGenerator;
 
