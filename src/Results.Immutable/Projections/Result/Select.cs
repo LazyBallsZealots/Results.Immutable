@@ -1,4 +1,6 @@
-﻿namespace Results.Immutable;
+﻿using Results.Immutable.Metadata;
+
+namespace Results.Immutable;
 
 public readonly partial record struct Result<T>
 {
@@ -21,12 +23,12 @@ public readonly partial record struct Result<T>
     ///     <see cref="Result{T}" />.
     /// </remarks>
     public Result<TNew> Select<TNew>(Func<Result<TNew>> selector) =>
-        IsSuccessful && selector() is var boundResult
-            ? boundResult with
-            {
-                Reasons = Reasons.AddRange(boundResult.Reasons),
-            }
-            : new(Reasons);
+        IsSuccessful && selector() is { value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure, }
+            ? new(
+                value,
+                MergeReasonsWith(additionalReasons),
+                isAFailure)
+            : new(reasons, true);
 
     /// <summary>
     ///     Projects this <see cref="Result{T}" />
@@ -43,12 +45,13 @@ public readonly partial record struct Result<T>
     ///     instance.
     /// </returns>
     public Result<TNew> Select<TNew>(Func<IOption<T>, Result<TNew>> bindingFunction) =>
-        IsSuccessful && bindingFunction(Value) is var boundResult
-            ? boundResult with
-            {
-                Reasons = Reasons.AddRange(boundResult.Reasons),
-            }
-            : new(Reasons);
+        IsSuccessful &&
+        bindingFunction(Value) is { value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure, }
+            ? new(
+                value,
+                MergeReasonsWith(additionalReasons),
+                isAFailure)
+            : new(reasons, true);
 
     /// <summary>
     ///     Projects this <see cref="Result{T}" />
@@ -70,12 +73,13 @@ public readonly partial record struct Result<T>
     ///     <see cref="Result{T}" />.
     /// </remarks>
     public async Task<Result<TNew>> SelectAsync<TNew>(Func<Task<Result<TNew>>> asyncSelector) =>
-        IsSuccessful && await asyncSelector() is var boundResult
-            ? boundResult with
-            {
-                Reasons = Reasons.AddRange(boundResult.Reasons),
-            }
-            : new(Reasons);
+        IsSuccessful &&
+        await asyncSelector() is { value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure, }
+            ? new(
+                value,
+                MergeReasonsWith(additionalReasons),
+                isAFailure)
+            : new(reasons, true);
 
     /// <summary>
     ///     Projects this <see cref="Result{T}" />
@@ -93,12 +97,16 @@ public readonly partial record struct Result<T>
     ///     <typeparamref name="TNew" /> instance.
     /// </returns>
     public async Task<Result<TNew>> SelectAsync<TNew>(Func<IOption<T>, Task<Result<TNew>>> asyncBindingFunction) =>
-        IsSuccessful && await asyncBindingFunction(Value) is var boundResult
-            ? boundResult with
-            {
-                Reasons = Reasons.AddRange(boundResult.Reasons),
-            }
-            : new(Reasons);
+        IsSuccessful &&
+        await asyncBindingFunction(Value) is
+        {
+            value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure,
+        }
+            ? new(
+                value,
+                MergeReasonsWith(additionalReasons),
+                isAFailure)
+            : new(reasons, true);
 
     /// <summary>
     ///     Projects this <see cref="Result{T}" />
@@ -120,12 +128,13 @@ public readonly partial record struct Result<T>
     ///     <see cref="Result{T}" />.
     /// </remarks>
     public async ValueTask<Result<TNew>> SelectAsync<TNew>(Func<ValueTask<Result<TNew>>> asyncSelector) =>
-        IsSuccessful && await asyncSelector() is var boundResult
-            ? boundResult with
-            {
-                Reasons = Reasons.AddRange(boundResult.Reasons),
-            }
-            : new(Reasons);
+        IsSuccessful &&
+        await asyncSelector() is { value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure, }
+            ? new(
+                value,
+                MergeReasonsWith(additionalReasons),
+                isAFailure)
+            : new(reasons, true);
 
     /// <typeparam name="TNew">
     ///     Generic parameter of the new <see cref="Result{T}" />.
@@ -138,10 +147,17 @@ public readonly partial record struct Result<T>
     /// <inheritdoc cref="SelectAsync{TNew}(Func{IOption{T},Task{Result{TNew}}})" />
     public async ValueTask<Result<TNew>> SelectAsync<TNew>(
         Func<IOption<T>, ValueTask<Result<TNew>>> asyncBindingFunction) =>
-        IsSuccessful && await asyncBindingFunction(Value) is var bindResult
-            ? bindResult with
-            {
-                Reasons = Reasons.AddRange(bindResult.Reasons),
-            }
-            : new(Reasons);
+        IsSuccessful &&
+        await asyncBindingFunction(Value) is
+        {
+            value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure,
+        }
+            ? new(
+                value,
+                MergeReasonsWith(additionalReasons),
+                isAFailure)
+            : new(reasons, true);
+
+    private ImmutableList<Reason>? MergeReasonsWith(ImmutableList<Reason>? reasons) =>
+        (this.reasons?.Any(), reasons?.Any()) is (true, true) ? this.reasons.AddRange(reasons) : null;
 }

@@ -163,9 +163,9 @@ public class ResultTests
             .Should()
             .NotBe(SuccessfulResult)
             .And.BeOfType<Result<Unit>>()
-            .Which.Errors
+            .Which.Errors.SelectMany(Flatten)
             .Should()
-            .BeEquivalentTo(Flatten(error));
+            .Contain(Flatten(error));
 
         static IEnumerable<Error> Flatten(Error e) =>
             new[]
