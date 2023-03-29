@@ -36,18 +36,17 @@ public readonly record struct Result
     /// <remarks></remarks>
     public static Result<T> Ok<T>(T value) => new(value);
 
-    /// <inheritdoc cref="Ok{T}(T)" />
     /// <param name="successes">
     ///     A collection of <see cref="Success" />es to associate
     ///     with the returned <see cref="Result{T}" />.
     /// </param>
+    /// <inheritdoc cref="Ok{T}(T)" />
     public static Result<T> Ok<T>(
         T value,
         IEnumerable<Success> successes) =>
         new(
             value,
-            successes,
-            false);
+            successes);
 
     /// <summary>
     ///     Creates a successful <see cref="Result{T}" />
@@ -66,19 +65,18 @@ public readonly record struct Result
     /// <param name="error">An <see cref="Error" /> to associate with failed result.</param>
     public static Result<Unit> OkIf(bool condition, Error error) => condition ? Ok() : Fail(error);
 
-    /// <inheritdoc cref="OkIf(bool, string)" />
     /// <param name="errorMessageFactory">
     ///     A <see cref="Func{T}" />, returning a <see cref="string" />
     ///     to be used to build an <see cref="Error" /> instance.
     /// </param>
+    /// <inheritdoc cref="OkIf(bool, string)" />
     public static Result<Unit> OkIf(bool condition, Func<string> errorMessageFactory) =>
         condition ? Ok() : Fail(errorMessageFactory());
 
-    /// <inheritdoc cref="OkIf(bool, Error)" />
-    /// ///
     /// <param name="errorMessageFactory">
     ///     A <see cref="Func{T}" />, returning an <see cref="Error" />.
     /// </param>
+    /// <inheritdoc cref="OkIf(bool, Error)" />
     public static Result<Unit> OkIf(bool condition, Func<Error> errorFactory) =>
         condition ? Ok() : Fail(errorFactory());
 
@@ -94,30 +92,30 @@ public readonly record struct Result
     /// </returns>
     public static Result<Unit> Fail(string errorMessage) => Fail(new Error(errorMessage));
 
-    /// <inheritdoc cref="Fail(string)" />
     /// <param name="error">
     ///     An <see cref="Error" /> to be associated
     ///     with the failed <see cref="Result{T}" />.
     /// </param>
+    /// <inheritdoc cref="Fail(string)" />
     public static Result<Unit> Fail(Error error) => new(ImmutableList.Create<Reason>(error), true);
 
-    /// <inheritdoc cref="Fail(Error)" />
     /// <param name="errors">
     ///     A collection of <see cref="Error" />s
     ///     to be associated with the failed <see cref="Result{T}" />.
     /// </param>
+    /// <inheritdoc cref="Fail(Error)" />
     public static Result<Unit> Fail(IEnumerable<Error> errors) => new(errors, true);
 
-    /// <inheritdoc cref="Fail(string)" />
     /// <typeparam name="T">Expected type of the value.</typeparam>
+    /// <inheritdoc cref="Fail(string)" />
     public static Result<T> Fail<T>(string errorMessage) => Fail<T>(new Error(errorMessage));
 
-    /// <inheritdoc cref="Fail(Error)" />
     /// <typeparam name="T">Expected type of the value.</typeparam>
+    /// <inheritdoc cref="Fail(Error)" />
     public static Result<T> Fail<T>(Error error) => new(ImmutableList.Create<Reason>(error), true);
 
-    /// <inheritdoc cref="Fail(IEnumerable{Error})" />
     /// <typeparam name="T">Expected type of the value.</typeparam>
+    /// <inheritdoc cref="Fail(IEnumerable{Error})" />
     public static Result<T> Fail<T>(IEnumerable<Error> errors) => new(errors, true);
 
     /// <summary>
@@ -135,12 +133,11 @@ public readonly record struct Result
     /// <seealso cref="FailIf(bool, Func{string})" />
     public static Result<Unit> FailIf(bool condition, string errorMessage) => condition ? Fail(errorMessage) : Ok();
 
-    /// <inheritdoc cref="FailIf(bool, string)" />
     /// <param name="error">An <see cref="Error" /> to associate with failed result.</param>
+    /// <inheritdoc cref="FailIf(bool, string)" />
     /// <seealso cref="FailIf(bool, Func{Error})" />
     public static Result<Unit> FailIf(bool condition, Error error) => condition ? Fail(error) : Ok();
 
-    /// <inheritdoc cref="FailIf(bool, string)" />
     /// <param name="errorMessageFactory">
     ///     A <see cref="Func{T}" />, returning a <see cref="string" />,
     ///     which contains an error message to associate with failed
@@ -150,15 +147,16 @@ public readonly record struct Result
     ///     This overload should be used if
     ///     lazy evaluation of the error is required.
     /// </remarks>
+    /// <inheritdoc cref="FailIf(bool, string)" />
     /// <seealso cref="FailIf(bool, string)" />
     public static Result<Unit> FailIf(bool condition, Func<string> errorMessageFactory) =>
         condition ? Fail(errorMessageFactory()) : Ok();
 
-    /// <inheritdoc cref="FailIf(bool, Func{string})" />
     /// <param name="errorFactory">
     ///     A <see cref="Func{T}" />, returning an <see cref="Error" />
     ///     which should be associated with a failed <see cref="Result{T}" />.
     /// </param>
+    /// <inheritdoc cref="FailIf(bool, Func{string})" />
     /// <seealso cref="FailIf(bool, Error)" />
     public static Result<Unit> FailIf(bool condition, Func<Error> errorFactory) =>
         condition ? Fail(errorFactory()) : Ok();
@@ -176,26 +174,24 @@ public readonly record struct Result
     ///     A merged <see cref="Result{T}" />,
     ///     containing an aggregation of all
     ///     <see cref="Result{T}.Reasons" />
-    ///     and <see cref="Result{T}.Value" />s.
+    ///     and <see cref="Result{T}.Option" />s.
     /// </returns>
     /// <remarks>
     ///     If any of the provided <paramref name="results" />
     ///     is a failure, then the merged result will be a failure
     ///     itself.
     /// </remarks>
-    public static Result<IEnumerable<T>> Merge<T>(params Result<T>[] results) =>
+    public static Result<IEnumerable<T?>> Merge<T>(params Result<T>[] results) =>
         Merge<T, IImmutableResult<T>>(
             results.Cast<IImmutableResult<T>>()
                 .ToList());
 
     /// <inheritdoc cref="Merge{T}(Result{T}[])" />
-    public static Result<IEnumerable<T>> Merge<T, TResult>(IReadOnlyCollection<TResult> results)
+    public static Result<IEnumerable<T?>> Merge<T, TResult>(IReadOnlyCollection<TResult> results)
         where TResult : IImmutableResult<T> =>
         new(
-            results.Where(static r => r is { IsSuccessful: true, Value: Some<T>, })
-                .Select(static r => r.Value)
-                .Cast<Some<T>>()
-                .Select(static s => s.Value),
+            results.Where(static r => r is { IsSuccessful: true, Option.IsSome: true, })
+                .Select(static r => r.Option.Value),
             results.SelectMany(static r => r.Reasons),
             results.Any(static r => r.IsAFailure));
 

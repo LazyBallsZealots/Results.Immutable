@@ -21,18 +21,14 @@ public interface IImmutableResult<T>
     bool IsSuccessful { get; }
 
     /// <summary>
-    ///     Gets the value of the performed operation,
-    ///     represented as <see cref="IOption{T}" />.
+    ///     Gets the optional value of the performed operation,
+    ///     represented as <see cref="Option{T}" />.
     /// </summary>
     /// <remarks>
-    ///     Failed results should have <see cref="None{T}" /> set, while successful ones
-    ///     will return <see cref="Some{T}" />.
     ///     To safely access the result value of an operation,
-    ///     <see cref="IOption{T}.Match" /> overloads should be used.
-    ///     Keep in mind that custom implementations of <see cref="IOption{T}" />
-    ///     interface are currently not supported.
+    ///     <see cref="Option{T}.Match" /> overloads should be used.
     /// </remarks>
-    IOption<T> Value { get; }
+    Option<T> Option { get; }
 
     /// <summary>
     ///     Gets an <see cref="ImmutableList{T}" /> of all

@@ -19,26 +19,6 @@ public sealed class OptionTests
                     actualValue == expectedValue;
             });
 
-    [Property(DisplayName = "Some can be converted using with operator", MaxTest = 1000)]
-    public Property SomeCanBeConvertedUsingWithOperator() =>
-        Prop.ForAll(
-            Gen.Two(Arb.Generate<int>())
-                .Where(static tuple => tuple.Item1 != tuple.Item2)
-                .Select(static tuple => (Option: Option.Some(tuple.Item1), NewValue: tuple.Item2))
-                .ToArbitrary(),
-            static tuple =>
-            {
-                var (option, newValue) = tuple;
-
-                var newOption = option with
-                {
-                    Value = newValue,
-                };
-
-                return newOption is { Value: var actualValue, } &&
-                    actualValue == newValue;
-            });
-
     [Property(DisplayName = "Match of some returns proper value", MaxTest = 1000)]
     public Property MatchOfSomeReturnsProperValue() =>
         Prop.ForAll(

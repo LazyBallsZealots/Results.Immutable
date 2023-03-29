@@ -3,4 +3,4 @@
 /.yarn/plugins/**/*  binary
 /.pnp.*              binary linguist-generated
 
-text eol=lf
+* text=auto eol=lf

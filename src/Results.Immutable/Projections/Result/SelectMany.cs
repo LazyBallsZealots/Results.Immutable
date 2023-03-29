@@ -18,14 +18,14 @@ public readonly partial record struct Result<T>
     /// <returns>
     ///     A <see cref="Result{T}" /> wrapping <typeparamref name="TOut" />,
     ///     which combines all intermediate results using
-    ///     <see cref="Select{TNew}(Func{IOption{T}, Result{TNew}})" />.
+    ///     <see cref="Select{TNew}(Func{Option{T}, Result{TNew}})" />.
     /// </returns>
     public Result<TOut> SelectMany<T1, TOut>(
-        Func<IOption<T>, Result<T1>> combinator,
-        Func<IOption<T>, IOption<T1>, Result<TOut>> selector) =>
+        Func<Option<T>, Result<T1>> combinator,
+        Func<Option<T>, Option<T1>, Result<TOut>> selector) =>
         Select<TOut>(
-            value => combinator(value)
-                .Select(secondValue => selector(value, secondValue)));
+            option => combinator(option)
+                .Select(secondValue => selector(option, secondValue)));
 
     /// <typeparam name="T2">Generic type of the combined result.</typeparam>
     /// <param name="firstCombinator">
@@ -38,16 +38,16 @@ public readonly partial record struct Result<T>
     /// </param>
     /// <inheritdoc cref="SelectMany{T1,TOut}" />
     public Result<TOut> SelectMany<T1, T2, TOut>(
-        Func<IOption<T>, Result<T1>> firstCombinator,
-        Func<IOption<T>, Result<T2>> secondCombinator,
-        Func<IOption<T>, IOption<T1>, IOption<T2>, Result<TOut>> selector) =>
+        Func<Option<T>, Result<T1>> firstCombinator,
+        Func<Option<T>, Result<T2>> secondCombinator,
+        Func<Option<T>, Option<T1>, Option<T2>, Result<TOut>> selector) =>
         Select<TOut>(
-            value => firstCombinator(value)
+            option => firstCombinator(option)
                 .Select(
-                    secondValue => secondCombinator(value)
+                    secondValue => secondCombinator(option)
                         .Select(
                             finalValue => selector(
-                                value,
+                                option,
                                 secondValue,
                                 finalValue))));
 
@@ -57,19 +57,19 @@ public readonly partial record struct Result<T>
     /// </param>
     /// <inheritdoc cref="SelectMany{T1, T2, TOut}" />
     public Result<TOut> SelectMany<T1, T2, T3, TOut>(
-        Func<IOption<T>, Result<T1>> firstCombinator,
-        Func<IOption<T>, Result<T2>> secondCombinator,
-        Func<IOption<T>, Result<T3>> thirdCombinator,
-        Func<IOption<T>, IOption<T1>, IOption<T2>, IOption<T3>, Result<TOut>> selector) =>
+        Func<Option<T>, Result<T1>> firstCombinator,
+        Func<Option<T>, Result<T2>> secondCombinator,
+        Func<Option<T>, Result<T3>> thirdCombinator,
+        Func<Option<T>, Option<T1>, Option<T2>, Option<T3>, Result<TOut>> selector) =>
         Select<TOut>(
-            value => firstCombinator(value)
+            option => firstCombinator(option)
                 .Select(
-                    secondValue => secondCombinator(value)
+                    secondValue => secondCombinator(option)
                         .Select(
-                            thirdValue => thirdCombinator(value)
+                            thirdValue => thirdCombinator(option)
                                 .Select(
                                     finalValue => selector(
-                                        value,
+                                        option,
                                         secondValue,
                                         thirdValue,
                                         finalValue)))));
@@ -80,22 +80,22 @@ public readonly partial record struct Result<T>
     /// </param>
     /// <inheritdoc cref="SelectMany{T1, T2, T3, TOut}" />
     public Result<TOut> SelectMany<T1, T2, T3, T4, TOut>(
-        Func<IOption<T>, Result<T1>> firstCombinator,
-        Func<IOption<T>, Result<T2>> secondCombinator,
-        Func<IOption<T>, Result<T3>> thirdCombinator,
-        Func<IOption<T>, Result<T4>> fourthCombinator,
-        Func<IOption<T>, IOption<T1>, IOption<T2>, IOption<T3>, IOption<T4>, Result<TOut>> selector) =>
+        Func<Option<T>, Result<T1>> firstCombinator,
+        Func<Option<T>, Result<T2>> secondCombinator,
+        Func<Option<T>, Result<T3>> thirdCombinator,
+        Func<Option<T>, Result<T4>> fourthCombinator,
+        Func<Option<T>, Option<T1>, Option<T2>, Option<T3>, Option<T4>, Result<TOut>> selector) =>
         Select(
-            value => firstCombinator(value)
+            option => firstCombinator(option)
                 .Select(
-                    secondValue => secondCombinator(value)
+                    secondValue => secondCombinator(option)
                         .Select(
-                            thirdValue => thirdCombinator(value)
+                            thirdValue => thirdCombinator(option)
                                 .Select(
-                                    fourthValue => fourthCombinator(value)
+                                    fourthValue => fourthCombinator(option)
                                         .Select(
                                             finalValue => selector(
-                                                value,
+                                                option,
                                                 secondValue,
                                                 thirdValue,
                                                 fourthValue,
@@ -107,25 +107,25 @@ public readonly partial record struct Result<T>
     /// </param>
     /// <inheritdoc cref="SelectMany{T1, T2, T3, T4, TOut}" />
     public Result<TOut> SelectMany<T1, T2, T3, T4, T5, TOut>(
-        Func<IOption<T>, Result<T1>> firstCombinator,
-        Func<IOption<T>, Result<T2>> secondCombinator,
-        Func<IOption<T>, Result<T3>> thirdCombinator,
-        Func<IOption<T>, Result<T4>> fourthCombinator,
-        Func<IOption<T>, Result<T5>> fifthCombinator,
-        Func<IOption<T>, IOption<T1>, IOption<T2>, IOption<T3>, IOption<T4>, IOption<T5>, Result<TOut>> selector) =>
+        Func<Option<T>, Result<T1>> firstCombinator,
+        Func<Option<T>, Result<T2>> secondCombinator,
+        Func<Option<T>, Result<T3>> thirdCombinator,
+        Func<Option<T>, Result<T4>> fourthCombinator,
+        Func<Option<T>, Result<T5>> fifthCombinator,
+        Func<Option<T>, Option<T1>, Option<T2>, Option<T3>, Option<T4>, Option<T5>, Result<TOut>> selector) =>
         Select(
-            value => firstCombinator(value)
+            option => firstCombinator(option)
                 .Select(
-                    secondValue => secondCombinator(value)
+                    secondValue => secondCombinator(option)
                         .Select(
-                            thirdValue => thirdCombinator(value)
+                            thirdValue => thirdCombinator(option)
                                 .Select(
-                                    fourthValue => fourthCombinator(value)
+                                    fourthValue => fourthCombinator(option)
                                         .Select(
-                                            fifthValue => fifthCombinator(value)
+                                            fifthValue => fifthCombinator(option)
                                                 .Select(
                                                     finalValue => selector(
-                                                        value,
+                                                        option,
                                                         secondValue,
                                                         thirdValue,
                                                         fourthValue,

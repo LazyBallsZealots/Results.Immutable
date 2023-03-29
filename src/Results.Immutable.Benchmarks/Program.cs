@@ -22,10 +22,10 @@ public class ResultBenchmarks
     public Result<string> ResultOfStringWhichShouldNotAllocate() => Result.Ok(value);
 
     [Benchmark]
-    public IOption<string> SomeStringWhichShouldNotAllocate() => Option.Some(value);
+    public Option<string> SomeStringWhichShouldNotAllocate() => Option.Some(value);
 
     [Benchmark]
-    public IOption<string> NoneStringWhichShouldNotAllocate() => Option.None<string>();
+    public Option<string> NoneStringWhichShouldNotAllocate() => Option.None<string>();
 
     [Benchmark]
     public Result<string> SelectOnSuccessWithoutReasonsWhichShouldNotAllocate() =>

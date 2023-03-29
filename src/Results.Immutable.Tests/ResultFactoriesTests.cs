@@ -1,13 +1,12 @@
 using System.Collections.Immutable;
 using FsCheck;
 using FsCheck.Xunit;
-using Results.Immutable.Extensions;
 using Results.Immutable.Tests.Extensions;
 using static Results.Immutable.Tests.Generators.IntegerResultGenerator;
 
 namespace Results.Immutable.Tests;
 
-public class ResultFactoriesTests
+public sealed class ResultFactoriesTests
 {
     private const string ErrorMessage = "An error message";
 
@@ -21,7 +20,7 @@ public class ResultFactoriesTests
     public void ShouldCreateSuccessfulResultOfProvidedTypeWithoutReasons() =>
         Result.Ok<int>()
             .Should()
-            .Match<Result<int>>(static r => r.IsSuccessful && !r.Reasons.Any() && r.Value is None<int>);
+            .Match<Result<int>>(static r => r.IsSuccessful && !r.Reasons.Any() && r.Option.IsNone);
 
     [Fact(DisplayName = "Should create a failed result with one error from error message")]
     public void ShouldCreateFailedResultFromErrorMessage() =>
@@ -129,11 +128,8 @@ public class ResultFactoriesTests
             Gen.ListOf(GetSuccessfulIntegerResultWithValueGenerator())
                 .ToArbitrary(),
             static list =>
-                list.Merge() is { IsSuccessful: true, Value: Some<IEnumerable<int>> { Value: var enumerable, }, } &&
-                enumerable.SequenceEqual(
-                    list.Select(static r => r.Value)
-                        .Cast<Some<int>>()
-                        .Select(static s => s.Value)));
+                list.Merge() is { IsSuccessful: true, Option.Value: { } enumerable, } &&
+                enumerable.SequenceEqual(list.Select(static r => r.Option.Value)));
 
     [Property(
         DisplayName = "Merger of a list of results is a failure if any of them has failed",
@@ -151,7 +147,8 @@ public class ResultFactoriesTests
         Enumerable.Empty<Result<Unit>>()
             .Merge()
             .Should()
-            .Match<Result<IEnumerable<Unit>>>(static r => r.IsSuccessful && r.ValueMatches(static e => !e.Any()));
+            .Match<Result<IEnumerable<Unit>>>(
+                static r => r.IsSuccessful && r.ValueMatches(static e => e != null && !e.Any()));
 
     [Property(
         DisplayName = "Merger of successful Result params is successful",
@@ -191,7 +188,7 @@ public class ResultFactoriesTests
             });
 
     [Fact(DisplayName = "OkIf returns successful result if the condition is true")]
-    public void OkIfRetursSuccessfulResultIfTheConditionIsTrue() =>
+    public void OkIfReturnsSuccessfulResultIfTheConditionIsTrue() =>
         Result.OkIf(true, string.Empty)
             .Should()
             .Match<Result<Unit>>(static r => r.IsSuccessful && ValueIsAUnit(r));
@@ -229,7 +226,7 @@ public class ResultFactoriesTests
             .Match<Result<Unit>>(static r => r.IsSuccessful && ValueIsAUnit(r));
 
         static string GetErrorMessage() =>
-            throw new InvalidOperationException("Lazy OkIf overload instantiated an error for succesful result!");
+            throw new InvalidOperationException("Lazy OkIf overload instantiated an error for successful result!");
     }
 
     [Fact(
@@ -240,7 +237,7 @@ public class ResultFactoriesTests
 
         Result.OkIf(
                 false,
-                () => errorMessage)
+                static () => errorMessage)
             .Should()
             .Match<Result<Unit>>(static r => r.IsAFailure && r.HasError<Error>(static e => e.Message == errorMessage));
     }
@@ -254,7 +251,7 @@ public class ResultFactoriesTests
 
         Result.OkIf(
                 false,
-                () => new RootError(errorMessage))
+                static () => new RootError(errorMessage))
             .Should()
             .Match<Result<Unit>>(
                 static r => r.IsAFailure && r.HasError<RootError>(static e => e.Message == errorMessage));
@@ -299,7 +296,7 @@ public class ResultFactoriesTests
             .Match<Result<Unit>>(static r => r.IsSuccessful && ValueIsAUnit(r));
 
         static string GetErrorMessage() =>
-            throw new InvalidOperationException("Lazy OkIf overload instantiated an error for succesful result!");
+            throw new InvalidOperationException("Lazy OkIf overload instantiated an error for successful result!");
     }
 
     [Fact(
@@ -311,7 +308,7 @@ public class ResultFactoriesTests
 
         Result.FailIf(
                 true,
-                () => errorMessage)
+                static () => errorMessage)
             .Should()
             .Match<Result<Unit>>(static r => r.IsAFailure && r.HasError<Error>(static e => e.Message == errorMessage));
     }
@@ -325,7 +322,7 @@ public class ResultFactoriesTests
 
         Result.FailIf(
                 true,
-                () => new RootError(errorMessage))
+                static () => new RootError(errorMessage))
             .Should()
             .Match<Result<Unit>>(
                 static r => r.IsAFailure && r.HasError<RootError>(static e => e.Message == errorMessage));
