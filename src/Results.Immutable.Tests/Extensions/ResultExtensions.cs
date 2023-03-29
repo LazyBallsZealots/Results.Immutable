@@ -5,5 +5,5 @@ internal static class ResultExtensions
     public static bool ValueMatches<T>(
         this Result<T> result,
         Predicate<T?> predicate) =>
-        result is { Option.Value: var value, } && predicate(value);
+        result is { Option.ValueOrDefault: var value, } && predicate(value);
 }

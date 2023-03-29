@@ -128,8 +128,8 @@ public sealed class ResultFactoriesTests
             Gen.ListOf(GetSuccessfulIntegerResultWithValueGenerator())
                 .ToArbitrary(),
             static list =>
-                list.Merge() is { IsSuccessful: true, Option.Value: { } enumerable, } &&
-                enumerable.SequenceEqual(list.Select(static r => r.Option.Value)));
+                list.Merge() is { IsSuccessful: true, Option.ValueOrDefault: { } enumerable, } &&
+                enumerable.SequenceEqual(list.Select(static r => r.Option.ValueOrDefault)));
 
     [Property(
         DisplayName = "Merger of a list of results is a failure if any of them has failed",
