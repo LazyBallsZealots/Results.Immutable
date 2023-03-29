@@ -24,6 +24,19 @@ public readonly record struct Option
     public static Option<T> None<T>() => new();
 }
 
+public static class OptionExt
+{
+    public static T? Get<T>(this Option<T> option) where T : class
+    {
+        return option.ValueOrDefault;
+    }
+    
+    public static T? GetValue<T>(this Option<T> option) where T : struct
+    {
+        return option.IsSome ? option.ValueOrDefault : null;
+    }
+}
+
 /// <typeparam name="T">Generic type of the value.</typeparam>
 /// <inheritdoc cref="Option" />
 public readonly partial record struct Option<T>
@@ -32,11 +45,13 @@ public readonly partial record struct Option<T>
     ///     Initializes a new instance of the <see cref="Option{T}" /> struct.
     /// </summary>
     /// <param name="value">Value to wrap as an option.</param>
-    internal Option(T? value)
+    internal Option(T value)
     {
-        Value = value;
+        _value = value;
         IsSome = true;
     }
+    
+    public Some<T>? Some => IsSome ? new Some<T>(_value) : null;
 
     /// <summary>
     ///     Gets the <see langword="bool" /> indicator,
@@ -55,9 +70,15 @@ public readonly partial record struct Option<T>
     /// <summary>
     ///     Gets the value associated with this <see cref="Option{T}" />.
     /// </summary>
-    public T? Value { get; } = default;
+    private readonly T _value = default!;
 
-    public static implicit operator Option<T>(T? value) => new(value);
+    public static implicit operator Option<T>(T value) => new(value);
+
+    public T? ValueOrDefault => IsSome ? _value : default;
+
+    public T GetOr(T @default) => IsSome ? _value : @default;
+    
+    public T GetOrElse(Func<T> fn) => IsSome ? _value : fn();
 
     /// <summary>
     ///     Projects the value of this <see cref="Option{T}" />
@@ -79,7 +100,7 @@ public readonly partial record struct Option<T>
     ///     or <paramref name="matchNone" /> delegates.
     /// </returns>
     public TResult Match<TResult>(Func<T?, TResult> matchSome, Func<TResult> matchNone) =>
-        IsSome ? matchSome(Value) : matchNone();
+        IsSome ? matchSome(_value) : matchNone();
 
     /// <summary>
     ///     Executes either <paramref name="matchSome" />
@@ -97,8 +118,14 @@ public readonly partial record struct Option<T>
     /// </param>
     public void Match(Action<T?> matchSome, Action matchNone)
     {
-        var value = Value;
-        var action = IsSome ? () => matchSome(value) : matchNone;
-        action();
+        if (IsSome)
+        {
+            matchSome(_value);
+        }
+        else
+        {
+            matchNone();
+        }
     }
+}
 }

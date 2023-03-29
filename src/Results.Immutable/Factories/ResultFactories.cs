@@ -191,7 +191,7 @@ public readonly record struct Result
         where TResult : IImmutableResult<T> =>
         new(
             results.Where(static r => r is { IsSuccessful: true, Option.IsSome: true, })
-                .Select(static r => r.Option.Value),
+                .Select(static r => r.Option.ValueOrDefault),
             results.SelectMany(static r => r.Reasons),
             results.Any(static r => r.IsAFailure));
 

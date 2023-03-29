@@ -28,7 +28,7 @@ public readonly partial record struct Option<T>
         Func<T?, T1?, Option<TOut>> selector) =>
         (IsSome, combinator(this)) switch
         {
-            (true, { IsSome: true, Value: var secondValue, }) => selector(Value, secondValue),
+            (true, { IsSome: true, _value: var secondValue, }) => selector(_value, secondValue),
             _ => new(),
         };
 
@@ -50,8 +50,8 @@ public readonly partial record struct Option<T>
         Func<T?, T1?, T2?, Option<TOut>> selector) =>
         (IsSome, firstCombinator(this), secondCombinator(this)) switch
         {
-            (true, { IsSome: true, Value: var secondValue, }, { IsSome: true, Value: var thirdValue, }) => selector(
-                Value,
+            (true, { IsSome: true, _value: var secondValue, }, { IsSome: true, _value: var thirdValue, }) => selector(
+                _value,
                 secondValue,
                 thirdValue),
             _ => new(),
@@ -81,10 +81,10 @@ public readonly partial record struct Option<T>
         (IsSome, firstCombinator(this), secondCombinator(this), thirdCombinator(this)) switch
         {
             (true,
-                { IsSome: true, Value: var secondValue, },
-                { IsSome: true, Value: var thirdValue, },
-                { IsSome: true, Value: var fourthValue, }) => selector(
-                    Value,
+                { IsSome: true, _value: var secondValue, },
+                { IsSome: true, _value: var thirdValue, },
+                { IsSome: true, _value: var fourthValue, }) => selector(
+                    _value,
                     secondValue,
                     thirdValue,
                     fourthValue),
@@ -120,12 +120,12 @@ public readonly partial record struct Option<T>
         (IsSome, firstCombinator(this), secondCombinator(this), thirdCombinator(this), fourthCombinator(this)) switch
         {
             (true,
-                { IsSome: true, Value: var secondValue, },
-                { IsSome: true, Value: var thirdValue, },
-                { IsSome: true, Value: var fourthValue, },
-                { IsSome: true, Value: var fifthValue, }) =>
+                { IsSome: true, _value: var secondValue, },
+                { IsSome: true, _value: var thirdValue, },
+                { IsSome: true, _value: var fourthValue, },
+                { IsSome: true, _value: var fifthValue, }) =>
                 selector(
-                    Value,
+                    _value,
                     secondValue,
                     thirdValue,
                     fourthValue,
@@ -168,12 +168,12 @@ public readonly partial record struct Option<T>
                 fifthCombinator(this)) switch
             {
                 (true,
-                    { IsSome: true, Value: var secondValue, },
-                    { IsSome: true, Value: var thirdValue, },
-                    { IsSome: true, Value: var fourthValue, },
-                    { IsSome: true, Value: var fifthValue, },
-                    { IsSome: true, Value: var sixthValue, }) => selector(
-                        Value,
+                    { IsSome: true, _value: var secondValue, },
+                    { IsSome: true, _value: var thirdValue, },
+                    { IsSome: true, _value: var fourthValue, },
+                    { IsSome: true, _value: var fifthValue, },
+                    { IsSome: true, _value: var sixthValue, }) => selector(
+                        _value,
                         secondValue,
                         thirdValue,
                         fourthValue,
