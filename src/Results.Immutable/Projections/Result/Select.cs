@@ -19,13 +19,14 @@ public readonly partial record struct Result<T>
     ///     instance.
     /// </returns>
     /// <remarks>
-    ///     This overload disregards the <see cref="Result{T}.Value" /> of this
+    ///     This overload disregards the <see cref="Option" /> of this
     ///     <see cref="Result{T}" />.
     /// </remarks>
     public Result<TNew> Select<TNew>(Func<Result<TNew>> selector) =>
-        IsSuccessful && selector() is { value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure, }
+        IsSuccessful &&
+        selector() is { option: var boundValue, reasons: var additionalReasons, IsAFailure: var isAFailure, }
             ? new(
-                value,
+                boundValue,
                 MergeReasonsWith(additionalReasons),
                 isAFailure)
             : new(reasons, true);
@@ -44,11 +45,14 @@ public readonly partial record struct Result<T>
     ///     A <see cref="Result{T}" />, wrapping <typeparamref name="TNew" />
     ///     instance.
     /// </returns>
-    public Result<TNew> Select<TNew>(Func<IOption<T>, Result<TNew>> bindingFunction) =>
+    public Result<TNew> Select<TNew>(Func<Option<T>, Result<TNew>> bindingFunction) =>
         IsSuccessful &&
-        bindingFunction(Value) is { value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure, }
+        bindingFunction(Option) is
+        {
+            option: var boundValue, reasons: var additionalReasons, IsAFailure: var isAFailure,
+        }
             ? new(
-                value,
+                boundValue,
                 MergeReasonsWith(additionalReasons),
                 isAFailure)
             : new(reasons, true);
@@ -69,14 +73,14 @@ public readonly partial record struct Result<T>
     ///     <typeparamref name="TNew" /> instance.
     /// </returns>
     /// <remarks>
-    ///     This overload disregards the <see cref="Immutable.Result{T}.Value" /> of this
+    ///     This overload disregards the <see cref="Option" /> of this
     ///     <see cref="Result{T}" />.
     /// </remarks>
     public async Task<Result<TNew>> SelectAsync<TNew>(Func<Task<Result<TNew>>> asyncSelector) =>
         IsSuccessful &&
-        await asyncSelector() is { value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure, }
+        await asyncSelector() is { option: var boundValue, reasons: var additionalReasons, IsAFailure: var isAFailure, }
             ? new(
-                value,
+                boundValue,
                 MergeReasonsWith(additionalReasons),
                 isAFailure)
             : new(reasons, true);
@@ -96,14 +100,14 @@ public readonly partial record struct Result<T>
     ///     operation, wrapping a <see cref="Result{T}" />, which contains
     ///     <typeparamref name="TNew" /> instance.
     /// </returns>
-    public async Task<Result<TNew>> SelectAsync<TNew>(Func<IOption<T>, Task<Result<TNew>>> asyncBindingFunction) =>
+    public async Task<Result<TNew>> SelectAsync<TNew>(Func<Option<T>, Task<Result<TNew>>> asyncBindingFunction) =>
         IsSuccessful &&
-        await asyncBindingFunction(Value) is
+        await asyncBindingFunction(Option) is
         {
-            value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure,
+            option: var boundValue, reasons: var additionalReasons, IsAFailure: var isAFailure,
         }
             ? new(
-                value,
+                boundValue,
                 MergeReasonsWith(additionalReasons),
                 isAFailure)
             : new(reasons, true);
@@ -124,40 +128,46 @@ public readonly partial record struct Result<T>
     ///     <typeparamref name="TNew" /> instance.
     /// </returns>
     /// <remarks>
-    ///     This overload disregards the <see cref="Result{T}.Value" /> of this
+    ///     This overload disregards the <see cref="Option" /> of this
     ///     <see cref="Result{T}" />.
     /// </remarks>
     public async ValueTask<Result<TNew>> SelectAsync<TNew>(Func<ValueTask<Result<TNew>>> asyncSelector) =>
         IsSuccessful &&
-        await asyncSelector() is { value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure, }
+        await asyncSelector() is { option: var boundValue, reasons: var additionalReasons, IsAFailure: var isAFailure, }
             ? new(
-                value,
+                boundValue,
                 MergeReasonsWith(additionalReasons),
                 isAFailure)
             : new(reasons, true);
 
+    /// <summary>
+    ///     Projects this <see cref="Result{T}" />
+    ///     to a <see cref="Result{T}" /> of <typeparamref name="TNew" />
+    ///     by executing <paramref name="asyncBindingFunction" /> asynchronously
+    ///     if this <see cref="Result{T}" /> is successful.
+    /// </summary>
     /// <typeparam name="TNew">
     ///     Generic parameter of the new <see cref="Result{T}" />.
     /// </typeparam>
+    /// <param name="asyncBindingFunction">Asynchronous delegate to execute.</param>
     /// <returns>
     ///     A <see cref="ValueTask{T}" />, representing the result of an asynchronous
     ///     operation, wrapping a <see cref="Result{T}" />, which contains
     ///     <typeparamref name="TNew" /> instance.
     /// </returns>
-    /// <inheritdoc cref="SelectAsync{TNew}(Func{IOption{T},Task{Result{TNew}}})" />
     public async ValueTask<Result<TNew>> SelectAsync<TNew>(
-        Func<IOption<T>, ValueTask<Result<TNew>>> asyncBindingFunction) =>
+        Func<Option<T>, ValueTask<Result<TNew>>> asyncBindingFunction) =>
         IsSuccessful &&
-        await asyncBindingFunction(Value) is
+        await asyncBindingFunction(Option) is
         {
-            value: var value, reasons: var additionalReasons, IsAFailure: var isAFailure,
+            option: var boundValue, reasons: var additionalReasons, IsAFailure: var isAFailure,
         }
             ? new(
-                value,
+                boundValue,
                 MergeReasonsWith(additionalReasons),
                 isAFailure)
             : new(reasons, true);
 
-    private ImmutableList<Reason>? MergeReasonsWith(ImmutableList<Reason>? reasons) =>
-        (this.reasons?.Any(), reasons?.Any()) is (true, true) ? this.reasons.AddRange(reasons) : null;
+    private ImmutableList<Reason>? MergeReasonsWith(ImmutableList<Reason>? reasonsToAdd) =>
+        (reasons?.Any(), reasonsToAdd?.Any()) is (true, true) ? reasons.AddRange(reasonsToAdd) : null;
 }

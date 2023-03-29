@@ -20,7 +20,7 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
     public override bool Equals(object? obj) => obj is Unit;
 
     /// <inheritdoc />
-    public override int GetHashCode() => base.GetHashCode();
+    public override int GetHashCode() => 0;
 
     /// <inheritdoc />
     public int CompareTo(Unit other) => 0;

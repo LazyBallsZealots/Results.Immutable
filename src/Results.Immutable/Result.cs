@@ -13,7 +13,7 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
 {
     private readonly ImmutableList<Reason>? reasons;
 
-    private readonly IOption<T>? value;
+    private readonly Option<T>? option;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
@@ -33,6 +33,7 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     ///     A collection of <see cref="Reason" />s
     ///     to associate with the <see cref="Result{T}" />.
     /// </param>
+    /// <param name="isAFailure"></param>
     internal Result(IEnumerable<Reason>? reasons, bool isAFailure)
         : this(
             null,
@@ -48,29 +49,15 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     ///     A <typeparamref name="T" />
     ///     to associate with the <see cref="Result{T}" />.
     /// </param>
-    internal Result(T value)
-        : this(
-            value,
-            null,
-            false)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
-    /// </summary>
-    /// <param name="value">
-    ///     A <typeparamref name="T" />
-    ///     to associate with the <see cref="Result{T}" />.
-    /// </param>
     /// <param name="reasons">
     ///     A collection of <see cref="Reason" />s
     ///     to associate with the <see cref="Result{T}" />.
     /// </param>
+    /// <param name="isAFailure"><see langword="bool" /> representing whether this <see cref="Result{T}" /> is a failure.</param>
     internal Result(
         T value,
-        IEnumerable<Reason>? reasons,
-        bool isAFailure)
+        IEnumerable<Reason>? reasons = null,
+        bool isAFailure = false)
         : this(
             Some(value),
             reasons,
@@ -81,20 +68,21 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// <summary>
     ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
     /// </summary>
-    /// <param name="value">
-    ///     An <see cref="IOption{T}" />,
-    ///     which will be assigned as <see cref="Value" />.
+    /// <param name="option">
+    ///     An <see cref="Option{T}" />,
+    ///     which will be assigned as <see cref="Option" />.
     /// </param>
     /// <param name="reasons">
     ///     A collection of <see cref="Reason" />s
     ///     to associate with the <see cref="Result{T}" />.
     /// </param>
+    /// <param name="isAFailure"><see langword="bool" /> representing whether this <see cref="Result{T}" /> is a failure.</param>
     private Result(
-        IOption<T>? value,
+        Option<T>? option,
         IEnumerable<Reason>? reasons,
         bool isAFailure)
     {
-        this.value = value;
+        this.option = option;
         this.reasons = reasons?.ToImmutableList();
         IsAFailure = isAFailure;
     }
@@ -115,7 +103,7 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     public ImmutableList<Reason> Reasons => reasons ?? ImmutableList<Reason>.Empty;
 
     /// <inheritdoc />
-    public IOption<T> Value => value ?? None<T>();
+    public Option<T> Option => option ?? None<T>();
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with a provided <paramref name="reason" />.
@@ -128,24 +116,24 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// </returns>
     public Result<T> WithReason(Reason reason) =>
         new(
-            Value,
+            Option,
             reasons?.Add(reason) ?? ImmutableList.Create(reason),
             reason is Error);
 
     /// <summary>
-    ///     Creates a new <see cref="Result{T}" /> with provided <paramref name="reasons" />.
+    ///     Creates a new <see cref="Result{T}" /> with provided <paramref name="reasonsToAdd" />.
     /// </summary>
-    /// <param name="reasons">
+    /// <param name="reasonsToAdd">
     ///     A collection of <see cref="Reason" />s to add.
     /// </param>
     /// <returns>
-    ///     A new <see cref="Result{T}" /> with provided <paramref name="reasons" />.
+    ///     A new <see cref="Result{T}" /> with provided <paramref name="reasonsToAdd" />.
     /// </returns>
-    public Result<T> WithReasons(IEnumerable<Reason> reasons)
+    public Result<T> WithReasons(IEnumerable<Reason> reasonsToAdd)
     {
-        var newReasons = this.reasons?.AddRange(reasons) ?? ImmutableList.CreateRange(reasons);
+        var newReasons = reasons is null ? ImmutableList.CreateRange(reasonsToAdd) : reasons.AddRange(reasonsToAdd);
 
-        return new(newReasons, IsAFailure || (newReasons?.Any(static r => r is Error) ?? false));
+        return new(newReasons, IsAFailure || newReasons.Any(static r => r is Error));
     }
 
     /// <summary>

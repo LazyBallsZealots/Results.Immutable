@@ -48,7 +48,7 @@ public sealed class ResultProjectionTests
             .Should()
             .Match<Result<Unit>>(
                 static r => r.IsAFailure &&
-                    r.Value is None<Unit> &&
+                    r.Option.IsNone &&
                     r.Errors.Single()
                         .Message ==
                     errorMessage);
@@ -72,7 +72,7 @@ public sealed class ResultProjectionTests
             .Should()
             .Match<Result<Unit>>(
                 static r => r.IsAFailure &&
-                    r.Value is None<Unit> &&
+                    r.Option.IsNone &&
                     r.Errors.Single()
                         .Message ==
                     errorMessage);
@@ -93,7 +93,7 @@ public sealed class ResultProjectionTests
             .Should()
             .Match<Result<Unit>>(
                 static r => r.IsAFailure &&
-                    r.Value is None<Unit> &&
+                    r.Option.IsNone &&
                     r.Errors.Single()
                         .Message ==
                     errorMessage);
@@ -118,7 +118,7 @@ public sealed class ResultProjectionTests
             .Should()
             .Match<Result<int>>(static r => r.ValueMatches(static i => i == 2));
 
-        static Task<Result<int>> Increment(IOption<int> i) =>
+        static Task<Result<int>> Increment(Option<int> i) =>
             Task.FromResult(
                 i.Match(
                     static v => Result.Ok(v + 1),
@@ -133,7 +133,7 @@ public sealed class ResultProjectionTests
             .Should()
             .Match<Result<int>>(static r => r.ValueMatches(static i => i == 2));
 
-        static ValueTask<Result<int>> Increment(IOption<int> i) =>
+        static ValueTask<Result<int>> Increment(Option<int> i) =>
             new(i.Match(static v => Result.Ok(v + 1), static () => Result.Fail<int>("An error")));
     }
 
@@ -182,7 +182,7 @@ public sealed class ResultProjectionTests
                                 static i => Result.Ok(i),
                                 MatchNone));
 
-                static Result<int> SumAsResult(IOption<int> one, IOption<int> two) =>
+                static Result<int> SumAsResult(Option<int> one, Option<int> two) =>
                     one.SelectMany(_ => two, static (first, second) => Option.Some(first + second))
                         .Match(
                             static i => Result.Ok(i),

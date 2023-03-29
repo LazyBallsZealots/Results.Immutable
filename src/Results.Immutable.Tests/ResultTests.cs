@@ -19,7 +19,7 @@ public class ResultTests
     public void ShouldCreateSuccessfulResultWithoutAValue() =>
         new Result<Unit>()
             .Should()
-            .Match<Result<Unit>>(static r => r.IsSuccessful && r.Value is None<Unit>);
+            .Match<Result<Unit>>(static r => r.IsSuccessful && r.Option.IsNone);
 
     [Fact(DisplayName = "Should create a new result with provided reason")]
     public void ShouldCreateANewResultWithProvidedReason()
@@ -177,7 +177,7 @@ public class ResultTests
     [Fact(DisplayName = "Getting value of a failed result should return None")]
     public void FetchingValueFromAFailedResultShouldReturnNone() =>
         Result.Fail("An error")
-            .Value
+            .Option
             .Should()
             .Be(Option.None<Unit>());
 
