@@ -24,13 +24,11 @@ public readonly partial record struct Option<T>
     ///     of the intermediate options.
     /// </returns>
     public Option<TOut> SelectMany<T1, TOut>(
-        Func<Option<T>, Option<T1>> combinator,
-        Func<T?, T1?, Option<TOut>> selector) =>
-        (IsSome, combinator(this)) switch
-        {
-            (true, { IsSome: true, Value: var secondValue, }) => selector(Value, secondValue),
-            _ => new(),
-        };
+        Func<T, Option<T1>> combinator,
+        Func<T, T1, Option<TOut>> selector) =>
+        Some is var (value) && combinator(value).Some is var (value1)
+            ? selector(value, value1)
+            : Option.None<TOut>();
 
     /// <typeparam name="T2">
     ///     Generic type of the combined <see cref="Option{T}" />.
@@ -43,19 +41,17 @@ public readonly partial record struct Option<T>
     ///     Delegate used to obtain an <see cref="Option{T}" />
     ///     of <typeparamref name="T2" /> from existing option.
     /// </param>
+    /// <param name="selector"></param>
     /// <inheritdoc cref="SelectMany{T1,TOut}" />
     public Option<TOut> SelectMany<T1, T2, TOut>(
-        Func<Option<T>, Option<T1>> firstCombinator,
-        Func<Option<T>, Option<T2>> secondCombinator,
-        Func<T?, T1?, T2?, Option<TOut>> selector) =>
-        (IsSome, firstCombinator(this), secondCombinator(this)) switch
-        {
-            (true, { IsSome: true, Value: var secondValue, }, { IsSome: true, Value: var thirdValue, }) => selector(
-                Value,
-                secondValue,
-                thirdValue),
-            _ => new(),
-        };
+        Func<T, Option<T1>> firstCombinator,
+        Func<T, Option<T2>> secondCombinator,
+        Func<T, T1, T2, Option<TOut>> selector) =>
+        Some is var (value)
+            && firstCombinator(value).Some is var (value1)
+            && secondCombinator(value).Some is var (value2)
+            ? selector(value, value1, value2)
+            : Option.None<TOut>();
 
     /// <typeparam name="T3">
     ///     Generic type of the combined <see cref="Option{T}" />.
@@ -78,18 +74,12 @@ public readonly partial record struct Option<T>
         Func<Option<T>, Option<T2>> secondCombinator,
         Func<Option<T>, Option<T3>> thirdCombinator,
         Func<T?, T1?, T2?, T3?, Option<TOut>> selector) =>
-        (IsSome, firstCombinator(this), secondCombinator(this), thirdCombinator(this)) switch
-        {
-            (true,
-                { IsSome: true, Value: var secondValue, },
-                { IsSome: true, Value: var thirdValue, },
-                { IsSome: true, Value: var fourthValue, }) => selector(
-                    Value,
-                    secondValue,
-                    thirdValue,
-                    fourthValue),
-            _ => new(),
-        };
+        Some is var (value)
+            && firstCombinator(this).Some is var (value1)
+            && secondCombinator(this).Some is var (value2)
+            && thirdCombinator(this).Some is var (value3)
+            ? selector(value, value1, value2, value3)
+            : Option.None<TOut>();
 
     /// <typeparam name="T4">
     ///     Generic type of the combined <see cref="Option{T}" />.
@@ -117,21 +107,13 @@ public readonly partial record struct Option<T>
         Func<Option<T>, Option<T3>> thirdCombinator,
         Func<Option<T>, Option<T4>> fourthCombinator,
         Func<T?, T1?, T2?, T3?, T4?, Option<TOut>> selector) =>
-        (IsSome, firstCombinator(this), secondCombinator(this), thirdCombinator(this), fourthCombinator(this)) switch
-        {
-            (true,
-                { IsSome: true, Value: var secondValue, },
-                { IsSome: true, Value: var thirdValue, },
-                { IsSome: true, Value: var fourthValue, },
-                { IsSome: true, Value: var fifthValue, }) =>
-                selector(
-                    Value,
-                    secondValue,
-                    thirdValue,
-                    fourthValue,
-                    fifthValue),
-            _ => new(),
-        };
+        Some is var (value)
+            && firstCombinator(this).Some is var (value1)
+            && secondCombinator(this).Some is var (value2)
+            && thirdCombinator(this).Some is var (value3)
+            && fourthCombinator(this).Some is var (value4)
+            ? selector(value, value1, value2, value3, value4)
+            : Option.None<TOut>();
 
     /// <typeparam name="T5">
     ///     Generic type of the combined <see cref="Option{T}" />.
@@ -164,21 +146,12 @@ public readonly partial record struct Option<T>
         Func<Option<T>, Option<T4>> fourthCombinator,
         Func<Option<T>, Option<T5>> fifthCombinator,
         Func<T?, T1?, T2?, T3?, T4?, T5?, Option<TOut>> selector) =>
-        (IsSome, firstCombinator(this), secondCombinator(this), thirdCombinator(this), fourthCombinator(this),
-                fifthCombinator(this)) switch
-            {
-                (true,
-                    { IsSome: true, Value: var secondValue, },
-                    { IsSome: true, Value: var thirdValue, },
-                    { IsSome: true, Value: var fourthValue, },
-                    { IsSome: true, Value: var fifthValue, },
-                    { IsSome: true, Value: var sixthValue, }) => selector(
-                        Value,
-                        secondValue,
-                        thirdValue,
-                        fourthValue,
-                        fifthValue,
-                        sixthValue),
-                _ => new(),
-            };
+        Some is var (value)
+            && firstCombinator(this).Some is var (value1)
+            && secondCombinator(this).Some is var (value2)
+            && thirdCombinator(this).Some is var (value3)
+            && fourthCombinator(this).Some is var (value4)
+            && fifthCombinator(this).Some is var (value5)
+            ? selector(value, value1, value2, value3, value4, value5)
+            : Option.None<TOut>();
 }
