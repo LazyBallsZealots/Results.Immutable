@@ -11,11 +11,19 @@ permissions:
 
 jobs:
   build:
-    name: Build
+    name: PR build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
 
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: |
+            6.x
+            7.x
+          dotnet-quality: 'ga'
+      
       - name: Install dependencies
         run: dotnet restore Results.Immutable.sln
         working-directory: src
