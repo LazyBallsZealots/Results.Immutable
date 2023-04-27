@@ -1,5 +1,5 @@
-﻿using Results.Immutable.Contracts;
-using Results.Immutable.Metadata;
+﻿using Results.Immutable.Metadata;
+using static Results.Immutable.Collection.Collection;
 
 namespace Results.Immutable;
 
@@ -15,7 +15,7 @@ public readonly record struct Result
     ///     This method should be used by all operations
     ///     which are supposed to return <see langword="void" />.
     /// </remarks>
-    public static Result<Unit> Ok() => new(Unit.Value);
+    public static Result<Unit> Ok() => new(Unit.Value, null);
 
     /// <summary>
     ///     Represents a successful operation.
@@ -34,7 +34,7 @@ public readonly record struct Result
     ///     A successful result, wrapping provided <paramref name="value" />.
     /// </returns>
     /// <remarks></remarks>
-    public static Result<T> Ok<T>(T value) => new(value);
+    public static Result<T> Ok<T>(T value) => new(value, null);
 
     /// <param name="successes">
     ///     A collection of <see cref="Success" />es to associate
@@ -44,9 +44,7 @@ public readonly record struct Result
     public static Result<T> Ok<T>(
         T value,
         IEnumerable<Success> successes) =>
-        new(
-            value,
-            successes);
+        new(value, successes.ToImmutableList());
 
     /// <summary>
     ///     Creates a successful <see cref="Result{T}" />
@@ -59,11 +57,11 @@ public readonly record struct Result
     ///     A <see cref="Result{T}" /> of <see cref="Unit" />,
     ///     dependent on the <paramref name="condition" />.
     /// </returns>
-    public static Result<Unit> OkIf(bool condition, string errorMessage) => condition ? Ok() : Fail(errorMessage);
+    public static Result<Unit> OkIf(bool condition, string errorMessage) => condition ? Ok() : Fail<Unit>(errorMessage);
 
     /// <inheritdoc cref="OkIf(bool, string)" />
     /// <param name="error">An <see cref="Error" /> to associate with failed result.</param>
-    public static Result<Unit> OkIf(bool condition, Error error) => condition ? Ok() : Fail(error);
+    public static Result<Unit> OkIf(bool condition, Error error) => condition ? Ok() : Fail<Unit>(error);
 
     /// <param name="errorMessageFactory">
     ///     A <see cref="Func{T}" />, returning a <see cref="string" />
@@ -71,7 +69,7 @@ public readonly record struct Result
     /// </param>
     /// <inheritdoc cref="OkIf(bool, string)" />
     public static Result<Unit> OkIf(bool condition, Func<string> errorMessageFactory) =>
-        condition ? Ok() : Fail(errorMessageFactory());
+        condition ? Ok() : Fail<Unit>(errorMessageFactory());
 
     /// <param name="errorMessageFactory">
     ///     A <see cref="Func{T}" />, returning an <see cref="Error" />.
@@ -92,31 +90,26 @@ public readonly record struct Result
     /// </returns>
     public static Result<Unit> Fail(string errorMessage) => Fail(new Error(errorMessage));
 
-    /// <param name="error">
-    ///     An <see cref="Error" /> to be associated
-    ///     with the failed <see cref="Result{T}" />.
-    /// </param>
     /// <inheritdoc cref="Fail(string)" />
-    public static Result<Unit> Fail(Error error) => new(ImmutableList.Create<Reason>(error), true);
+    public static Result<Unit> Fail(Error error) => new(ImmutableList.Create(error), null);
 
-    /// <param name="errors">
-    ///     A collection of <see cref="Error" />s
-    ///     to be associated with the failed <see cref="Result{T}" />.
-    /// </param>
     /// <inheritdoc cref="Fail(Error)" />
-    public static Result<Unit> Fail(IEnumerable<Error> errors) => new(errors, true);
+    public static Result<Unit> Fail(IEnumerable<Error> errors) => new(errors.ToImmutableList(), null);
 
-    /// <typeparam name="T">Expected type of the value.</typeparam>
+    /// <inheritdoc cref="Fail(Error)" />
+    public static Result<Unit> Fail(params Error[] errors) => new(errors.ToImmutableList(), null);
+
     /// <inheritdoc cref="Fail(string)" />
     public static Result<T> Fail<T>(string errorMessage) => Fail<T>(new Error(errorMessage));
 
-    /// <typeparam name="T">Expected type of the value.</typeparam>
     /// <inheritdoc cref="Fail(Error)" />
-    public static Result<T> Fail<T>(Error error) => new(ImmutableList.Create<Reason>(error), true);
+    public static Result<T> Fail<T>(Error error) => new(ImmutableList.Create(error), null);
 
-    /// <typeparam name="T">Expected type of the value.</typeparam>
     /// <inheritdoc cref="Fail(IEnumerable{Error})" />
-    public static Result<T> Fail<T>(IEnumerable<Error> errors) => new(errors, true);
+    public static Result<T> Fail<T>(IEnumerable<Error> errors) => new(errors.ToImmutableList(), null);
+
+    /// <inheritdoc cref="Fail(IEnumerable{Error})" />
+    public static Result<T> Fail<T>(params Error[] errors) => new(errors.ToImmutableList(), null);
 
     /// <summary>
     ///     Creates a failed <see cref="Result{T}" />
@@ -161,39 +154,173 @@ public readonly record struct Result
     public static Result<Unit> FailIf(bool condition, Func<Error> errorFactory) =>
         condition ? Fail(errorFactory()) : Ok();
 
+    /// <inheritdoc cref="Result.Transpose{T}(IReadOnlyCollection{Result{T}})" />
+    public static Result<ImmutableList<T>> Transpose<T>(params Result<T>[] results) => Transpose(results);
+
+    /// <summary>
+    ///     Transposes a collection of <see cref="Result{T}" />s,
+    ///     aggregating the values into an <see cref="ImmutableList{T}" />.
+    /// 
+    ///     If at least one of the <paramref name="results" /> is failed, then the whole computation is failed,
+    ///     and the <see cref="Result{T}.Errors" /> will be aggregated.
+    /// 
+    ///     The order of the values in the <see cref="ImmutableList{T}" /> is the same as in the input collection.
+    ///     The successes are aggregated in both OK and ERROR states.
+    /// </summary>
+    /// <param name="results">
+    ///     A collection of <see cref="Result{T}" />s to transpose.
+    /// </param>
+    /// <typeparam name="T">Type of the values</typeparam>
+    /// <returns>
+    ///     A <see cref="Result{T}" /> containing an aggregation of all the values of the input collection.
+    /// </returns>
+    public static Result<ImmutableList<T>> Transpose<T>(IReadOnlyCollection<Result<T>> results)
+    {
+        if (results.Count == 0)
+        {
+            return Ok(ImmutableList<T>.Empty);
+        }
+
+        var errorsBuilder = ImmutableList.CreateBuilder<Error>();
+        var successesBuilder = ImmutableList.CreateBuilder<Success>();
+        var valuesBuilder = ImmutableList.CreateBuilder<T>();
+        var IsErrored = false;
+
+        foreach (var result in results)
+        {
+            if (result.Some is var (x))
+            {
+                valuesBuilder.Add(x);
+            }
+            else
+            {
+                IsErrored = true;
+                errorsBuilder.AddRange(result.Errors);
+            }
+            successesBuilder.AddRange(result.Successes);
+
+        }
+        return IsErrored
+            ? new Result<ImmutableList<T>>(errorsBuilder.ToImmutable(), successesBuilder.ToImmutable())
+            : new Result<ImmutableList<T>>(valuesBuilder.ToImmutable(), successesBuilder.ToImmutable());
+    }
+
     /// <summary>
     ///     Merges all <paramref name="results" />
     ///     into one <see cref="Result{T}" />,
-    ///     aggregating the values into an <see cref="IEnumerable{T}" />.
+    ///     aggregating all errors and successes into one <see cref="Result{T}" />.
+    /// 
+    ///     If at least one of the <paramref name="results" /> is failed, then the whole computation is failed.
     /// </summary>
-    /// <typeparam name="T">Type of the values.</typeparam>
     /// <param name="results">
     ///     A collection of <see cref="Result{T}" />s to merge.
     /// </param>
     /// <returns>
     ///     A merged <see cref="Result{T}" />,
     ///     containing an aggregation of all
-    ///     <see cref="Result{T}.Reasons" />
-    ///     and <see cref="Result{T}.Option" />s.
+    ///     <see cref="Result{T}.Errors" />.
     /// </returns>
-    /// <remarks>
-    ///     If any of the provided <paramref name="results" />
-    ///     is a failure, then the merged result will be a failure
-    ///     itself.
-    /// </remarks>
-    public static Result<IEnumerable<T?>> Merge<T>(params Result<T>[] results) =>
-        Merge<T, IImmutableResult<T>>(
-            results.Cast<IImmutableResult<T>>()
-                .ToList());
+    public static Result<Unit> Merge(IReadOnlyCollection<Result<Unit>> results)
+    {
+        var errorsBuilder = ImmutableList.CreateBuilder<Error>();
+        var successesBuilder = ImmutableList.CreateBuilder<Success>();
+        var IsErrored = false;
 
-    /// <inheritdoc cref="Merge{T}(Result{T}[])" />
-    public static Result<IEnumerable<T?>> Merge<T, TResult>(IReadOnlyCollection<TResult> results)
-        where TResult : IImmutableResult<T> =>
-        new(
-            results.Where(static r => r is { IsSuccessful: true, Option.IsSome: true, })
-                .Select(static r => r.Option.ValueOrDefault),
-            results.SelectMany(static r => r.Reasons),
-            results.Any(static r => r.IsAFailure));
+        foreach (var result in results)
+        {
+            if (result.Some is var (x))
+            {
+                continue;
+            }
+            IsErrored = true;
+            errorsBuilder.AddRange(result.Errors);
+            successesBuilder.AddRange(result.Successes);
+        }
+        return IsErrored
+            ? new Result<Unit>(errorsBuilder.ToImmutable(), successesBuilder.ToImmutable())
+            : new Result<Unit>(Unit.Value, successesBuilder.ToImmutable());
+
+    }
+
+    /// <summary>
+    ///     Creates a <see cref="Result{T}" /> based on the arguments.
+    /// </summary>
+    /// <param name="first">First result</param>
+    /// <param name="second">Second result</param>
+    /// <typeparam name="T1">Type of the first result</typeparam>
+    /// <typeparam name="T2">Type of the second result</typeparam>
+    public static Result<(T1, T2)> Zip<T1, T2>(Result<T1> first, Result<T2> second)
+    {
+        var successes = ConcatLists(first.Successes, second.Successes);
+        if (first.Some is var (v1) && second.Some is var (v2))
+        {
+            return new Result<(T1, T2)>((v1, v2), successes);
+        }
+        return new Result<(T1, T2)>(ConcatLists(first.Errors, second.Errors), successes);
+    }
+
+    /// <summary>
+    ///     Creates a <see cref="Result{T}" /> based on the arguments.
+    /// </summary>
+    /// <param name="first">First result</param>
+    /// <param name="second">Second result</param>
+    /// <param name="third">Third result</param>
+    /// <typeparam name="T1">Type of the first result</typeparam>
+    /// <typeparam name="T2">Type of the second result</typeparam>
+    /// <typeparam name="T3">Type of the third result</typeparam>
+    public static Result<(T1, T2, T3)> Zip<T1, T2, T3>(Result<T1> first, Result<T2> second, Result<T3> third)
+    {
+        var successes = ConcatLists(first.Successes, second.Successes, third.Successes);
+        if (first.Some is var (v1) && second.Some is var (v2) && third.Some is var (v3))
+        {
+            return new Result<(T1, T2, T3)>((v1, v2, v3), successes);
+        }
+        return new Result<(T1, T2, T3)>(ConcatLists(first.Errors, second.Errors, third.Errors), successes);
+    }
+
+    /// <summary>
+    ///     Creates a <see cref="Result{T}" /> based on the arguments.
+    /// </summary>
+    /// <param name="first">First result</param>
+    /// <param name="second">Second result</param>
+    /// <param name="third">Third result</param>
+    /// <param name="fourth">Fourth result</param>
+    /// <typeparam name="T1">Type of the first result</typeparam>
+    /// <typeparam name="T2">Type of the second result</typeparam>
+    /// <typeparam name="T3">Type of the third result</typeparam>
+    /// <typeparam name="T4">Type of the fourth result</typeparam>
+    public static Result<(T1, T2, T3, T4)> Zip<T1, T2, T3, T4>(Result<T1> first, Result<T2> second, Result<T3> third, Result<T4> fourth)
+    {
+        var successes = ConcatLists(first.Successes, second.Successes, third.Successes, fourth.Successes);
+        if (first.Some is var (v1) && second.Some is var (v2) && third.Some is var (v3) && fourth.Some is var (v4))
+        {
+            return new Result<(T1, T2, T3, T4)>((v1, v2, v3, v4), successes);
+        }
+        return new Result<(T1, T2, T3, T4)>(ConcatLists(first.Errors, second.Errors, third.Errors, fourth.Errors), successes);
+    }
+
+    /// <summary>
+    ///     Creates a <see cref="Result{T}" /> based on the arguments.
+    /// </summary>
+    /// <param name="first">First result</param>
+    /// <param name="second">Second result</param>
+    /// <param name="third">Third result</param>
+    /// <param name="fourth">Fourth result</param>
+    /// <param name="fifth">Fifth result</param>
+    /// <typeparam name="T1">Type of the first result</typeparam>
+    /// <typeparam name="T2">Type of the second result</typeparam>
+    /// <typeparam name="T3">Type of the third result</typeparam>
+    /// <typeparam name="T4">Type of the fourth result</typeparam>
+    /// <typeparam name="T5">Type of the fifth result</typeparam>
+    public static Result<(T1, T2, T3, T4, T5)> Zip<T1, T2, T3, T4, T5>(Result<T1> first, Result<T2> second, Result<T3> third, Result<T4> fourth, Result<T5> fifth)
+    {
+        var successes = ConcatLists(first.Successes, second.Successes, third.Successes, fourth.Successes, fifth.Successes);
+        if (first.Some is var (v1) && second.Some is var (v2) && third.Some is var (v3) && fourth.Some is var (v4) && fifth.Some is var (v5))
+        {
+            return new Result<(T1, T2, T3, T4, T5)>((v1, v2, v3, v4, v5), successes);
+        }
+        return new Result<(T1, T2, T3, T4, T5)>(ConcatLists(first.Errors, second.Errors, third.Errors, fourth.Errors, fifth.Errors), successes);
+    }
 
     /// <summary>
     ///     Attempts to perform a <paramref name="func" />;

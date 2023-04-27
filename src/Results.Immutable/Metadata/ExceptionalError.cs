@@ -3,11 +3,22 @@
 /// <summary>
 ///     Represents an error caused by an exception.
 /// </summary>
-/// <param name="CausedBy">
-///     Cause of the error.
+/// <param name="Message">
+///     The exception message.
 /// </param>
-public sealed record ExceptionalError(Exception CausedBy)
+public sealed record ExceptionalError(Exception CausedBy, ImmutableList<Error> InnerErrors)
     : Error(
-        CausedBy.ToString(),
-        ImmutableList<Error>.Empty,
-        ImmutableDictionary<string, object>.Empty);
+        CausedBy.Message,
+        InnerErrors)
+{
+    public ExceptionalError(Exception exception)
+        : this(exception, ImmutableList<Error>.Empty)
+    {
+    }
+
+    public ExceptionalError(Exception exception, Error innerError)
+        : this(exception, ImmutableList.Create(innerError))
+    {
+    }
+
+}

@@ -4,19 +4,17 @@ namespace Results.Immutable.Extensions;
 
 internal static class EnumerableExtensions
 {
-    public static IEnumerable<TReason> Flatten<TReason>(
-        this IEnumerable<TReason> reasons,
-        Func<TReason, IEnumerable<TReason>> childrenFunc)
-        where TReason : Reason
+    public static IEnumerable<T> Flatten<T>(
+        this IEnumerable<T> reasons,
+        Func<T, IEnumerable<T>> selector)
     {
-        var queue = new Queue<TReason>(reasons);
-        var visited = new HashSet<TReason>();
+        var queue = new Queue<T>(reasons);
 
-        while (queue.TryDequeue(out var reason) && visited.Add(reason))
+        while (queue.TryDequeue(out var reason))
         {
             yield return reason;
 
-            childrenFunc(reason)
+            selector(reason)
                 .ForEach(queue.Enqueue);
         }
     }

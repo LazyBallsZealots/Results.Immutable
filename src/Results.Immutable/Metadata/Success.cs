@@ -2,15 +2,19 @@
 
 public record Success(
         string Message,
-        ImmutableList<Success> Successes,
-        ImmutableDictionary<string, object> Metadata)
-    : Reason(Message, Metadata)
+        ImmutableList<Success> InnerSuccesses)
 {
     public Success(string message)
         : this(
             message,
-            ImmutableList<Success>.Empty,
-            ImmutableDictionary<string, object>.Empty)
+            ImmutableList<Success>.Empty)
+    {
+    }
+
+    public Success(string message, Success innerSuccess)
+        : this(
+            message,
+            ImmutableList<Success>.Empty.Add(innerSuccess))
     {
     }
 }

@@ -1,7 +1,4 @@
-﻿using Results.Immutable.Contracts;
-using Results.Immutable.Extensions;
-using Results.Immutable.Metadata;
-using static Results.Immutable.Option;
+﻿using Results.Immutable.Metadata;
 
 namespace Results.Immutable;
 
@@ -9,132 +6,107 @@ namespace Results.Immutable;
 ///     A structure representing the result of an operation.
 /// </summary>
 /// <typeparam name="T">Type of the value associated with this <see cref="Result{T}" />.</typeparam>
-public readonly partial record struct Result<T> : IImmutableResult<T>
+public readonly partial struct Result<T> : IEquatable<Result<T>>
 {
-    private readonly ImmutableList<Reason>? reasons;
+    private readonly ImmutableList<Error>? errors;
+    private readonly ImmutableList<Success>? successes;
 
-    private readonly Option<T>? option;
+    private readonly Some<T>? some;
+
+    public Some<T>? Some => some;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
+    /// Initializes a new failed instance of the <see cref="Result{T}" /> structure.
     /// </summary>
     public Result()
-        : this(
-            null,
-            null,
-            false)
     {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
-    /// </summary>
-    /// <param name="reasons">
-    ///     A collection of <see cref="Reason" />s
-    ///     to associate with the <see cref="Result{T}" />.
-    /// </param>
-    /// <param name="isAFailure"></param>
-    internal Result(IEnumerable<Reason>? reasons, bool isAFailure)
-        : this(
-            null,
-            reasons,
-            isAFailure)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
-    /// </summary>
-    /// <param name="value">
-    ///     A <typeparamref name="T" />
-    ///     to associate with the <see cref="Result{T}" />.
-    /// </param>
-    /// <param name="reasons">
-    ///     A collection of <see cref="Reason" />s
-    ///     to associate with the <see cref="Result{T}" />.
-    /// </param>
-    /// <param name="isAFailure"><see langword="bool" /> representing whether this <see cref="Result{T}" /> is a failure.</param>
-    internal Result(
-        T value,
-        IEnumerable<Reason>? reasons = null,
-        bool isAFailure = false)
-        : this(
-            Some(value),
-            reasons,
-            isAFailure)
-    {
+        errors = ImmutableList.Create(new Error("Constructed result"));
+        some = null;
+        successes = null;
     }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
     /// </summary>
     /// <param name="option">
-    ///     An <see cref="Option{T}" />,
-    ///     which will be assigned as <see cref="Option" />.
+    ///     A value.
     /// </param>
-    /// <param name="reasons">
-    ///     A collection of <see cref="Reason" />s
-    ///     to associate with the <see cref="Result{T}" />.
+    /// <param name="successes">
+    ///     A list of <see cref="Success" />s.
     /// </param>
-    /// <param name="isAFailure"><see langword="bool" /> representing whether this <see cref="Result{T}" /> is a failure.</param>
+    internal Result(
+        T value,
+        ImmutableList<Success>? successes) : this(new Some<T>(value), successes)
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
+    /// </summary>
+    /// <param name="someValue">
+    ///     An <see cref="Option{T}" />.
+    /// </param>
+    /// <param name="successes">
+    ///     A list of <see cref="Success" />s.
+    /// </param>
+    internal Result(
+        Some<T>? someValue,
+        ImmutableList<Success>? successes)
+    {
+        this.errors = null;
+        this.successes = successes;
+        this.some = someValue;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
+    /// </summary>
+    /// <param name="errors">
+    ///     A list of <see cref="Error" />s.
+    /// </param>
+    /// <param name="successes">
+    ///     A list of <see cref="Success" />s.
+    /// </param>
+    internal Result(
+        ImmutableList<Error>? errors,
+        ImmutableList<Success>? successes)
+    {
+        this.errors = errors;
+        this.successes = successes;
+        this.some = null;
+    }
+
     private Result(
-        Option<T>? option,
-        IEnumerable<Reason>? reasons,
-        bool isAFailure)
+        Some<T>? some,
+        ImmutableList<Error>? errors,
+        ImmutableList<Success>? successes)
     {
-        this.option = option;
-        this.reasons = reasons?.ToImmutableList();
-        IsAFailure = isAFailure;
+        this.errors = errors;
+        this.successes = successes;
+        this.some = some;
     }
 
-    /// <inheritdoc />
-    public bool IsAFailure { get; }
-
-    /// <inheritdoc />
-    public bool IsSuccessful => !IsAFailure;
-
-    /// <inheritdoc />
-    public ImmutableList<Error> Errors => GetReasonsOfType<Error>();
-
-    /// <inheritdoc />
-    public ImmutableList<Success> Successes => GetReasonsOfType<Success>();
-
-    /// <inheritdoc />
-    public ImmutableList<Reason> Reasons => reasons ?? ImmutableList<Reason>.Empty;
-
-    /// <inheritdoc />
-    public Option<T> Option => option ?? None<T>();
+    /// <summary>
+    ///     Gets the boolean indicator whether this <see cref="Result{T}" />
+    ///     represents a failed operation.
+    /// 
+    ///     A failed operation does not contain a value, and may contain errors.
+    /// </summary>
+    public bool IsErrored => some is null;
 
     /// <summary>
-    ///     Creates a new <see cref="Result{T}" /> with a provided <paramref name="reason" />.
+    ///     Gets the boolean indicator whether this <see cref="Result{T}" />
+    ///     represents a successful operation.
+    /// 
+    ///     An OK operation contains a value, no errors are present.
     /// </summary>
-    /// <param name="reason">
-    ///     A <see cref="Reason" /> to add.
-    /// </param>
-    /// <returns>
-    ///     A new <see cref="Result{T}" /> with provided <paramref name="reason" />.
-    /// </returns>
-    public Result<T> WithReason(Reason reason) =>
-        new(
-            Option,
-            reasons?.Add(reason) ?? ImmutableList.Create(reason),
-            reason is Error);
+    public bool IsOk => some is not null;
 
-    /// <summary>
-    ///     Creates a new <see cref="Result{T}" /> with provided <paramref name="reasonsToAdd" />.
-    /// </summary>
-    /// <param name="reasonsToAdd">
-    ///     A collection of <see cref="Reason" />s to add.
-    /// </param>
-    /// <returns>
-    ///     A new <see cref="Result{T}" /> with provided <paramref name="reasonsToAdd" />.
-    /// </returns>
-    public Result<T> WithReasons(IEnumerable<Reason> reasonsToAdd)
-    {
-        var newReasons = reasons is null ? ImmutableList.CreateRange(reasonsToAdd) : reasons.AddRange(reasonsToAdd);
+    /// <inheritdoc />
+    public ImmutableList<Error> Errors => errors ?? ImmutableList<Error>.Empty;
 
-        return new(newReasons, IsAFailure || newReasons.Any(static r => r is Error));
-    }
+    /// <inheritdoc />
+    public ImmutableList<Success> Successes => successes ?? ImmutableList<Success>.Empty;
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with an <see cref="Error" />,
@@ -147,9 +119,8 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     ///     A new <see cref="Result{T}" /> with an <see cref="Error" />,
     ///     containing provided <paramref name="errorMessage" />.
     /// </returns>
-    public Result<T> WithError(string errorMessage) => WithReason(new Error(errorMessage));
+    public Result<T> AddError(string errorMessage) => AddError(new Error(errorMessage));
 
-    /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with a provided <paramref name="error" />.
     /// </summary>
     /// <param name="error">
@@ -158,7 +129,7 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="error" />.
     /// </returns>
-    public Result<T> WithError(Error error) => WithReason(error);
+    public Result<T> AddError(Error error) => AddErrors(new[] { error });
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with <see cref="Error" />s
@@ -172,8 +143,8 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     ///     A new <see cref="Result{T}" /> with <see cref="Error" />s,
     ///     built from <paramref name="errorMessages" />.
     /// </returns>
-    public Result<T> WithErrors(IEnumerable<string> errorMessages) =>
-        WithReasons(errorMessages.Select(static message => new Error(message)));
+    public Result<T> AddErrors(IEnumerable<string> errorMessages) =>
+        AddErrors(errorMessages.Select(errorMessage => new Error(errorMessage)));
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with provided <paramref name="errors" />.
@@ -184,7 +155,7 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="errors" />.
     /// </returns>
-    public Result<T> WithErrors(IEnumerable<Error> errors) => WithReasons(errors);
+    public Result<T> AddErrors(IEnumerable<Error> errors) => new Result<T>(Errors.AddRange(errors), null);
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with a provided <paramref name="success" />.
@@ -195,7 +166,7 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="success" />.
     /// </returns>
-    public Result<T> WithSuccess(Success success) => WithReason(success);
+    public Result<T> AddSuccess(Success success) => AddSuccesses(new[] { success });
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with provided <paramref name="successes" />.
@@ -206,12 +177,13 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="successes" />.
     /// </returns>
-    public Result<T> WithSuccesses(IEnumerable<Success> successes) => WithReasons(successes);
+    public Result<T> AddSuccesses(IEnumerable<Success> successes) =>
+        new Result<T>(some, Errors, Successes.AddRange(successes));
 
     /// <summary>
     ///     Returns a <see cref="bool" /> value indicating whether
     ///     this <see cref="Result{T}" /> instance contains a <typeparamref name="TError" />
-    ///     matching provided <paramref name="predicate" />
+    ///     matching provided <paramref name="predicate" />.
     /// </summary>
     /// <typeparam name="TError">
     ///     Generic type of the error.
@@ -224,14 +196,30 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     ///     match provided <paramref name="predicate" />,
     ///     otherwise - <see langword="false" />.
     /// </returns>
-    public bool HasError<TError>(Predicate<TError>? predicate = null)
+    public bool HasError<TError>(Func<TError, bool> predicate)
         where TError : Error =>
-        HasReason(predicate);
+        Errors.OfType<TError>().Any(predicate);
+
+    /// <summary>
+    ///     Returns a <see cref="bool" /> value indicating whether
+    ///     this <see cref="Result{T} /> contains a <typeparamref name="TError" />.
+    /// </summary>
+    /// <typeparam name="TError">
+    ///     Generic type of the error.
+    /// </typeparam>
+    /// <returns>
+    ///     <see langword="true" /> if any of the <see cref="Errors" />
+    ///     match provided <paramref name="predicate" />,
+    ///     otherwise - <see langword="false" />.
+    /// </returns>
+    public bool HasError<TError>()
+        where TError : Error =>
+        Errors.OfType<TError>().Any();
 
     /// <summary>
     ///     Returns a <see cref="bool" /> value indicating whether
     ///     this <see cref="Result{T}" /> instance contains a <typeparamref name="TSuccess" />
-    ///     matching provided <paramref name="predicate" />
+    ///     matching provided <paramref name="predicate" />.
     /// </summary>
     /// <typeparam name="TSuccess">
     ///     Generic type of the success.
@@ -244,44 +232,88 @@ public readonly partial record struct Result<T> : IImmutableResult<T>
     ///     match provided <paramref name="predicate" />,
     ///     otherwise - <see langword="false" />.
     /// </returns>
-    public bool HasSuccess<TSuccess>(Predicate<TSuccess>? predicate = null)
+    public bool HasSuccess<TSuccess>(Func<TSuccess, bool> predicate)
         where TSuccess : Success =>
-        HasReason(predicate);
+        Successes.OfType<TSuccess>().Any(predicate);
 
     /// <summary>
     ///     Returns a <see cref="bool" /> value indicating whether
-    ///     this <see cref="Result{T}" /> instance contains a <typeparamref name="TReason" />
-    ///     matching provided <paramref name="predicate" />
+    ///     this <see cref="Result{T}" /> contains a <typeparamref name="TSuccess" />.
     /// </summary>
-    /// <typeparam name="TReason">
-    ///     Generic type of the reason.
+    /// <typeparam name="TSuccess">
+    ///     Generic type of the success.
     /// </typeparam>
     /// <param name="predicate">
     ///     A <see cref="Predicate{T}" /> to match.
     /// </param>
     /// <returns>
-    ///     <see langword="true" /> if any of the <see cref="Reasons" />
+    ///     <see langword="true" /> if any of the <see cref="Successes" />
     ///     match provided <paramref name="predicate" />,
     ///     otherwise - <see langword="false" />.
     /// </returns>
-    public bool HasReason<TReason>(Predicate<TReason>? predicate = null)
-        where TReason : Reason =>
-        Reasons.SelectMany(
-                static r => r switch
-                {
-                    Success { Successes.Count: > 0, } s =>
-                        s.Yield()
-                            .Flatten(static s => s.Successes),
-                    Error { Errors.Count: > 0, } e =>
-                        e.Yield()
-                            .Flatten(static s => s.Errors),
-                    _ => r.Yield(),
-                })
-            .OfType<TReason>()
-            .Any(r => predicate?.Invoke(r) ?? true);
+    public bool HasSuccess<TSuccess>()
+        where TSuccess : Success =>
+        Successes.OfType<TSuccess>().Any();
 
-    private ImmutableList<TReason> GetReasonsOfType<TReason>()
-        where TReason : Reason, IEquatable<TReason> =>
-        Reasons.OfType<TReason>()
-            .ToImmutableList();
+
+    public TNew Match<TNew>(Func<T, TNew> onOk, Func<ImmutableList<Error>, TNew> onError)
+    {
+        if (some is var (x))
+        {
+            return onOk(x);
+        }
+        else
+        {
+            return onError(Errors);
+        }
+    }
+
+    public TNew Match<TNew>(Func<T, ImmutableList<Success>, TNew> onOk, Func<ImmutableList<Error>, ImmutableList<Success>, TNew> onError)
+    {
+        if (some is var (x))
+        {
+            return onOk(x, Successes);
+        }
+        else
+        {
+            return onError(Errors, Successes);
+        }
+    }
+
+    public void Match(Action<T> onOk, Action<ImmutableList<Error>> onError)
+    {
+        if (some is var (x))
+        {
+            onOk(x);
+        }
+        else
+        {
+            onError(Errors);
+        }
+    }
+
+    public void Match(Action<T, ImmutableList<Success>> onOk, Action<ImmutableList<Error>, ImmutableList<Success>> onError)
+    {
+        if (some is var (x))
+        {
+            onOk(x, Successes);
+        }
+        else
+        {
+            onError(Errors, Successes);
+        }
+    }
+
+    public override bool Equals(object? obj) => obj is Result<T> other &&
+            other.some == some &&
+            other.Errors.SequenceEqual(Errors) &&
+            other.Successes.SequenceEqual(Successes);
+
+    public bool Equals(Result<T> other) => Equals(other as object);
+
+    public override int GetHashCode() => HashCode.Combine(some, Errors, Successes);
+
+    public static bool operator ==(Result<T> left, Result<T> right) => Equals(left, right);
+
+    public static bool operator !=(Result<T> left, Result<T> right) => !Equals(left, right);
 }
