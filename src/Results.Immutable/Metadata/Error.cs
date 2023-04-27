@@ -2,15 +2,21 @@
 
 public record Error(
         string Message,
-        ImmutableList<Error> Errors,
-        ImmutableDictionary<string, object> Metadata)
-    : Reason(Message, Metadata)
+        ImmutableList<Error> InnerErrors)
 {
+
+    public Error(string message, Error innerError)
+        : this(
+            message,
+            ImmutableList.Create(innerError))
+    {
+    }
+
     public Error(string message)
         : this(
             message,
-            ImmutableList<Error>.Empty,
-            ImmutableDictionary<string, object>.Empty)
+            ImmutableList<Error>.Empty)
     {
     }
 }
+
