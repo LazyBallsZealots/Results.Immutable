@@ -30,6 +30,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Results.Immutable\Results.Immutable.csproj" />
+    <Compile Remove="ResultProjectionTests.cs" />
+    <Compile Remove="ResultTests.cs" />
   </ItemGroup>
 
 </Project>
