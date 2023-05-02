@@ -360,6 +360,7 @@ MigrationBackup/
 
 # Rider
 .idea
+/inspectcode.xml
 
 # VS Code
 .vscode
