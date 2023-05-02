@@ -194,4 +194,70 @@ public sealed class OptionTests
             option.GetValueOrElse(() => "wrong").Should().BeNull();
         }
     }
+
+    public class AsEnumerable
+    {
+        [Fact(DisplayName = "Returns empty if none")]
+        public void ReturnsEmptyIfNone()
+        {
+            var option = Option.None<int>();
+            option.AsEnumerable().Should().BeEmpty();
+        }
+
+        [Fact(DisplayName = "Returns single item if some")]
+        public void ReturnsSingleItemIfSome()
+        {
+            var option = Option.Some(4);
+            var enumerable = option.AsEnumerable();
+            enumerable.Should().HaveCount(1);
+            enumerable.First().Should().Be(4);
+        }
+    }
+
+    public class FromConvertions
+    {
+        [Fact(DisplayName = "Converts from IEnumerable with values, discarding the tail")]
+        public void ConvertsFromIEnumerableWithValuesDiscardingTheTail()
+        {
+            var enumerable = new[] { 1, 2, 3 };
+            var option = Option.FromEnumerable(enumerable);
+            option.ValueOrDefault.Should().Be(1);
+        }
+
+        [Fact(DisplayName = "Converts from IEnumerable with no values")]
+        public void ConvertsFromIEnumerableWithNoValues()
+        {
+            var enumerable = Array.Empty<int>();
+            var option = Option.FromEnumerable(enumerable);
+            option.IsNone.Should().BeTrue();
+        }
+
+        [Fact(DisplayName = "Converts null from a nullable reference type")]
+        public void ConvertsNullFromANullableReferenceType()
+        {
+            var option = Option.FromNullable<string>(null);
+            option.IsNone.Should().BeTrue();
+        }
+
+        [Fact(DisplayName = "Converts a value from a nullable reference type")]
+        public void ConvertsAValueFromANullableReferenceType()
+        {
+            var option = Option.FromNullable("hello");
+            option.ValueOrDefault.Should().Be("hello");
+        }
+
+        [Fact(DisplayName = "Converts null from a nullable value type")]
+        public void ConvertsNullFromANullableValueType()
+        {
+            var option = Option.FromNullable<int>(null);
+            option.IsNone.Should().BeTrue();
+        }
+
+        [Fact(DisplayName = "Converts a value from a nullable value type")]
+        public void ConvertsAValueFromANullableValueType()
+        {
+            var option = Option.FromNullable(1 as int?);
+            option.ValueOrDefault.Should().Be(1);
+        }
+    }
 }
