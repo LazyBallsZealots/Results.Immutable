@@ -165,4 +165,49 @@ public readonly partial record struct Option<T>
             matchNone();
         }
     }
+
+    /// <summary>
+    /// Returns the value of this <see cref="Option{T}" /> if it has one.
+    /// Otherwise throws a <see cref="NoValueException" /> with the specified message.
+    /// 
+    /// This method is unsafe, avoid at all cost unless the absence of value indicates a major problem.
+    /// 
+    /// Also, this can be used for testing purposes.
+    /// 
+    /// Example:
+    /// 
+    /// <code>
+    /// var option = Option.Some("hello");
+    /// option.Expect("No value!"); // "hello"
+    /// 
+    /// var option2 = Option.None&lt;string&gt;();
+    /// option2.Expect("No value!"); // Oh no! throws a NoValueException with the specified message
+    /// </code>
+    /// 
+    /// </summary>
+    /// <param name="message">The message of the exception in case there is no value.</param>
+    public T Expect(string message)
+    {
+        if (Some is var (value))
+        {
+            return value;
+        }
+
+        throw new NoValueException(message);
+    }
+
+    /// <inheritdoc cref="Expect(string)" />
+    public T Expect(Func<string> message) =>
+        Expect(message());
+
+    /// <inheritdoc cref="Expect(string)" />
+    public T Expect()
+    {
+        if (Some is var (value))
+        {
+            return value;
+        }
+
+        throw new NoValueException();
+    }
 }

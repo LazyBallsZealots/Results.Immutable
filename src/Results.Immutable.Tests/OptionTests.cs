@@ -194,4 +194,52 @@ public sealed class OptionTests
             option.GetValueOrElse(() => "wrong").Should().BeNull();
         }
     }
+
+    public class Expect
+    {
+        [Fact(DisplayName = "Throws if none (with message)")]
+        public void ThrowsIfNone()
+        {
+            var option = Option.None<int>();
+            Action action = () => option.Expect("something");
+            action.Should().Throw<NoValueException>().WithMessage("something");
+        }
+
+        [Fact(DisplayName = "Does not throw if some (with message)")]
+        public void DoesNotThrowIfSome()
+        {
+            var option = Option.Some(4);
+            option.Expect("something").Should().Be(4);
+        }
+
+        [Fact(DisplayName = "Throws if none (with thunk message)")]
+        public void ThrowsIfNoneWithThunkMessage()
+        {
+            var option = Option.None<int>();
+            Action action = () => option.Expect(() => "ducks are watching");
+            action.Should().Throw<NoValueException>().WithMessage("ducks are watching");
+        }
+
+        [Fact(DisplayName = "Does not throw if some (with thunk message)")]
+        public void DoesNotThrowIfSomeWithThunkMessage()
+        {
+            var option = Option.Some(4);
+            option.Expect(() => "ducks are watching").Should().Be(4);
+        }
+
+        [Fact(DisplayName = "Throws if none (without message)")]
+        public void ThrowsIfNoneWithoutMessage()
+        {
+            var option = Option.None<int>();
+            Action action = () => option.Expect();
+            action.Should().Throw<NoValueException>();
+        }
+
+        [Fact(DisplayName = "Does not throw if some (without message)")]
+        public void DoesNotThrowIfSomeWithoutMessage()
+        {
+            var option = Option.Some(4);
+            option.Expect().Should().Be(4);
+        }
+    }
 }
