@@ -145,4 +145,64 @@ public class OptionProjectionTests
                 static i => Gen.OneOf(
                     Gen.Fresh(() => Option.Some(i)),
                     Gen.Fresh(static () => Option.None<int>())));
+
+    public class Map
+    {
+        [Fact(DisplayName = "Map on none returns none")]
+        public void MapOnNoneReturnsNone()
+        {
+            Option.None<int>().Map(static i => i + 1).Should().Be(Option.None<int>());
+        }
+
+        [Fact(DisplayName = "Map on some returns some")]
+        public void MapOnSomeReturnsSome()
+        {
+            Option.Some("Some length").Map(static s => s.Length).Should().Be(Option.Some(11));
+        }
+
+        [Fact(DisplayName = "Select does the same as Map")]
+        public void MapOnSomeReturnsNone()
+        {
+            var opt = Option.Some(10);
+            opt.Select(static i => i + 1).Should().Be(opt.Map(static i => i + 1));
+        }
+    }
+
+    public class AndThen
+    {
+        [Fact(DisplayName = "AndThen on none returns none")]
+        public void AndThenOnNoneReturnsNone()
+        {
+            Option.None<int>().AndThen(static i => Option.Some(i + 1)).Should().Be(Option.None<int>());
+        }
+
+        [Fact(DisplayName = "AndThen on some returns some")]
+        public void AndThenOnSomeReturnsSome()
+        {
+            Option.Some(10).AndThen(static i => Option.Some(i + 1)).Should().Be(Option.Some(11));
+        }
+
+        [Fact(DisplayName = "SelectMany does the same as AndThen")]
+        public void AndThenOnSomeReturnsNone()
+        {
+            var opt = Option.Some(10);
+            opt.SelectMany(static i => Option.Some(i + 1)).Should().Be(opt.AndThen(static i => Option.Some(i + 1)));
+        }
+    }
+
+    public class OrElse
+    {
+        [Fact(DisplayName = "OrElse on none returns the second value")]
+        public void OrElseOnNoneReturnsTheSecondValue()
+
+        {
+            Option.None<int>().OrElse(static () => Option.Some(20)).Should().Be(Option.Some(20));
+        }
+
+        [Fact(DisplayName = "OrElse on some returns the first value")]
+        public void OrElseOnSomeReturnsTheFirstValue()
+        {
+            Option.Some(10).OrElse(static () => Option.Some(20)).Should().Be(Option.Some(10));
+        }
+    }
 }

@@ -1,7 +1,49 @@
-﻿namespace Results.Immutable;
+﻿using System.Runtime.CompilerServices;
+
+namespace Results.Immutable;
 
 public readonly partial record struct Option<T>
 {
+
+    /// <summary>
+    /// Project the value of the <see cref="Option{T}"/> to a different type with 
+    /// a selector function that returns a <see cref="Option{TOut}"/>.
+    /// 
+    /// Example:
+    /// 
+    /// <code>
+    /// var option = Option.Some(1);
+    /// var result = option.AndThen(x => Option.Some(x + 1));
+    /// var resultNone = option.AndThen(x => Option.None&lt;int&gt;());
+    /// </code>
+    /// 
+    /// </summary>
+    /// <param name="selector">A function to transform the value of the <see cref="Option{T}"/>.</param>
+    /// <typeparam name="TOut">The new type.</typeparam>
+    /// <returns>An option of the new type.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Option<TOut> SelectMany<TOut>(Func<T, Option<TOut>> selector) =>
+            Some is var (value)
+            ? selector(value)
+            : Option.None<TOut>();
+
+    /// <inheritdoc cref="AndThen{TOut}(Func{T, Option{TOut}})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Option<TOut> AndThen<TOut>(Func<T, Option<TOut>> selector) =>
+            SelectMany(selector);
+
+    /// <summary>
+    ///     Returns this <see cref="Option{T}" />, if this <see cref="Option{T}" /> has a value.
+    ///     Otherwise, returns the returned value by <paramref name="fn" />.
+    /// </summary>
+    /// <param name="fn">A function that returns an <see cref="Option{T}" />.</param>
+    /// <returns>An <see cref="Option{T}" />.</returns>
+    public Option<T> OrElse(Func<Option<T>> fn) =>
+            IsSome ? this : fn();
+
+    /// <summary>
+    ///     Returns the first <see cref="Option{T}
+
     /// <summary>
     ///     Combines the options and uses <paramref name="selector" />
     ///     to project the combined values to a new <see cref="Option{T}" />.
