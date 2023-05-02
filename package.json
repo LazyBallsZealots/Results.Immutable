@@ -1,5 +1,6 @@
 {
-  "name": "Results.Immutable",
+  "name": "results-immutable",
+  "private": true,
   "packageManager": "yarn@3.5.0",
   "devDependencies": {
     "@commitlint/cli": "^17.5.0",
@@ -10,6 +11,6 @@
     "prettier": "^2.8.7"
   },
   "scripts": {
-    "prepare": "yarn husky install"
+    "postinstall": "yarn husky install"
   }
 }

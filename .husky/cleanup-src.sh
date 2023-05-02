@@ -2,4 +2,4 @@
 
 dotnet tool restore
 printf -v joined '%s;' "${@#src/}"
-dotnet jb cleanupcode --profile=FullCleanup --settings=./src/Results.Immutable.DotSettings ./src/Results.Immutable.sln "--include=${joined%;}"
+dotnet jb cleanupcode --profile=FullCleanup --settings=./src/Results.Immutable.sln.DotSettings ./src/Results.Immutable.sln "--include=${joined%;}"
