@@ -15,7 +15,7 @@ public readonly record struct Result
     ///     This method should be used by all operations
     ///     which are supposed to return <see langword="void" />.
     /// </remarks>
-    public static Result<Unit> Ok() => new(Unit.Value, null);
+    public static Result<Unit> Ok() => new(Unit.Value);
 
     /// <summary>
     ///     Represents a successful operation.
@@ -34,7 +34,7 @@ public readonly record struct Result
     ///     A successful result, wrapping provided <paramref name="value" />.
     /// </returns>
     /// <remarks></remarks>
-    public static Result<T> Ok<T>(T value) => new(value, null);
+    public static Result<T> Ok<T>(T value) => new(value);
 
     /// <param name="successes">
     ///     A collection of <see cref="Success" />es to associate
@@ -44,7 +44,7 @@ public readonly record struct Result
     public static Result<T> Ok<T>(
         T value,
         IEnumerable<Success> successes) =>
-        new(value, successes.ToImmutableList());
+        new(value);
 
     /// <summary>
     ///     Creates a successful <see cref="Result{T}" />
@@ -91,25 +91,25 @@ public readonly record struct Result
     public static Result<Unit> Fail(string errorMessage) => Fail(new Error(errorMessage));
 
     /// <inheritdoc cref="Fail(string)" />
-    public static Result<Unit> Fail(Error error) => new(ImmutableList.Create(error), null);
+    public static Result<Unit> Fail(Error error) => new(ImmutableList.Create(error));
 
     /// <inheritdoc cref="Fail(Error)" />
-    public static Result<Unit> Fail(IEnumerable<Error> errors) => new(errors.ToImmutableList(), null);
+    public static Result<Unit> Fail(IEnumerable<Error> errors) => new(errors.ToImmutableList());
 
     /// <inheritdoc cref="Fail(Error)" />
-    public static Result<Unit> Fail(params Error[] errors) => new(errors.ToImmutableList(), null);
+    public static Result<Unit> Fail(params Error[] errors) => new(errors.ToImmutableList());
 
     /// <inheritdoc cref="Fail(string)" />
     public static Result<T> Fail<T>(string errorMessage) => Fail<T>(new Error(errorMessage));
 
     /// <inheritdoc cref="Fail(Error)" />
-    public static Result<T> Fail<T>(Error error) => new(ImmutableList.Create(error), null);
+    public static Result<T> Fail<T>(Error error) => new(ImmutableList.Create(error));
 
     /// <inheritdoc cref="Fail(IEnumerable{Error})" />
-    public static Result<T> Fail<T>(IEnumerable<Error> errors) => new(errors.ToImmutableList(), null);
+    public static Result<T> Fail<T>(IEnumerable<Error> errors) => new(errors.ToImmutableList());
 
     /// <inheritdoc cref="Fail(IEnumerable{Error})" />
-    public static Result<T> Fail<T>(params Error[] errors) => new(errors.ToImmutableList(), null);
+    public static Result<T> Fail<T>(params Error[] errors) => new(errors.ToImmutableList());
 
     /// <summary>
     ///     Creates a failed <see cref="Result{T}" />
@@ -197,12 +197,10 @@ public readonly record struct Result
                 IsErrored = true;
                 errorsBuilder.AddRange(result.Errors);
             }
-            successesBuilder.AddRange(result.Successes);
-
         }
         return IsErrored
-            ? new Result<ImmutableList<T>>(errorsBuilder.ToImmutable(), successesBuilder.ToImmutable())
-            : new Result<ImmutableList<T>>(valuesBuilder.ToImmutable(), successesBuilder.ToImmutable());
+            ? new Result<ImmutableList<T>>(errorsBuilder.ToImmutable())
+            : new Result<ImmutableList<T>>(valuesBuilder.ToImmutable());
     }
 
     /// <summary>
@@ -234,11 +232,10 @@ public readonly record struct Result
             }
             IsErrored = true;
             errorsBuilder.AddRange(result.Errors);
-            successesBuilder.AddRange(result.Successes);
         }
         return IsErrored
-            ? new Result<Unit>(errorsBuilder.ToImmutable(), successesBuilder.ToImmutable())
-            : new Result<Unit>(Unit.Value, successesBuilder.ToImmutable());
+            ? new Result<Unit>(errorsBuilder.ToImmutable())
+            : new Result<Unit>(Unit.Value);
 
     }
 
@@ -251,12 +248,11 @@ public readonly record struct Result
     /// <typeparam name="T2">Type of the second result</typeparam>
     public static Result<(T1, T2)> Zip<T1, T2>(Result<T1> first, Result<T2> second)
     {
-        var successes = ConcatLists(first.Successes, second.Successes);
         if (first.Some is var (v1) && second.Some is var (v2))
         {
-            return new Result<(T1, T2)>((v1, v2), successes);
+            return new Result<(T1, T2)>((v1, v2));
         }
-        return new Result<(T1, T2)>(ConcatLists(first.Errors, second.Errors), successes);
+        return new Result<(T1, T2)>(ConcatLists(first.Errors, second.Errors));
     }
 
     /// <summary>
@@ -270,12 +266,11 @@ public readonly record struct Result
     /// <typeparam name="T3">Type of the third result</typeparam>
     public static Result<(T1, T2, T3)> Zip<T1, T2, T3>(Result<T1> first, Result<T2> second, Result<T3> third)
     {
-        var successes = ConcatLists(first.Successes, second.Successes, third.Successes);
         if (first.Some is var (v1) && second.Some is var (v2) && third.Some is var (v3))
         {
-            return new Result<(T1, T2, T3)>((v1, v2, v3), successes);
+            return new Result<(T1, T2, T3)>((v1, v2, v3));
         }
-        return new Result<(T1, T2, T3)>(ConcatLists(first.Errors, second.Errors, third.Errors), successes);
+        return new Result<(T1, T2, T3)>(ConcatLists(first.Errors, second.Errors, third.Errors));
     }
 
     /// <summary>
@@ -291,12 +286,11 @@ public readonly record struct Result
     /// <typeparam name="T4">Type of the fourth result</typeparam>
     public static Result<(T1, T2, T3, T4)> Zip<T1, T2, T3, T4>(Result<T1> first, Result<T2> second, Result<T3> third, Result<T4> fourth)
     {
-        var successes = ConcatLists(first.Successes, second.Successes, third.Successes, fourth.Successes);
         if (first.Some is var (v1) && second.Some is var (v2) && third.Some is var (v3) && fourth.Some is var (v4))
         {
-            return new Result<(T1, T2, T3, T4)>((v1, v2, v3, v4), successes);
+            return new Result<(T1, T2, T3, T4)>((v1, v2, v3, v4));
         }
-        return new Result<(T1, T2, T3, T4)>(ConcatLists(first.Errors, second.Errors, third.Errors, fourth.Errors), successes);
+        return new Result<(T1, T2, T3, T4)>(ConcatLists(first.Errors, second.Errors, third.Errors, fourth.Errors));
     }
 
     /// <summary>
@@ -314,12 +308,11 @@ public readonly record struct Result
     /// <typeparam name="T5">Type of the fifth result</typeparam>
     public static Result<(T1, T2, T3, T4, T5)> Zip<T1, T2, T3, T4, T5>(Result<T1> first, Result<T2> second, Result<T3> third, Result<T4> fourth, Result<T5> fifth)
     {
-        var successes = ConcatLists(first.Successes, second.Successes, third.Successes, fourth.Successes, fifth.Successes);
         if (first.Some is var (v1) && second.Some is var (v2) && third.Some is var (v3) && fourth.Some is var (v4) && fifth.Some is var (v5))
         {
-            return new Result<(T1, T2, T3, T4, T5)>((v1, v2, v3, v4, v5), successes);
+            return new Result<(T1, T2, T3, T4, T5)>((v1, v2, v3, v4, v5));
         }
-        return new Result<(T1, T2, T3, T4, T5)>(ConcatLists(first.Errors, second.Errors, third.Errors, fourth.Errors, fifth.Errors), successes);
+        return new Result<(T1, T2, T3, T4, T5)>(ConcatLists(first.Errors, second.Errors, third.Errors, fourth.Errors, fifth.Errors));
     }
 
     /// <summary>

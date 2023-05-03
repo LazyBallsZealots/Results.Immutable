@@ -1,4 +1,4 @@
-﻿using Results.Immutable.Metadata;
+using Results.Immutable.Metadata;
 
 namespace Results.Immutable;
 
@@ -9,7 +9,6 @@ namespace Results.Immutable;
 public readonly partial struct Result<T> : IEquatable<Result<T>>
 {
     private readonly ImmutableList<Error>? errors;
-    private readonly ImmutableList<Success>? successes;
 
     private readonly Some<T>? some;
 
@@ -22,7 +21,6 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     {
         errors = ImmutableList.Create(new Error("Constructed result"));
         some = null;
-        successes = null;
     }
 
     /// <summary>
@@ -35,8 +33,7 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     ///     A list of <see cref="Success" />s.
     /// </param>
     internal Result(
-        T value,
-        ImmutableList<Success>? successes) : this(new Some<T>(value), successes)
+        T value) : this(new Some<T>(value))
     {
     }
 
@@ -50,11 +47,9 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     ///     A list of <see cref="Success" />s.
     /// </param>
     internal Result(
-        Some<T>? someValue,
-        ImmutableList<Success>? successes)
+        Some<T>? someValue)
     {
         this.errors = null;
-        this.successes = successes;
         this.some = someValue;
     }
 
@@ -68,21 +63,17 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     ///     A list of <see cref="Success" />s.
     /// </param>
     internal Result(
-        ImmutableList<Error>? errors,
-        ImmutableList<Success>? successes)
+        ImmutableList<Error>? errors)
     {
         this.errors = errors;
-        this.successes = successes;
         this.some = null;
     }
 
     private Result(
         Some<T>? some,
-        ImmutableList<Error>? errors,
-        ImmutableList<Success>? successes)
+        ImmutableList<Error>? errors)
     {
         this.errors = errors;
-        this.successes = successes;
         this.some = some;
     }
 
@@ -105,9 +96,6 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     /// <inheritdoc />
     public ImmutableList<Error> Errors => errors ?? ImmutableList<Error>.Empty;
 
-    /// <inheritdoc />
-    public ImmutableList<Success> Successes => successes ?? ImmutableList<Success>.Empty;
-
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with an <see cref="Error" />,
     ///     containing provided <paramref name="errorMessage" />.
@@ -129,8 +117,8 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="error" />.
     /// </returns>
-    public Result<T> AddError(Error error) => AddErrors(new[] { error });
 
+    public Result<T> AddError(Error error) => AddErrors(new[] { error });
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with <see cref="Error" />s
     ///     built from provided <paramref name="errorMessages" />.
@@ -155,30 +143,7 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="errors" />.
     /// </returns>
-    public Result<T> AddErrors(IEnumerable<Error> errors) => new Result<T>(Errors.AddRange(errors), null);
-
-    /// <summary>
-    ///     Creates a new <see cref="Result{T}" /> with a provided <paramref name="success" />.
-    /// </summary>
-    /// <param name="success">
-    ///     A <see cref="Success" /> to add.
-    /// </param>
-    /// <returns>
-    ///     A new <see cref="Result{T}" /> with provided <paramref name="success" />.
-    /// </returns>
-    public Result<T> AddSuccess(Success success) => AddSuccesses(new[] { success });
-
-    /// <summary>
-    ///     Creates a new <see cref="Result{T}" /> with provided <paramref name="successes" />.
-    /// </summary>
-    /// <param name="successes">
-    ///     A collection of <see cref="Success" />es to add.
-    /// </param>
-    /// <returns>
-    ///     A new <see cref="Result{T}" /> with provided <paramref name="successes" />.
-    /// </returns>
-    public Result<T> AddSuccesses(IEnumerable<Success> successes) =>
-        new Result<T>(some, Errors, Successes.AddRange(successes));
+    public Result<T> AddErrors(IEnumerable<Error> errors) => new Result<T>(Errors.AddRange(errors));
 
     /// <summary>
     ///     Returns a <see cref="bool" /> value indicating whether
@@ -216,46 +181,6 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
         where TError : Error =>
         Errors.OfType<TError>().Any();
 
-    /// <summary>
-    ///     Returns a <see cref="bool" /> value indicating whether
-    ///     this <see cref="Result{T}" /> instance contains a <typeparamref name="TSuccess" />
-    ///     matching provided <paramref name="predicate" />.
-    /// </summary>
-    /// <typeparam name="TSuccess">
-    ///     Generic type of the success.
-    /// </typeparam>
-    /// <param name="predicate">
-    ///     A <see cref="Predicate{T}" /> to match.
-    /// </param>
-    /// <returns>
-    ///     <see langword="true" /> if any of the <see cref="Successes" />
-    ///     match provided <paramref name="predicate" />,
-    ///     otherwise - <see langword="false" />.
-    /// </returns>
-    public bool HasSuccess<TSuccess>(Func<TSuccess, bool> predicate)
-        where TSuccess : Success =>
-        Successes.OfType<TSuccess>().Any(predicate);
-
-    /// <summary>
-    ///     Returns a <see cref="bool" /> value indicating whether
-    ///     this <see cref="Result{T}" /> contains a <typeparamref name="TSuccess" />.
-    /// </summary>
-    /// <typeparam name="TSuccess">
-    ///     Generic type of the success.
-    /// </typeparam>
-    /// <param name="predicate">
-    ///     A <see cref="Predicate{T}" /> to match.
-    /// </param>
-    /// <returns>
-    ///     <see langword="true" /> if any of the <see cref="Successes" />
-    ///     match provided <paramref name="predicate" />,
-    ///     otherwise - <see langword="false" />.
-    /// </returns>
-    public bool HasSuccess<TSuccess>()
-        where TSuccess : Success =>
-        Successes.OfType<TSuccess>().Any();
-
-
     public TNew Match<TNew>(Func<T, TNew> onOk, Func<ImmutableList<Error>, TNew> onError)
     {
         if (some is var (x))
@@ -265,18 +190,6 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
         else
         {
             return onError(Errors);
-        }
-    }
-
-    public TNew Match<TNew>(Func<T, ImmutableList<Success>, TNew> onOk, Func<ImmutableList<Error>, ImmutableList<Success>, TNew> onError)
-    {
-        if (some is var (x))
-        {
-            return onOk(x, Successes);
-        }
-        else
-        {
-            return onError(Errors, Successes);
         }
     }
 
@@ -292,26 +205,13 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
         }
     }
 
-    public void Match(Action<T, ImmutableList<Success>> onOk, Action<ImmutableList<Error>, ImmutableList<Success>> onError)
-    {
-        if (some is var (x))
-        {
-            onOk(x, Successes);
-        }
-        else
-        {
-            onError(Errors, Successes);
-        }
-    }
-
     public override bool Equals(object? obj) => obj is Result<T> other &&
             other.some == some &&
-            other.Errors.SequenceEqual(Errors) &&
-            other.Successes.SequenceEqual(Successes);
+            other.Errors.SequenceEqual(Errors);
 
     public bool Equals(Result<T> other) => Equals(other as object);
 
-    public override int GetHashCode() => HashCode.Combine(some, Errors, Successes);
+    public override int GetHashCode() => HashCode.Combine(some, Errors);
 
     public static bool operator ==(Result<T> left, Result<T> right) => Equals(left, right);
 

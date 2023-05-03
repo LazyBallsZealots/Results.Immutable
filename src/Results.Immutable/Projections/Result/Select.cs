@@ -23,6 +23,8 @@ public readonly partial struct Result<T>
     ///     <see cref="Result{T}" />.
     /// </remarks>
     public Result<TNew> Select<TNew>(Func<T, TNew> selector) =>
-        some is var (v) ? new Result<TNew>(selector(v), successes) : new Result<TNew>(errors, successes);
+        some is var (v) ? new Result<TNew>(selector(v)) : new Result<TNew>(errors);
 
+    public Result<TNew> Map<TNew>(Func<T, TNew> selector) =>
+        some is var (v) ? new Result<TNew>(selector(v)) : new Result<TNew>(errors);
 }
