@@ -3,7 +3,7 @@ name: PR build
 on:
   pull_request:
     branches: ["main"]
-    paths: ["src/**/*"]
+    # paths: ["src/**/*"]
 
 permissions:
   pull-requests: write
@@ -22,31 +22,54 @@ jobs:
           dotnet-version: |
             6.x
             7.x
-          dotnet-quality: 'ga'
-      
-      - name: Install dependencies
+          dotnet-quality: "ga"
+
+      - name: Restore dependencies
         run: dotnet restore Results.Immutable.sln
         working-directory: src
+
+      # - name: Restore tools
+      #   run: dotnet tool restore
+
+      # - name: Inspect code
+      #   run: |
+      #     dotnet jb inspectcode --build --settings=./src/Results.Immutable.DotSettings \
+      #       ./src/Results.Immutable.sln -o=inspectcode.xml
+      #     echo "\`\`\`xml" >> $GITHUB_STEP_SUMMARY
+      #     cat inspectcode.xml >> $GITHUB_STEP_SUMMARY
+      #     echo "\n\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Inspect code
+        uses: muno92/resharper_inspectcode@1.6.13
+        with:
+          solutionPath: src/Results.Immutable.sln
+
+      # - name: Check inspected code
+      #   run: |
+      #     if ((Select-Xml -Path .\inspectcode.xml -XPath "/Report/IssueTypes/*" | measure).Count -gt 0) {
+      #       throw "Too many issues, check workflow's Summary page"
+      #     }
+      #   shell: pwsh
 
       - name: Build
         run: dotnet build Results.Immutable.sln --configuration Debug --no-restore
         working-directory: src
-        
+
       - name: Test & analyze coverage
         run: dotnet test Results.Immutable.sln --no-build --collect:"XPlat Code Coverage" --results-directory ./coverage
         working-directory: src
-        
+
       - name: Coverage Summary Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-            filename: src/coverage/**/coverage.cobertura.xml
-            badge: true
-            fail_below_min: true
-            format: markdown
-            hide_complexity: true
-            output: both
-            thresholds: '80 95'
-            
+          filename: src/coverage/**/coverage.cobertura.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          hide_complexity: true
+          output: both
+          thresholds: "80 95"
+
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
         if: github.event_name == 'pull_request'
