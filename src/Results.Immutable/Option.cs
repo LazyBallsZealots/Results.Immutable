@@ -1,4 +1,6 @@
-﻿namespace Results.Immutable;
+﻿using System.Collections;
+
+namespace Results.Immutable;
 
 /// <summary>
 ///     Represents an optional value.
@@ -22,6 +24,36 @@ public readonly record struct Option
     ///     A new instance of <see cref="Immutable.Option{T}" /> without value.
     /// </returns>
     public static Option<T> None<T>() => new();
+
+    /// <summary>
+    /// Converts a nullable struct type to an <see cref="Option{T}" />,
+    /// if the value is null, the <see cref="Option{T}" /> is None.
+    /// </summary>
+    /// <typeparam name="T">Type of the value.</typeparam>
+    public static Option<T> FromNullable<T>(T? value) where T : struct =>
+            value.HasValue ? Some(value.Value) : None<T>();
+
+    /// <summary>
+    /// Converts a nullable reference type to an <see cref="Option{T}" />,
+    /// if the value is null, the <see cref="Option{T}" /> is None.
+    /// </summary>
+    /// <typeparam name="T">Type of the value.</typeparam>
+    public static Option<T> FromNullable<T>(T? value) where T : class =>
+          value is not null ? Some(value) : None<T>();
+
+
+    /// <summary>
+    /// Converts an <see cref="IEnumerable{T}" /> into an <see cref="Option{T}" />,
+    /// it takes the first element of the <see cref="IEnumerable{T}" /> and the rest are discarded.
+    /// If the <see cref="IEnumerable{T}" /> is empty, the <see cref="Option{T}" /> is None.
+    /// </summary>
+    /// <param name="enumerable">An <see cref="IEnumerable{T}"/> to convert into an <see cref="Option{T}"/>.</param>
+    /// <typeparam name="T">Type of the value.</typeparam>
+    public static Option<T> FromEnumerable<T>(IEnumerable<T> enumerable)
+    {
+        var enumerator = enumerable.GetEnumerator();
+        return enumerator.MoveNext() ? Some(enumerator.Current) : None<T>();
+    }
 }
 
 /// <typeparam name="T">Generic type of the value.</typeparam>
@@ -163,6 +195,18 @@ public readonly partial record struct Option<T>
         else
         {
             matchNone();
+        }
+    }
+
+    /// <summary>
+    /// Convert this <see cref="Option{T}" /> to an <see cref="IEnumerable{T}" />.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{T}" /> with a single value or none.</returns>
+    public IEnumerable<T> AsEnumerable()
+    {
+        if (Some is var (value))
+        {
+            yield return value;
         }
     }
 }
