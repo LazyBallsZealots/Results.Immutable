@@ -6,7 +6,7 @@ namespace Results.Immutable.Tests.ResultFactoriesTests;
 public sealed class TransposeTests
 {
     [Property(DisplayName = "Transposition of a list of successful results should result in a success")]
-    public Property MergingAListOfSuccessfulResultsShouldReturnSuccessfulResult() =>
+    public Property TransposingAListOfSuccessfulResultsShouldReturnSuccessfulResult() =>
         Prop.ForAll(
             Gen.ListOf(
                     Arb.Generate<int>()
@@ -31,7 +31,7 @@ public sealed class TransposeTests
                     .EndWith(tuple.Index.ToString()));
 
     [Property(DisplayName = "Transposition of a list of results is a failure if any of them has failed")]
-    public Property MergingAListOrResultsIsAFailureIfAnyOfThemHasFailed() =>
+    public Property TransposingAListOrResultsIsAFailureIfAnyOfThemHasFailed() =>
         Prop.ForAll(
             Gen.ListOf(GetIntegerResultGenerator())
                 .Where(static list => list.Any(static r => r.HasFailed))
@@ -49,7 +49,7 @@ public sealed class TransposeTests
     [Property(
         DisplayName = "Transposition of successful Result params is successful",
         MaxTest = 1000)]
-    public Property MergingOfSuccessfulResultsIsSuccessful() =>
+    public Property TransposingOfSuccessfulResultsIsSuccessful() =>
         Prop.ForAll(
             Gen.Two(
                     Arb.Generate<int>()
@@ -65,7 +65,7 @@ public sealed class TransposeTests
     [Property(
         DisplayName = "Merger of Result params is a failure if any of them is a failure",
         MaxTest = 1000)]
-    public Property MergingOfResultsIsAFailureIfAnyOfThemIsAFailure() =>
+    public Property TransposingOfResultsIsAFailureIfAnyOfThemIsAFailure() =>
         Prop.ForAll(
             Gen.Two(GetIntegerResultGenerator())
                 .Where(
@@ -82,15 +82,10 @@ public sealed class TransposeTests
                     .HasFailed;
             });
 
-    private static Gen<Result<int>> GetIntegerResultGenerator()
-    {
-        return Gen.OneOf(
+    private static Gen<Result<int>> GetIntegerResultGenerator() =>
+        Gen.OneOf(
             Arb.Generate<int>()
                 .Select(Result.Ok),
             Arb.Generate<string>()
                 .Select(static em => Result.Fail<int>(em)));
-    }
-
-    private static bool ResultHasEmptyEnumerableOfUnits(Result<IEnumerable<Unit>> r) =>
-        r is { Some.Value: var enumerable, } && !enumerable.Any();
 }
