@@ -1,3 +1,6 @@
+using FsCheck;
+using FsCheck.Xunit;
+
 namespace Results.Immutable.Tests.ResultTests;
 
 public sealed class EqualityTests
@@ -53,23 +56,42 @@ public sealed class EqualityTests
             .BeFalse();
     }
 
-    [Fact(DisplayName = "Returns a boolean indicating equality (==)")]
-    public void ReturnsABooleanIndicatingEquality()
-    {
-        (Result.Ok(42) == Result.Ok(42)).Should()
-            .BeTrue();
+    [Property(DisplayName = "Returns a boolean indicating (in)equality")]
+    public Property ReturnsBooleansIndicatingEquality() =>
+        Prop.ForAll(
+            Arb.Generate<Tuple<object?, object?>>()
+                .ToArbitrary(),
+            static tuple =>
+            {
+                var (value1, value2) = tuple;
 
-        (Result.Ok(26) != Result.Ok(42)).Should()
-            .BeTrue();
-    }
-    
-    [Fact(DisplayName = "Returns a boolean indicating difference (!=)")]
-    public void ReturnsABooleanIndicatingDifference()
-    {
-        (Result.Ok(29) != Result.Ok(29)).Should()
-            .BeFalse();
+                return value1?.Equals(value2) is true || value1 is null && value2 is null
+                    ? Result.Ok(value1) == Result.Ok(value2)
+                    : Result.Ok(value1) != Result.Ok(value2);
+            });
 
-        (Result.Ok(26) != Result.Ok(42)).Should()
-            .BeTrue();
-    }
+    [Property(DisplayName = "Hashes failed results in the same way")]
+    public Property ReturnsAValidHashCodeForFailedResults() =>
+        Prop.ForAll<List<string>>(
+            static errorMessages =>
+            {
+                var errors = errorMessages.Select(static s => new Error(s))
+                    .ToList();
+
+                var r1 = Result.Fail(errors);
+                var r2 = Result.Fail(errors);
+
+                return r1.GetHashCode() == r2.GetHashCode();
+            });
+
+    [Property(DisplayName = "Hashes successful results in the same way")]
+    public Property ReturnsAValidHashCodeForSuccessfulResults() =>
+        Prop.ForAll<object?>(
+            static value =>
+            {
+                var r1 = Result.Ok(value);
+                var r2 = Result.Ok(value);
+
+                return r1.GetHashCode() == r2.GetHashCode();
+            });
 }

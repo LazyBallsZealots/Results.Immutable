@@ -1,6 +1,4 @@
-﻿using Results.Immutable.Metadata;
-
-namespace Results.Immutable;
+﻿namespace Results.Immutable;
 
 public readonly partial struct Result<T>
 {

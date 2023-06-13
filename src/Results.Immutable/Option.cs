@@ -56,7 +56,6 @@ public readonly partial record struct Option<T>
     /// <summary>
     ///     Gets the value associated with this <see cref="Option{T}" />.
     ///     In case of <see cref="Option{T}.IsNone" />, returns the default value of <typeparamref name="T" />.
-    /// 
     ///     This property is <strong>unsafe</strong> to use then <typeparamref name="T" /> is a nullable reference type,
     ///     and non-nullable value types.
     ///     It is not possible to determine whether the value is null or None.
@@ -75,7 +74,6 @@ public readonly partial record struct Option<T>
     ///         option.ValueOrDefault; // null, same as Option.None&lt;string&gt;()
     ///         var option2 = Option.None&lt;int&gt;();
     ///         option2.ValueOrDefault; // 0
-
     ///     </code>
     /// </example>
     /// <value>The value associated with this <see cref="Option{T}" /> or default value of <typeparamref name="T" />.</value>
@@ -106,8 +104,7 @@ public readonly partial record struct Option<T>
     /// <param name="other"></param>
     /// <typeparam name="TOther"></typeparam>
     /// <returns></returns>
-    public Option<TOther> And<TOther>(Option<TOther> other) =>
-        Some.HasValue ? other : Option.None<TOther>();
+    public Option<TOther> And<TOther>(Option<TOther> other) => Some.HasValue ? other : Option.None<TOther>();
 
     /// <summary>
     ///     Returns this <see cref="Option{T}" />, if this <see cref="Option{T}" /> has a value.
@@ -115,8 +112,7 @@ public readonly partial record struct Option<T>
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public Option<T> Or(Option<T> other) =>
-        Some.HasValue ? this : other;
+    public Option<T> Or(Option<T> other) => Some.HasValue ? this : other;
 
     /// <summary>
     ///     Projects the value of this <see cref="Option{T}" />

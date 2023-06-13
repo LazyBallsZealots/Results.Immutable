@@ -4,12 +4,11 @@
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <IsPackable>true</IsPackable>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Projections\Option\" />
-    <Compile Remove="Extensions/ResultEnumerableExtensions.cs" />
+    <Folder Include="Projections\Option\"/>
   </ItemGroup>
 
 </Project>

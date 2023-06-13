@@ -19,7 +19,7 @@ public readonly partial record struct Option<T>
     /// </returns>
     public Option<TOut> SelectMany<TOut>(Func<T, Option<TOut>> selector) =>
         Some is var (value) &&
-        selector(value) is {IsSome: true,} r
+        selector(value) is { IsSome: true, } r
             ? r
             : Option.None<TOut>();
 

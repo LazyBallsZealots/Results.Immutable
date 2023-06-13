@@ -81,70 +81,80 @@ public sealed class OptionTests
     public void HasAnObjectWrappedInSome()
     {
         var option = Option.Some("hello");
-        option.Some?.Value.Should().Be("hello");
+        option.Some?.Value.Should()
+            .Be("hello");
     }
 
     [Fact(DisplayName = "Has a null object wrapped in Some")]
     public void HasANullObjectWrappedInSome()
     {
         var option = Option.Some<string?>(null);
-        option.Some?.Value.Should().BeNull();
+        option.Some?.Value.Should()
+            .BeNull();
     }
 
     [Fact(DisplayName = "Has no object wrapped in Some")]
     public void HasNoObjectWrappedInSome()
     {
         var option = Option.None<string>();
-        option.Some.Should().BeNull();
+        option.Some.Should()
+            .BeNull();
     }
 
     [Fact(DisplayName = "Has a struct wrapped in Some")]
     public void HasAStructWrappedInSome()
     {
         var option = Option.Some(1);
-        option.Some?.Value.Should().Be(1);
+        option.Some?.Value.Should()
+            .Be(1);
     }
 
     [Fact(DisplayName = "Has a null struct wrapped in Some")]
     public void HasANullStructWrappedInSome()
     {
         var option = Option.Some<int?>(null);
-        option.Some?.Value.Should().BeNull();
+        option.Some?.Value.Should()
+            .BeNull();
     }
 
     [Fact(DisplayName = "Has no struct wrapped in Some")]
     public void HasNoStructWrappedInSome()
     {
         var option = Option.None<int>();
-        option.Some.Should().BeNull();
+        option.Some.Should()
+            .BeNull();
     }
 
     [Fact(DisplayName = "Gets object if it is there")]
     public void GetsObjectIfItIsThere()
     {
         var option = Option.Some("hello");
-        option.ValueOrDefault.Should().Be("hello");
+        option.ValueOrDefault.Should()
+            .Be("hello");
     }
 
     [Fact(DisplayName = "Gets default object if there is no value")]
     public void GetsDefaultObjectIfThereIsNoValue()
     {
         var option = Option.None<string>();
-        option.ValueOrDefault.Should().BeNull();
+        option.ValueOrDefault.Should()
+            .BeNull();
     }
 
     [Fact(DisplayName = "Gets struct if it is there")]
     public void GetsStructIfItIsThere()
     {
         var option = Option.Some(1);
-        option.ValueOrDefault.Should().Be(1);
+        option.ValueOrDefault.Should()
+            .Be(1);
     }
 
     [Fact(DisplayName = "Gets default struct if there is no value")]
     public void GetsDefaultStructIfThereIsNoValue()
     {
         var option = Option.None<int>();
-        option.ValueOrDefault.Should().Be(0);
+        option.ValueOrDefault.Should()
+            .Be(0);
     }
 
     public class GetValueOrTests
@@ -153,21 +163,27 @@ public sealed class OptionTests
         public void GetsTheValueIfSetAndNotOrPart()
         {
             var option = Option.Some(4);
-            option.GetValueOr(5).Should().Be(4);
+            option.GetValueOr(5)
+                .Should()
+                .Be(4);
         }
 
         [Fact(DisplayName = "Gets the fallback if none")]
         public void GetsTheFallbackIfNone()
         {
             var option = Option.None<int>();
-            option.GetValueOr(5).Should().Be(5);
+            option.GetValueOr(5)
+                .Should()
+                .Be(5);
         }
 
         [Fact(DisplayName = "Gets its null value if available")]
         public void GetsTheNullValueIfSetAndNotOrPart()
         {
             var option = Option.Some<string?>(null);
-            option.GetValueOr("wrong").Should().BeNull();
+            option.GetValueOr("wrong")
+                .Should()
+                .BeNull();
         }
     }
 
@@ -177,21 +193,27 @@ public sealed class OptionTests
         public void GetsTheValueIfSetAndNotOrPart()
         {
             var option = Option.Some(4);
-            option.GetValueOrElse(() => 5).Should().Be(4);
+            option.GetValueOrElse(() => 5)
+                .Should()
+                .Be(4);
         }
 
         [Fact(DisplayName = "Gets the fallback if none")]
         public void GetsTheFallbackIfNone()
         {
             var option = Option.None<int>();
-            option.GetValueOrElse(() => 5).Should().Be(5);
+            option.GetValueOrElse(() => 5)
+                .Should()
+                .Be(5);
         }
 
         [Fact(DisplayName = "Gets its null value if available")]
         public void GetsTheNullValueIfSetAndNotOrPart()
         {
             var option = Option.Some<string?>(null);
-            option.GetValueOrElse(() => "wrong").Should().BeNull();
+            option.GetValueOrElse(() => "wrong")
+                .Should()
+                .BeNull();
         }
     }
 }

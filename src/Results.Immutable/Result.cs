@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using Results.Immutable.Extensions;
 using Results.Immutable.Metadata;
 
 namespace Results.Immutable;
@@ -30,19 +32,8 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     ///     A value.
     /// </param>
     internal Result(T value)
-        : this(new Some<T>(value))
     {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Result{T}" /> structure.
-    /// </summary>
-    /// <param name="someValue">
-    ///     An <see cref="Option{T}" />.
-    /// </param>
-    internal Result(Some<T>? someValue)
-    {
-        Some = someValue;
+        Some = new(value);
         errors = null;
     }
 
@@ -158,9 +149,13 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     ///     match provided <paramref name="predicate" />,
     ///     otherwise - <see langword="false" />.
     /// </returns>
+    /// <remarks>
+    ///     This function traverses whole Errors hierarchy.
+    /// </remarks>
     public bool HasError<TError>(Func<TError, bool> predicate)
         where TError : Error =>
-        Errors.OfType<TError>()
+        Errors.Flatten(static e => e.InnerErrors)
+            .OfType<TError>()
             .Any(predicate);
 
     /// <summary>
@@ -173,9 +168,13 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     /// <returns>
     ///     <see langword="true" /> if any of the <see cref="Errors" /> of the type <see cref="TError" />.
     /// </returns>
+    /// <remarks>
+    ///     This function traverses whole Errors hierarchy.
+    /// </remarks>
     public bool HasError<TError>()
         where TError : Error =>
-        Errors.OfType<TError>()
+        Errors.Flatten(static e => e.InnerErrors)
+            .OfType<TError>()
             .Any();
 
     /// <summary>
@@ -224,9 +223,21 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     public bool Equals(Result<T> other) => Equals(other as object);
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Some, Errors);
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(Some);
 
-    public static bool operator ==(Result<T> left, Result<T> right) => Equals(left, right);
+        foreach (var error in Errors)
+        {
+            hashCode.Add(error);
+        }
 
-    public static bool operator !=(Result<T> left, Result<T> right) => !Equals(left, right);
+        return hashCode.ToHashCode();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(Result<T> left, Result<T> right) => left.Equals(right);
+
+    public static bool operator !=(Result<T> left, Result<T> right) => !(left == right);
 }

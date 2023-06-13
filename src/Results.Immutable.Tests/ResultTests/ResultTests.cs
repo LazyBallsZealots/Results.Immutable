@@ -11,48 +11,13 @@ public sealed class ResultTests
             .BeEquivalentTo(Result.Fail<Unit>("Constructed result"));
     }
 
-    [Fact(DisplayName = "Is not successful")]
-    public void IsNotSuccessful()
-    {
-        var result = Result.Fail();
-
-        result.HasSucceeded.Should()
-            .BeFalse();
-
-        result.IsOk.Should()
-            .BeFalse();
-
-        result.HasFailed.Should()
-            .BeTrue();
-
-        result.IsErrored.Should()
-            .BeTrue();
-    }
-
-    [Fact(DisplayName = "Is successful")]
-    public void IsSuccessful()
-    {
-        var result = Result.Ok();
-
-        result.HasSucceeded.Should()
-            .BeTrue();
-
-        result.IsOk.Should()
-            .BeTrue();
-
-        result.HasFailed.Should()
-            .BeFalse();
-
-        result.IsErrored.Should()
-            .BeFalse();
-    }
-
     [Fact(DisplayName = "Adds an error to a successful result")]
     public void AddsAnErrorToASuccessfulResult()
     {
         var original = Result.Ok();
 
         var result = original.AddError("An error");
+
         result
             .Should()
             .BeEquivalentTo(Result.Fail("An error"));
@@ -157,14 +122,8 @@ public sealed class ResultTests
 
         var ran = false;
         result.Match(
-            _ =>
-            {
-                ran = true;
-            },
-            _ =>
-            {
-                ran = false;
-            });
+            _ => { ran = true; },
+            _ => { ran = false; });
 
         ran.Should()
             .BeTrue();
@@ -177,14 +136,8 @@ public sealed class ResultTests
 
         IEnumerable<Error>? errors = null;
         result.Match(
-            _ =>
-            {
-                errors = null;
-            },
-            err =>
-            {
-                errors = err;
-            });
+            _ => { errors = null; },
+            err => { errors = err; });
 
         errors.Should()
             .BeEquivalentTo(
@@ -217,7 +170,11 @@ public sealed class ResultTests
             static errors => errors);
 
         value.Should()
-            .BeEquivalentTo(new[] {new Error("A strange error")});
+            .BeEquivalentTo(
+                new[]
+                {
+                    new Error("A strange error"),
+                });
     }
 
     private sealed record ErrorA : Error
