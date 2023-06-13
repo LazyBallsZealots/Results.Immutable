@@ -1,6 +1,4 @@
-﻿using Results.Immutable.Metadata;
-
-namespace Results.Immutable.Extensions;
+﻿namespace Results.Immutable.Extensions;
 
 internal static class EnumerableExtensions
 {
@@ -17,11 +15,6 @@ internal static class EnumerableExtensions
             selector(reason)
                 .ForEach(queue.Enqueue);
         }
-    }
-
-    public static IEnumerable<T> Yield<T>(this T item)
-    {
-        yield return item;
     }
 
     public static void ForEach<T>(

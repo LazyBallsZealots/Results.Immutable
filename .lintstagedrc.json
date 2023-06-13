@@ -1,4 +1,6 @@
 {
-    "*.{md,mdx}": ["prettier --write"],
-    "*.cs": "./.husky/cleanup-src.sh"
+  "*.{md,mdx}": [
+    "prettier --write"
+  ],
+  "*.cs": "./.husky/cleanup-src.sh"
 }

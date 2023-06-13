@@ -20,14 +20,6 @@ public static class Result
     /// <summary>
     ///     Represents a successful operation.
     /// </summary>
-    /// <returns>
-    ///     A successful result.
-    /// </returns>
-    public static Result<T> Ok<T>() => new();
-
-    /// <summary>
-    ///     Represents a successful operation.
-    /// </summary>
     /// <typeparam name="T">Type of the value.</typeparam>
     /// <param name="value">Value to associate with successful result.</param>
     /// <returns>
@@ -61,7 +53,7 @@ public static class Result
     public static Result<Unit> OkIf(bool condition, Func<string> errorMessageFactory) =>
         condition ? Ok() : Fail<Unit>(errorMessageFactory());
 
-    /// <param name="errorMessageFactory">
+    /// <param name="errorFactory">
     ///     A <see cref="Func{T}" />, returning an <see cref="Error" />.
     /// </param>
     /// <inheritdoc cref="OkIf(bool, Error)" />
@@ -145,15 +137,14 @@ public static class Result
         condition ? Fail(errorFactory()) : Ok();
 
     /// <inheritdoc cref="Result.Transpose{T}(IReadOnlyCollection{Result{T}})" />
-    public static Result<ImmutableList<T>> Transpose<T>(params Result<T>[] results) => Transpose(results);
+    public static Result<ImmutableList<T>> Transpose<T>(params Result<T>[] results) =>
+        Transpose((IReadOnlyCollection<Result<T>>)results);
 
     /// <summary>
     ///     Transposes a collection of <see cref="Result{T}" />s,
     ///     aggregating the values into an <see cref="ImmutableList{T}" />.
-    /// 
     ///     If at least one of the <paramref name="results" /> is failed, then the whole computation is failed,
     ///     and the <see cref="Result{T}.Errors" /> will be aggregated.
-    /// 
     ///     The order of the values in the <see cref="ImmutableList{T}" /> is the same as in the input collection.
     ///     The successes are aggregated in both OK and ERROR states.
     /// </summary>
@@ -197,7 +188,6 @@ public static class Result
     ///     Merges all <paramref name="results" />
     ///     into one <see cref="Result{T}" />,
     ///     aggregating all errors and successes into one <see cref="Result{T}" />.
-    /// 
     ///     If at least one of the <paramref name="results" /> is failed, then the whole computation is failed.
     /// </summary>
     /// <param name="results">
@@ -213,13 +203,10 @@ public static class Result
         var errorsBuilder = ImmutableList.CreateBuilder<Error>();
         var isErrored = false;
 
-        foreach (var result in results)
+        foreach (var result in results.Where(static r => r.Some is null))
         {
-            if (result.Some is null)
-            {
-                isErrored = true;
-                errorsBuilder.AddRange(result.Errors);
-            }
+            isErrored = true;
+            errorsBuilder.AddRange(result.Errors);
         }
 
         return isErrored
@@ -373,62 +360,6 @@ public static class Result
         try
         {
             return Ok(func());
-        }
-        catch (Exception e)
-        {
-            return Fail<T>(catchHandler(e));
-        }
-    }
-
-    /// <summary>
-    ///     Attempts to perform a <paramref name="asyncFunc" />;
-    ///     if no exception is thrown, a successful
-    ///     <see cref="Result{T}" /> is returned,
-    ///     Otherwise - a failed <see cref="Result{T}" />
-    ///     is returned, with an error instance built from
-    ///     <paramref name="catchHandler" />.
-    /// </summary>
-    /// <param name="asyncFunc">
-    ///     An asynchronous delegate, represented by a
-    ///     <see cref="Func{TResult}" /> of a <see cref="Task{TResult}" />
-    ///     to execute.
-    /// </param>
-    /// <inheritdoc cref="Try{T}(Func{T}, Func{Exception, Error}?)" />
-    /// <seealso cref="Try{T}(Func{ValueTask{T}}, Func{Exception, Error}?)" />
-    public static async Task<Result<T>> Try<T>(
-        Func<Task<T>> asyncFunc,
-        Func<Exception, Error>? catchHandler = null)
-    {
-        catchHandler ??= ExceptionHandler;
-
-        try
-        {
-            var result = await asyncFunc();
-            return Ok(result);
-        }
-        catch (Exception e)
-        {
-            return Fail<T>(catchHandler(e));
-        }
-    }
-
-    /// <param name="asyncFunc">
-    ///     An asynchronous delegate, represented by a
-    ///     <see cref="Func{TResult}" /> of a <see cref="ValueTask{TResult}" />
-    ///     to execute.
-    /// </param>
-    /// <inheritdoc cref="Try{T}(Func{Task{T}}, Func{Exception, Error}?)" />
-    /// <seealso cref="Try{T}(Func{Task{T}}, Func{Exception, Error}?)" />
-    public static async ValueTask<Result<T>> Try<T>(
-        Func<ValueTask<T>> asyncFunc,
-        Func<Exception, Error>? catchHandler = null)
-    {
-        catchHandler ??= ExceptionHandler;
-
-        try
-        {
-            var result = await asyncFunc();
-            return Ok(result);
         }
         catch (Exception e)
         {

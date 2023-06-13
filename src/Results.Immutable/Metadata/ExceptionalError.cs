@@ -1,11 +1,5 @@
 ﻿namespace Results.Immutable.Metadata;
 
-/// <summary>
-///     Represents an error caused by an exception.
-/// </summary>
-/// <param name="Message">
-///     The exception message.
-/// </param>
 public sealed record ExceptionalError(Exception CausedBy, ImmutableList<Error> InnerErrors)
     : Error(
         CausedBy.Message,
@@ -20,5 +14,4 @@ public sealed record ExceptionalError(Exception CausedBy, ImmutableList<Error> I
         : this(exception, ImmutableList.Create(innerError))
     {
     }
-
 }

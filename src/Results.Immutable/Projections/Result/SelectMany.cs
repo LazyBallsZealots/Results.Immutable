@@ -10,10 +10,8 @@ public readonly partial struct Result<T>
     /// <param name="selector">A transform to apply to the value of the result and the intermediate value.</param>
     /// <typeparam name="TNew">The type of the final value.</typeparam>
     /// <returns>A result contained the transformed value.</returns>
-    public Result<TNew> SelectMany<TNew>(Func<T, Result<TNew>> selector)
-    {
-        return Some is not var (v) ? new(errors) : selector(v);
-    }
+    public Result<TNew> SelectMany<TNew>(Func<T, Result<TNew>> selector) =>
+        Some is not var (v) ? new(errors) : selector(v);
 
     /// <summary>
     ///     Projects the possible value of the <see cref="Result{T}" /> into a new <see cref="Result{T}" />,
@@ -36,11 +34,8 @@ public readonly partial struct Result<T>
         }
 
         var intermediateResult = intermediateSelector(value);
-        if (intermediateResult.Some is not var (intermediate))
-        {
-            return new(intermediateResult.errors);
-        }
-
-        return new(resultSelector(value, intermediate));
+        return intermediateResult.Some is not var (intermediate)
+            ? new(intermediateResult.errors)
+            : new(resultSelector(value, intermediate));
     }
 }
