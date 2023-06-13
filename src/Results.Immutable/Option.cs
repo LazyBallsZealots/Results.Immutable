@@ -137,7 +137,7 @@ public readonly partial record struct Option<T>
     ///     obtained by executing either <paramref name="matchSome" />
     ///     or <paramref name="matchNone" /> delegates.
     /// </returns>
-    public TResult Match<TResult>(Func<T?, TResult> matchSome, Func<TResult> matchNone) =>
+    public TResult Match<TResult>(Func<T, TResult> matchSome, Func<TResult> matchNone) =>
         Some is var (value) ? matchSome(value) : matchNone();
 
     /// <summary>

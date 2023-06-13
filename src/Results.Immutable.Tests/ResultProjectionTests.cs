@@ -106,7 +106,7 @@ public sealed class ResultProjectionTests
     public Property BindOnSuccessfulResultWithValueConvertsIt(int firstValue, int finalValue) =>
         (Result.Ok(firstValue)
                     .Select(_ => Result.Ok(finalValue))
-                is { IsSuccessful: true, } r &&
+                is {IsSuccessful: true,} r &&
             r.ValueMatches(i => i == finalValue))
         .ToProperty();
 
@@ -169,21 +169,15 @@ public sealed class ResultProjectionTests
                         _ => second,
                         _ => third,
                         static (
-                            one,
-                            two,
-                            three) => one.SelectMany(
-                                _ => two,
-                                _ => three,
-                                static (
-                                    first,
-                                    second,
-                                    third) => Option.Some(first + second + third))
+                                one,
+                                two,
+                                three) => (from v1 in one from v2 in two from v3 in three select v1 + v2 + v3)
                             .Match(
                                 static i => Result.Ok(i),
                                 MatchNone));
 
                 static Result<int> SumAsResult(Option<int> one, Option<int> two) =>
-                    one.SelectMany(_ => two, static (first, second) => Option.Some(first + second))
+                    one.SelectMany(_ => two, static (first, second) => first + second)
                         .Match(
                             static i => Result.Ok(i),
                             MatchNone);
@@ -205,10 +199,10 @@ public sealed class ResultProjectionTests
                         _ => Result.Ok(secondValue),
                         static (first, second) => first.SelectMany(
                                 _ => second,
-                                static (i1, i2) => Option.Some(i1 + i2))
+                                static (i1, i2) => i1 + i2)
                             .Match(
                                 static i => Result.Ok(i),
-                                MatchNone)) is { IsSuccessful: true, } success &&
+                                MatchNone)) is {IsSuccessful: true,} success &&
                 success.ValueMatches(i => i == sum))
             .ToProperty();
     }
@@ -230,18 +224,12 @@ public sealed class ResultProjectionTests
                         _ => Result.Ok(secondValue),
                         _ => Result.Ok(thirdValue),
                         static (
-                            first,
-                            second,
-                            third) => first.SelectMany(
-                                _ => second,
-                                _ => third,
-                                static (
-                                    first,
-                                    second,
-                                    third) => Option.Some(first + second + third))
+                                first,
+                                second,
+                                third) => (from v1 in first from v2 in second from v3 in third select v1 + v2 + v3)
                             .Match(
                                 static i => Result.Ok(i),
-                                MatchNone)) is { IsSuccessful: true, } success &&
+                                MatchNone)) is {IsSuccessful: true,} success &&
                 success.ValueMatches(i => i == sum))
             .ToProperty();
     }
@@ -265,21 +253,13 @@ public sealed class ResultProjectionTests
                         _ => Result.Ok(third),
                         _ => Result.Ok(fourth),
                         static (
-                            a,
-                            b,
-                            c,
-                            d) => a.SelectMany(
-                                _ => b,
-                                _ => c,
-                                _ => d,
-                                static (
-                                    a,
-                                    b,
-                                    c,
-                                    d) => Option.Some(a + b + c + d))
+                                a,
+                                b,
+                                c,
+                                d) => (from v1 in a from v2 in b from v3 in c from v4 in d select v1 + v2 + v3 + v4)
                             .Match(
                                 static i => Result.Ok(i),
-                                MatchNone)) is { IsSuccessful: true, } success &&
+                                MatchNone)) is {IsSuccessful: true,} success &&
                 success.ValueMatches(i => i == sum))
             .ToProperty();
     }
@@ -305,24 +285,20 @@ public sealed class ResultProjectionTests
                         _ => Result.Ok(fourth),
                         _ => Result.Ok(fifth),
                         static (
-                            a,
-                            b,
-                            c,
-                            d,
-                            e) => a.SelectMany(
-                                _ => b,
-                                _ => c,
-                                _ => d,
-                                _ => e,
-                                static (
-                                    a,
-                                    b,
-                                    c,
-                                    d,
-                                    e) => Option.Some(a + b + c + d + e))
+                                a,
+                                b,
+                                c,
+                                d,
+                                e) => (
+                                from v1 in a
+                                from v2 in b
+                                from v3 in c
+                                from v4 in d
+                                from v5 in e
+                                select v1 + v2 + v3 + v4 + v5)
                             .Match(
                                 static i => Result.Ok(i),
-                                MatchNone)) is { IsSuccessful: true, } success &&
+                                MatchNone)) is {IsSuccessful: true,} success &&
                 success.ValueMatches(i => i == sum))
             .ToProperty();
     }
@@ -350,27 +326,22 @@ public sealed class ResultProjectionTests
                         _ => Result.Ok(fifth),
                         _ => Result.Ok(sixth),
                         static (
-                            a,
-                            b,
-                            c,
-                            d,
-                            e,
-                            f) => a.SelectMany(
-                                _ => b,
-                                _ => c,
-                                _ => d,
-                                _ => e,
-                                _ => f,
-                                static (
-                                    a,
-                                    b,
-                                    c,
-                                    d,
-                                    e,
-                                    f) => Option.Some(a + b + c + d + e + f))
+                                one,
+                                two,
+                                three,
+                                four,
+                                five,
+                                six) => (
+                                from v1 in one
+                                from v2 in two
+                                from v3 in three
+                                from v4 in four
+                                from v5 in five
+                                from v6 in six
+                                select v1 + v2 + v3 + v4 + v5 + v6)
                             .Match(
                                 static i => Result.Ok(i),
-                                MatchNone)) is { IsSuccessful: true, } success &&
+                                MatchNone)) is {IsSuccessful: true,} success &&
                 success.ValueMatches(i => i == sum))
             .ToProperty();
     }
