@@ -16,7 +16,7 @@ public sealed class TryTests
 
     [Fact(
         DisplayName =
-            "Try returns a failed result with an ExceptionalError with proper exception referenced by CausedBy property if exception is thrown")]
+            "Try returns a failed result with an ExceptionalError with proper exception referencediny CausedBy property if exception is thrown")]
     public void TryReturnsAFailedResultWithAnExceptionalErrorWithProperExceptionIfAnExceptionIsThrown()
     {
         var exceptionToThrow = new InvalidOperationException("Oops!");

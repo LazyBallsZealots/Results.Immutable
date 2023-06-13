@@ -221,15 +221,8 @@ public static class Result
     /// <param name="second">Second result</param>
     /// <typeparam name="T1">Type of the first result</typeparam>
     /// <typeparam name="T2">Type of the second result</typeparam>
-    public static Result<(T1, T2)> Zip<T1, T2>(Result<T1> first, Result<T2> second)
-    {
-        if (first.Some is var (v1) && second.Some is var (v2))
-        {
-            return new((v1, v2));
-        }
-
-        return new(ConcatLists(first.Errors, second.Errors));
-    }
+    public static Result<(T1, T2)> Zip<T1, T2>(Result<T1> first, Result<T2> second) =>
+        (first.Some, second.Some) is var ((v1), (v2)) ? new((v1, v2)) : new(ConcatLists(first.Errors, second.Errors));
 
     /// <summary>
     ///     Creates a <see cref="Result{T}" /> based on the arguments.
@@ -243,19 +236,14 @@ public static class Result
     public static Result<(T1, T2, T3)> Zip<T1, T2, T3>(
         Result<T1> first,
         Result<T2> second,
-        Result<T3> third)
-    {
-        if (first.Some is var (v1) && second.Some is var (v2) && third.Some is var (v3))
-        {
-            return new((v1, v2, v3));
-        }
-
-        return new(
-            ConcatLists(
-                first.Errors,
-                second.Errors,
-                third.Errors));
-    }
+        Result<T3> third) =>
+        (first.Some, second.Some, third.Some) is var ((v1), (v2), (v3))
+            ? new((v1, v2, v3))
+            : new(
+                ConcatLists(
+                    first.Errors,
+                    second.Errors,
+                    third.Errors));
 
     /// <summary>
     ///     Creates a <see cref="Result{T}" /> based on the arguments.
@@ -272,20 +260,15 @@ public static class Result
         Result<T1> first,
         Result<T2> second,
         Result<T3> third,
-        Result<T4> fourth)
-    {
-        if (first.Some is var (v1) && second.Some is var (v2) && third.Some is var (v3) && fourth.Some is var (v4))
-        {
-            return new((v1, v2, v3, v4));
-        }
-
-        return new(
-            ConcatLists(
-                first.Errors,
-                second.Errors,
-                third.Errors,
-                fourth.Errors));
-    }
+        Result<T4> fourth) =>
+        (first.Some, second.Some, third.Some, fourth.Some) is var ((v1), (v2), (v3), (v4))
+            ? new((v1, v2, v3, v4))
+            : new(
+                ConcatLists(
+                    first.Errors,
+                    second.Errors,
+                    third.Errors,
+                    fourth.Errors));
 
     /// <summary>
     ///     Creates a <see cref="Result{T}" /> based on the arguments.
@@ -305,25 +288,16 @@ public static class Result
         Result<T2> second,
         Result<T3> third,
         Result<T4> fourth,
-        Result<T5> fifth)
-    {
-        if (first.Some is var (v1) &&
-            second.Some is var (v2) &&
-            third.Some is var (v3) &&
-            fourth.Some is var (v4) &&
-            fifth.Some is var (v5))
-        {
-            return new((v1, v2, v3, v4, v5));
-        }
-
-        return new(
-            ConcatLists(
-                first.Errors,
-                second.Errors,
-                third.Errors,
-                fourth.Errors,
-                fifth.Errors));
-    }
+        Result<T5> fifth) =>
+        (first.Some, second.Some, third.Some, fourth.Some, fifth.Some) is var ((v1), (v2), (v3), (v4), (v5))
+            ? new((v1, v2, v3, v4, v5))
+            : new(
+                ConcatLists(
+                    first.Errors,
+                    second.Errors,
+                    third.Errors,
+                    fourth.Errors,
+                    fifth.Errors));
 
     /// <summary>
     ///     Attempts to perform a <paramref name="func" />;

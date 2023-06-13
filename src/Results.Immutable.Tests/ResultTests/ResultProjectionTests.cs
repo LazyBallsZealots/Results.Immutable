@@ -1,5 +1,6 @@
 ﻿using FsCheck;
 using FsCheck.Xunit;
+using Results.Immutable.Tests.Generators;
 using static FluentAssertions.FluentActions;
 
 namespace Results.Immutable.Tests.ResultTests;
@@ -57,7 +58,7 @@ public sealed class ResultProjectionTests
         DisplayName = "Projecting two results should return a success or a failure, depending on initial results")]
     public Property BindingOnTwoSuccessfulResultsShouldReturnASuccessfulResultWithAProperValue() =>
         Prop.ForAll(
-            Generator.OfResult()
+            SelectMany.Generator()
                 .ToArbitrary(),
             static tuple =>
             {
@@ -76,36 +77,4 @@ public sealed class ResultProjectionTests
                         failedResult.HasError(static (Error e) => e.Message == "Second errored out"),
                 };
             });
-
-    private static class Generator
-    {
-        public static Gen<(Result<object?> FirstResult, Result<object?> SecondResult,
-                Func<object?, object?, object?> Selector, object? FinalValue)>
-            OfResult() =>
-            Arb.Generate<Tuple<object?, object?, Func<object?, object?, object?>>>()
-                .SelectMany(
-                    static tuple =>
-                    {
-                        var (first, second, _) = tuple;
-                        const string firstErrorMessage = "First errored out";
-                        const string secondErrorMessage = "Second errored out";
-
-                        return Gen.OneOf(
-                            Gen.Fresh(() => (First: Result.Ok(first), Second: Result.Ok(second))),
-                            Gen.Fresh(
-                                () => (First: Result.Fail<object?>(firstErrorMessage), Second: Result.Ok(second))),
-                            Gen.Fresh(
-                                () => (First: Result.Ok(first), Second: Result.Fail<object?>(secondErrorMessage))),
-                            Gen.Fresh(
-                                static () => (First: Result.Fail<object?>("First errored out"),
-                                    Second: Result.Fail<object?>("Second errored out"))));
-                    },
-                    static (funcTuple, resultsTuple) =>
-                    {
-                        var ((first, second, selector), (result1, result2)) = (funcTuple, resultsTuple);
-
-                        return (FirstResult: result1, SecondResult: result2, Selector: selector,
-                            FinalValue: selector(first, second));
-                    });
-    }
 }
