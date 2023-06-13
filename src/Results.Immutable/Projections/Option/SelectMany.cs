@@ -2,9 +2,29 @@
 
 public readonly partial record struct Option<T>
 {
+    public Option<TOut> Select<TOut>(Func<T, TOut> selector) =>
+        Some is var (value) ? selector(value) : Option.None<TOut>();
+
     /// <summary>
-    ///     Combines the options and uses <paramref name="selector" />
-    ///     to project the combined values to a new <see cref="Option{T}" />.
+    ///     Projects the possible value to a new <see cref="Option{T}" />.
+    /// </summary>
+    /// <param name="selector">
+    ///     A transform function to apply to the possible value.
+    /// </param>
+    /// <typeparam name="TOut">
+    ///     Generic type of the resulting <see cref="Option{T}" />.
+    /// </typeparam>
+    /// <returns>
+    ///     An <see cref="Option{T}" />, which contains possibly the transformed value.
+    /// </returns>
+    public Option<TOut> SelectMany<TOut>(Func<T, Option<TOut>> selector) =>
+        Some is var (value) &&
+        selector(value) is {IsSome: true,} r
+            ? r
+            : Option.None<TOut>();
+
+    /// <summary>
+    ///     Projects the possible value to a new <see cref="Option{T}" />.
     /// </summary>
     /// <typeparam name="T1">
     ///     Generic type of the combined <see cref="Option{T}" />.
@@ -13,145 +33,31 @@ public readonly partial record struct Option<T>
     ///     Generic type of the resulting <see cref="Option{T}" />.
     /// </typeparam>
     /// <param name="combinator">
-    ///     Delegate used to obtain an <see cref="Option{T}" />
-    ///     of <typeparamref name="T1" /> from existing option.
+    ///     A transform function to apply to the possible value of this <see cref="Option{T}" />.
     /// </param>
     /// <param name="selector">
-    ///     Selector for the final <see cref="Option{T}" />.
+    ///     A transform function to apply to the possible value of the combined <see cref="Option{T}" />.
     /// </param>
     /// <returns>
-    ///     An <see cref="Option{T}" />, which combines all
-    ///     of the intermediate options.
+    ///     An <see cref="Option{T}" />, which contains possibly the transformed value.
     /// </returns>
     public Option<TOut> SelectMany<T1, TOut>(
         Func<T, Option<T1>> combinator,
-        Func<T, T1, Option<TOut>> selector) =>
-        Some is var (value) && combinator(value).Some is var (value1)
+        Func<T, T1, TOut> selector) =>
+        Some is var (value) &&
+        combinator(value)
+            .Some is var (value1)
             ? selector(value, value1)
             : Option.None<TOut>();
 
-    /// <typeparam name="T2">
-    ///     Generic type of the combined <see cref="Option{T}" />.
-    /// </typeparam>
-    /// <param name="firstCombinator">
-    ///     Delegate used to obtain an <see cref="Option{T}" />
-    ///     of <typeparamref name="T1" /> from existing option.
-    /// </param>
-    /// <param name="secondCombinator">
-    ///     Delegate used to obtain an <see cref="Option{T}" />
-    ///     of <typeparamref name="T2" /> from existing option.
-    /// </param>
-    /// <param name="selector"></param>
-    /// <inheritdoc cref="SelectMany{T1,TOut}" />
-    public Option<TOut> SelectMany<T1, T2, TOut>(
-        Func<T, Option<T1>> firstCombinator,
-        Func<T, Option<T2>> secondCombinator,
-        Func<T, T1, T2, Option<TOut>> selector) =>
-        Some is var (value)
-            && firstCombinator(value).Some is var (value1)
-            && secondCombinator(value).Some is var (value2)
-            ? selector(value, value1, value2)
-            : Option.None<TOut>();
-
-    /// <typeparam name="T3">
-    ///     Generic type of the combined <see cref="Option{T}" />.
-    /// </typeparam>
-    /// <param name="firstCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T1" /> from existing option.
-    /// </param>
-    /// <param name="secondCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T2" /> from existing option.
-    /// </param>
-    /// <param name="thirdCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T3" /> from existing option.
-    /// </param>
-    /// <inheritdoc cref="SelectMany{T1,T2,TOut}" />
-    public Option<TOut> SelectMany<T1, T2, T3, TOut>(
-        Func<Option<T>, Option<T1>> firstCombinator,
-        Func<Option<T>, Option<T2>> secondCombinator,
-        Func<Option<T>, Option<T3>> thirdCombinator,
-        Func<T?, T1?, T2?, T3?, Option<TOut>> selector) =>
-        Some is var (value)
-            && firstCombinator(this).Some is var (value1)
-            && secondCombinator(this).Some is var (value2)
-            && thirdCombinator(this).Some is var (value3)
-            ? selector(value, value1, value2, value3)
-            : Option.None<TOut>();
-
-    /// <typeparam name="T4">
-    ///     Generic type of the combined <see cref="Option{T}" />.
-    /// </typeparam>
-    /// <param name="firstCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T1" /> from existing option.
-    /// </param>
-    /// <param name="secondCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T2" /> from existing option.
-    /// </param>
-    /// <param name="thirdCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T3" /> from existing option.
-    /// </param>
-    /// <param name="fourthCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T4" /> from existing option.
-    /// </param>
-    /// <inheritdoc cref="SelectMany{T1,T2,T3,TOut}" />
-    public Option<TOut> SelectMany<T1, T2, T3, T4, TOut>(
-        Func<Option<T>, Option<T1>> firstCombinator,
-        Func<Option<T>, Option<T2>> secondCombinator,
-        Func<Option<T>, Option<T3>> thirdCombinator,
-        Func<Option<T>, Option<T4>> fourthCombinator,
-        Func<T?, T1?, T2?, T3?, T4?, Option<TOut>> selector) =>
-        Some is var (value)
-            && firstCombinator(this).Some is var (value1)
-            && secondCombinator(this).Some is var (value2)
-            && thirdCombinator(this).Some is var (value3)
-            && fourthCombinator(this).Some is var (value4)
-            ? selector(value, value1, value2, value3, value4)
-            : Option.None<TOut>();
-
-    /// <typeparam name="T5">
-    ///     Generic type of the combined <see cref="Option{T}" />.
-    /// </typeparam>
-    /// <param name="firstCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T1" /> from existing option.
-    /// </param>
-    /// <param name="secondCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T2" /> from existing option.
-    /// </param>
-    /// <param name="thirdCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T3" /> from existing option.
-    /// </param>
-    /// <param name="fourthCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T4" /> from existing option.
-    /// </param>
-    /// <param name="fifthCombinator">
-    ///     Delegate used to obtain a <see cref="Option{T}" />
-    ///     of <typeparamref name="T4" /> from existing option.
-    /// </param>
-    /// <inheritdoc cref="SelectMany{T1,T2,T3,T4,TOut}" />
-    public Option<TOut> SelectMany<T1, T2, T3, T4, T5, TOut>(
-        Func<Option<T>, Option<T1>> firstCombinator,
-        Func<Option<T>, Option<T2>> secondCombinator,
-        Func<Option<T>, Option<T3>> thirdCombinator,
-        Func<Option<T>, Option<T4>> fourthCombinator,
-        Func<Option<T>, Option<T5>> fifthCombinator,
-        Func<T?, T1?, T2?, T3?, T4?, T5?, Option<TOut>> selector) =>
-        Some is var (value)
-            && firstCombinator(this).Some is var (value1)
-            && secondCombinator(this).Some is var (value2)
-            && thirdCombinator(this).Some is var (value3)
-            && fourthCombinator(this).Some is var (value4)
-            && fifthCombinator(this).Some is var (value5)
-            ? selector(value, value1, value2, value3, value4, value5)
-            : Option.None<TOut>();
+    /// <summary>
+    ///     Filters the possible value by a predicate.
+    /// </summary>
+    /// <param name="predicate">A function to test each possible value.</param>
+    /// <returns>
+    ///     An <see cref="Option{T}" /> with the possible value if the predicate is true,
+    ///     otherwise it is returned as empty.
+    /// </returns>
+    public Option<T> Where(Func<T, bool> predicate) =>
+        Some is var (value) && predicate(value) ? this : Option.None<T>();
 }

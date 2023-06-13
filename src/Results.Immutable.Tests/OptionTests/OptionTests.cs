@@ -1,7 +1,7 @@
 ﻿using FsCheck;
 using FsCheck.Xunit;
 
-namespace Results.Immutable.Tests;
+namespace Results.Immutable.Tests.OptionTests;
 
 public sealed class OptionTests
 {
