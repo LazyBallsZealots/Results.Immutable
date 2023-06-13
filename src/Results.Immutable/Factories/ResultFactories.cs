@@ -225,7 +225,7 @@ public readonly record struct Result
         Func<T> func,
         Func<Exception, Error>? catchHandler = null)
     {
-        catchHandler ??= ExceptionHandler;
+        catchHandler ??= e => new ExceptionalError(e);
 
         try
         {
@@ -256,7 +256,7 @@ public readonly record struct Result
         Func<Task<T>> asyncFunc,
         Func<Exception, Error>? catchHandler = null)
     {
-        catchHandler ??= ExceptionHandler;
+        catchHandler ??= e => new ExceptionalError(e);
 
         try
         {
@@ -280,7 +280,7 @@ public readonly record struct Result
         Func<ValueTask<T>> asyncFunc,
         Func<Exception, Error>? catchHandler = null)
     {
-        catchHandler ??= ExceptionHandler;
+        catchHandler ??= e => new ExceptionalError(e);
 
         try
         {
@@ -293,5 +293,5 @@ public readonly record struct Result
         }
     }
 
-    private static Error ExceptionHandler(Exception exception) => new ExceptionalError(exception);
+    // private static Error ExceptionHandler(Exception exception) => new ExceptionalError(exception);
 }
