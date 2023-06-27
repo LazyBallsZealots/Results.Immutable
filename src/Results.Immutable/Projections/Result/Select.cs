@@ -17,7 +17,7 @@ public readonly partial struct Result<T>
     ///     instance.
     /// </returns>
     /// <remarks>
-    ///     This overload disregards the <see cref="Option" /> of this
+    ///     This overload disregards the <see cref="OptionFactories" /> of this
     ///     <see cref="Result{T}" />.
     /// </remarks>
     public Result<TNew> Select<TNew>(Func<T, TNew> selector) =>

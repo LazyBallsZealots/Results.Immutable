@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Projections\Option\"/>
+    <Folder Include="Projections\Option\" />
   </ItemGroup>
 
 </Project>
