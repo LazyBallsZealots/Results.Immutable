@@ -1,5 +1,5 @@
 {
-  "name": "results-immutable",
+  "name": "results-immutable-workspaces",
   "private": true,
   "packageManager": "yarn@3.5.0",
   "devDependencies": {
@@ -7,9 +7,14 @@
     "@commitlint/config-conventional": "^17.4.4",
     "commitlint": "^17.5.0",
     "husky": "^8.0.3",
+    "lerna": "^7.3.0",
     "lint-staged": "^13.2.0",
-    "prettier": "^2.8.7"
+    "prettier": "^2.8.7",
+    "xml2js": "^0.6.2"
   },
+  "workspaces": [
+    "src/*"
+  ],
   "scripts": {
     "postinstall": "yarn husky install"
   }
