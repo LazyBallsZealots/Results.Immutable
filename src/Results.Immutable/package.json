@@ -4,6 +4,6 @@
   "version": "0.0.0",
   "packageManager": "yarn@3.5.0",
   "scripts": {
-    "version": "node ../../scripts/version.mjs"
+    "version": "node ../../scripts/version.mjs; git add Results.Immutable.csproj"
   }
 }
