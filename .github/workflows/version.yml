@@ -6,6 +6,19 @@ permissions:
 
 on:
   workflow_dispatch:
+    inputs:
+      release-type:
+        description: Release type
+        type: choice
+        default: stable
+        options:
+          - stable
+          - alpha
+          - beta
+          - rc
+
+env:
+  params: ${{ inputs.release-type == 'stable' && '--conventional-graduate' || format('--conventional-prerelease --preid {0}', inputs.release-type) }}
 
 jobs:
   preview:
@@ -23,7 +36,7 @@ jobs:
       - run: yarn install --immutable
       - name: Preview proposed versions
         run: |
-          echo "n" | yarn lerna version >> $GITHUB_STEP_SUMMARY
+          echo "n" | yarn lerna version ${{ env.params }} >> $GITHUB_STEP_SUMMARY
 
   version:
     name: Update versions
@@ -61,9 +74,9 @@ jobs:
 
       - name: Preview proposed versions
         run: |
-          yarn lerna version -y --create-release github
+          yarn lerna version -y --create-release github ${{ env.params }}
 
       - name: Create Pull Request
         run: |
           echo -e "Review Pull Request:\n" >> $GITHUB_STEP_SUMMARY
-          gh pr create --fill- >> $GITHUB_STEP_SUMMARY
+          gh pr create --fill-first >> $GITHUB_STEP_SUMMARY
