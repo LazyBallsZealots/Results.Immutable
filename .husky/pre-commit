@@ -1,5 +1,4 @@
 #!/bin/bash
-. $HOME/.nvm/nvm.sh
 . "$(dirname -- "$0")/_/husky.sh"
 
 yarn lint-staged --relative
