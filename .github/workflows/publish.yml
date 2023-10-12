@@ -1,0 +1,39 @@
+name: Publish packages
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "Results.Immutable/*"
+  workflow_dispatch:
+
+jobs:
+  packages:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (startsWith(github.event.head_commit.message, 'Merge pull request') &&
+      endsWith(github.event.head_commit.message, 'chore(release): publish'))
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: |
+            6.0.x
+            7.0.x
+      - run: |
+          dotnet pack src/Results.Immutable/Results.Immutable.csproj \
+            --include-symbols \
+            -p:SymbolPackageFormat=snupkg \
+            -c Release \
+            -o ./nugets
+        name: dotnet pack
+      - run: |
+          dotnet nuget push "./nugets/*" \
+            -k $NUGET_AUTH_TOKEN \
+            -s https://api.nuget.org/v3/index.json
+        name: Nuget push
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_KEY }}
