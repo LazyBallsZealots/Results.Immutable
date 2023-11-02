@@ -1,7 +1,7 @@
 {
   "name": "Results.Immutable",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.0",
   "packageManager": "yarn@3.5.0",
   "scripts": {
     "version": "node ../../scripts/version.mjs; git add Results.Immutable.csproj"
