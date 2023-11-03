@@ -33,9 +33,9 @@ public readonly partial struct Result<T>
             return new(errors);
         }
 
-        var intermediateResult = intermediateSelector(value);
-        return intermediateResult.Some is not var (intermediate)
-            ? new(intermediateResult.errors)
-            : new(resultSelector(value, intermediate));
+        return intermediateSelector(value) is { } intermediateResult &&
+            intermediateResult is { Some.Value: var intermediateValue, }
+                ? new(resultSelector(value, intermediateValue))
+                : new(intermediateResult.errors);
     }
 }

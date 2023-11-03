@@ -341,5 +341,38 @@ public static class Result
         }
     }
 
+    public static async Task<Result<Unit>> TryAsync(
+        Func<Task> func,
+        Func<Exception, Error>? catchHandler = null)
+    {
+        catchHandler ??= ExceptionHandler;
+
+        try
+        {
+            await func();
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return Fail(catchHandler(e));
+        }
+    }
+
+    public static async Task<Result<T>> TryAsync<T>(
+        Func<Task<T>> func,
+        Func<Exception, Error>? catchHandler = null)
+    {
+        catchHandler ??= ExceptionHandler;
+
+        try
+        {
+            return Ok(await func());
+        }
+        catch (Exception e)
+        {
+            return Fail<T>(catchHandler(e));
+        }
+    }
+
     private static Error ExceptionHandler(Exception exception) => new ExceptionalError(exception);
 }
