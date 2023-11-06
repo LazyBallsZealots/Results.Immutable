@@ -1,4 +1,5 @@
 ﻿using FsCheck;
+using FsCheck.Fluent;
 using FsCheck.Xunit;
 
 namespace Results.Immutable.Tests.ResultFactoriesTests;
@@ -8,9 +9,9 @@ public sealed class TransposeTests
     [Property(DisplayName = "Transposition of a list of successful results should result in a success")]
     public Property TransposingAListOfSuccessfulResultsShouldReturnSuccessfulResult() =>
         Prop.ForAll(
-            Gen.ListOf(
-                    Arb.Generate<int>()
-                        .Select(Result.Ok))
+            ArbMap.Default.GeneratorFor<int>()
+                .Select(Result.Ok)
+                .ListOf()
                 .ToArbitrary(),
             static list =>
                 list.Transpose() is { HasSucceeded: true, Some.Value: var enumerable, } &&
@@ -33,7 +34,8 @@ public sealed class TransposeTests
     [Property(DisplayName = "Transposition of a list of results is a failure if any of them has failed")]
     public Property TransposingAListOrResultsIsAFailureIfAnyOfThemHasFailed() =>
         Prop.ForAll(
-            Gen.ListOf(GetIntegerResultGenerator())
+            GetIntegerResultGenerator()
+                .ListOf()
                 .Where(static list => list.Any(static r => r.HasFailed))
                 .ToArbitrary(),
             static list => list.Transpose()
@@ -51,9 +53,9 @@ public sealed class TransposeTests
         MaxTest = 1000)]
     public Property TransposingOfSuccessfulResultsIsSuccessful() =>
         Prop.ForAll(
-            Gen.Two(
-                    Arb.Generate<int>()
-                        .Select(Result.Ok))
+            ArbMap.Default.GeneratorFor<int>()
+                .Select(Result.Ok)
+                .Two()
                 .ToArbitrary(),
             static tuple =>
             {
@@ -67,7 +69,8 @@ public sealed class TransposeTests
         MaxTest = 1000)]
     public Property TransposingOfResultsIsAFailureIfAnyOfThemIsAFailure() =>
         Prop.ForAll(
-            Gen.Two(GetIntegerResultGenerator())
+            GetIntegerResultGenerator()
+                .Two()
                 .Where(
                     static tuple =>
                     {
@@ -84,8 +87,8 @@ public sealed class TransposeTests
 
     private static Gen<Result<int>> GetIntegerResultGenerator() =>
         Gen.OneOf(
-            Arb.Generate<int>()
+            ArbMap.Default.GeneratorFor<int>()
                 .Select(Result.Ok),
-            Arb.Generate<string>()
+            ArbMap.Default.GeneratorFor<string>()
                 .Select(static em => Result.Fail<int>(em)));
 }

@@ -1,4 +1,5 @@
 ﻿using FsCheck;
+using FsCheck.Fluent;
 using FsCheck.Xunit;
 using Results.Immutable.Tests.Generators;
 using static FluentAssertions.FluentActions;

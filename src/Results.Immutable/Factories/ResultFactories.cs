@@ -302,7 +302,7 @@ public static class Result
     /// <summary>
     ///     Attempts to perform a <paramref name="func" />;
     ///     if no exception is thrown, a successful
-    ///     <see cref="Result{T}" /> is returned,
+    ///     <see cref="Result{T}" /> is returned.
     ///     Otherwise - a failed <see cref="Result{T}" />
     ///     is returned, with an error instance built from
     ///     <paramref name="catchHandler" />.
@@ -341,8 +341,32 @@ public static class Result
         }
     }
 
-    public static async Task<Result<Unit>> TryAsync(
-        Func<Task> func,
+    /// <summary>
+    ///     Attempts to run <paramref name="func" />
+    ///     asynchronously; if no exception is thrown,
+    ///     <see cref="Result{T}" /> of <see cref="Unit" /> is returned.
+    ///     Otherwise, a failed <see cref="Result{T}" /> is returned,
+    ///     with an error instance built from <paramref name="catchHandler" />.
+    /// </summary>
+    /// <param name="func">
+    ///     An asynchronous delegate to execute.
+    /// </param>
+    /// <param name="catchHandler">
+    ///     A delegate which returns an instance of an <see cref="Error" />
+    ///     if an exception is thrown.
+    /// </param>
+    /// <returns>
+    ///     Successful <see cref="Result{T}" /> of <see cref="Unit" /> if no exception was thrown,
+    ///     otherwise - a failure.
+    /// </returns>
+    /// <remarks>
+    ///     The default <paramref name="catchHandler" />
+    ///     returns an <see cref="ExceptionalError" />,
+    ///     which contains the thrown exception in the
+    ///     <see cref="ExceptionalError.CausedBy" /> property.
+    /// </remarks>
+    public static async ValueTask<Result<Unit>> TryAsync(
+        Func<ValueTask> func,
         Func<Exception, Error>? catchHandler = null)
     {
         catchHandler ??= ExceptionHandler;
@@ -358,8 +382,32 @@ public static class Result
         }
     }
 
-    public static async Task<Result<T>> TryAsync<T>(
-        Func<Task<T>> func,
+    /// <summary>
+    ///     Attempts to run <paramref name="func" />
+    ///     asynchronously; if no exception is thrown,
+    ///     <see cref="Result{T}" /> of <typeparamref name="T" /> is returned.
+    ///     Otherwise, a failed <see cref="Result{T}" /> is returned,
+    ///     with an error instance built from <paramref name="catchHandler" />.
+    /// </summary>
+    /// <param name="func">
+    ///     An asynchronous delegate to execute.
+    /// </param>
+    /// <param name="catchHandler">
+    ///     A delegate which returns an instance of an <see cref="Error" />
+    ///     if an exception is thrown.
+    /// </param>
+    /// <returns>
+    ///     Successful <see cref="Result{T}" /> of <see cref="Unit" /> if no exception was thrown,
+    ///     otherwise - a failure.
+    /// </returns>
+    /// <remarks>
+    ///     The default <paramref name="catchHandler" />
+    ///     returns an <see cref="ExceptionalError" />,
+    ///     which contains the thrown exception in the
+    ///     <see cref="ExceptionalError.CausedBy" /> property.
+    /// </remarks>
+    public static async ValueTask<Result<T>> TryAsync<T>(
+        Func<ValueTask<T>> func,
         Func<Exception, Error>? catchHandler = null)
     {
         catchHandler ??= ExceptionHandler;

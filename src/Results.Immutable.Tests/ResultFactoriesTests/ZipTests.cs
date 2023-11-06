@@ -1,4 +1,5 @@
 ﻿using FsCheck;
+using FsCheck.Fluent;
 using FsCheck.Xunit;
 using Results.Immutable.Tests.Generators;
 
@@ -85,7 +86,7 @@ public sealed class ZipTests
             ResultOfObject.Generator()
                 .Four()
                 .SelectMany(
-                    _ => ResultOfObject.Generator(),
+                    static _ => ResultOfObject.Generator(),
                     static (tuple, result) => (tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, result))
                 .ToArbitrary(),
             static tuple =>
