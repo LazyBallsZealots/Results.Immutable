@@ -1,4 +1,4 @@
-using FsCheck;
+using FsCheck.Fluent;
 using FsCheck.Xunit;
 using static Results.Immutable.Tests.ResultFactoriesTests.ResultMatching;
 
@@ -18,7 +18,7 @@ public sealed class OkTests
     [Property(DisplayName = "Creates a successful result of provided type")]
     public void ShouldCreateSuccessfulResultOfProvidedType() =>
         Prop.ForAll(
-            Arb.Generate<object?>()
+            ArbMap.Default.GeneratorFor<object?>()
                 .ToArbitrary(),
             static obj =>
             {

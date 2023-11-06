@@ -25,15 +25,17 @@ public static class TaskOfResultExtensions
     ///     A <see cref="Task{T}" />, representing the result of an asynchronous operation,
     ///     wrapping the <see cref="Result{T}" /> of <typeparamref name="TNew" />.
     /// </returns>
-    public static async Task<Result<TNew>> Select<T, TNew>(
-        this Task<Result<T>> task,
+    public static async ValueTask<Result<TNew>> Select<T, TNew>(
+        this ValueTask<Result<T>> task,
         Func<T, TNew> selector) =>
-        (await task).Select(selector);
+        await task is var result && result is { Some.Value: var value, }
+            ? new(selector(value))
+            : Result.Fail<TNew>(result.Errors);
 
     /// <summary>
     ///     Projects the <see cref="Result{T}" />
     ///     of this <paramref name="task" />
-    ///     using a provided <paramref name="resultSelector" />,
+    ///     using a provided <paramref name="asyncResultSelector" />,
     ///     flattening the structure.
     /// </summary>
     /// <typeparam name="T">Generic type of the <see cref="Result{T}" />.</typeparam>
@@ -42,22 +44,17 @@ public static class TaskOfResultExtensions
     ///     A <see cref="Task{T}" /> of <see cref="Result{T}" />,
     ///     representing the result of an asynchronous operation.
     /// </param>
-    /// <param name="resultSelector">
+    /// <param name="asyncResultSelector">
     ///     Delegate to execute.
     /// </param>
     /// <returns>
     ///     A <see cref="Task{T}" />, representing the result of an asynchronous operation,
     ///     wrapping the <see cref="Result{T}" /> of <typeparamref name="TNew" />.
     /// </returns>
-    public static async Task<Result<TNew>> SelectMany<T, TNew>(
-        this Task<Result<T>> task,
-        Func<T, Result<TNew>> resultSelector) =>
-        (await task).SelectMany(resultSelector);
-
-    public static async Task<Result<TNew>> SelectMany<T, TNew>(
-        this Task<Result<T>> task,
-        Func<T, Task<Result<TNew>>> asyncResultSelector) =>
-        await task is { } result && result is { Some.Value: var value, }
+    public static async ValueTask<Result<TNew>> SelectMany<T, TNew>(
+        this ValueTask<Result<T>> task,
+        Func<T, ValueTask<Result<TNew>>> asyncResultSelector) =>
+        await task is var result && result is { Some.Value: var value, }
             ? await asyncResultSelector(value)
             : Result.Fail<TNew>(result.Errors);
 
@@ -82,25 +79,19 @@ public static class TaskOfResultExtensions
     ///     A <see cref="Task{T}" />, representing the result of an asynchronous
     ///     operation, wrapping the <see cref="Result{T}" /> of <typeparamref name="TNew" />.
     /// </returns>
-    public static async Task<Result<TNew>> SelectMany<T, TIntermediate, TNew>(
-        this Task<Result<T>> task,
-        Func<T, Result<TIntermediate>> intermediateSelector,
-        Func<T, TIntermediate, TNew> resultSelector) =>
-        (await task).SelectMany(intermediateSelector, resultSelector);
-
-    public static async Task<Result<TNew>> SelectMany<T, TIntermediate, TNew>(
-        this Task<Result<T>> task,
-        Func<T, Task<Result<TIntermediate>>> asyncIntermediateSelector,
+    public static async ValueTask<Result<TNew>> SelectMany<T, TIntermediate, TNew>(
+        this ValueTask<Result<T>> task,
+        Func<T, ValueTask<Result<TIntermediate>>> intermediateSelector,
         Func<T, TIntermediate, TNew> resultSelector)
     {
-        if (await task is { } result && result is not { Some.Value: var value, })
+        if (await task is var result && result is { Some.Value: var value, })
         {
-            return Result.Fail<TNew>(result.Errors);
+            return await intermediateSelector(value) is var intermediateResult &&
+                intermediateResult is { Some.Value: var intermediate, }
+                    ? Result.Ok(resultSelector(value, intermediate))
+                    : Result.Fail<TNew>(intermediateResult.Errors);
         }
 
-        return await asyncIntermediateSelector(value) is { } intermediateResult &&
-            intermediateResult is { Some.Value: var intermediateValue, }
-                ? Result.Ok(resultSelector(value, intermediateValue))
-                : Result.Fail<TNew>(intermediateResult.Errors);
+        return Result.Fail<TNew>(result.Errors);
     }
 }

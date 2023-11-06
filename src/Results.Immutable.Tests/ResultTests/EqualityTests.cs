@@ -1,4 +1,5 @@
 using FsCheck;
+using FsCheck.Fluent;
 using FsCheck.Xunit;
 
 namespace Results.Immutable.Tests.ResultTests;
@@ -59,13 +60,13 @@ public sealed class EqualityTests
     [Property(DisplayName = "Returns a boolean indicating (in)equality")]
     public Property ReturnsBooleansIndicatingEquality() =>
         Prop.ForAll(
-            Arb.Generate<Tuple<object?, object?>>()
+            ArbMap.Default.GeneratorFor<Tuple<object?, object?>>()
                 .ToArbitrary(),
             static tuple =>
             {
                 var (value1, value2) = tuple;
 
-                return value1?.Equals(value2) is true || value1 is null && value2 is null
+                return value1?.Equals(value2) is true || (value1 is null && value2 is null)
                     ? Result.Ok(value1) == Result.Ok(value2)
                     : Result.Ok(value1) != Result.Ok(value2);
             });

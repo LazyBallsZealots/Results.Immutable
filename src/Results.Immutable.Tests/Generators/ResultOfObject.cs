@@ -1,16 +1,17 @@
 ﻿using FsCheck;
+using FsCheck.Fluent;
 
 namespace Results.Immutable.Tests.Generators;
 
 internal static class ResultOfObject
 {
     public static Gen<Result<object?>> Generator() =>
-        Arb.Generate<object?>()
+        ArbMap.Default.GeneratorFor<object?>()
             .SelectMany(
                 static obj =>
                     Gen.OneOf(
-                        Gen.Fresh(() => Result.Ok(obj)),
-                        Gen.Fresh(() => Result.Fail<object?>("Errored out"))));
+                        Gen.Constant(Result.Ok(obj)),
+                        Gen.Constant(Result.Fail<object?>("Errored out"))));
 
     public static Gen<(Result<object?>, Result<object?>)> TwoTupleGenerator(object? first, object? second)
     {
@@ -18,11 +19,11 @@ internal static class ResultOfObject
         const string secondErrorMessage = "Second errored out";
 
         return Gen.OneOf(
-            Gen.Fresh(() => (First: Result.Ok(first), Second: Result.Ok(second))),
-            Gen.Fresh(() => (First: Result.Fail<object?>(firstErrorMessage), Second: Result.Ok(second))),
-            Gen.Fresh(() => (First: Result.Ok(first), Second: Result.Fail<object?>(secondErrorMessage))),
-            Gen.Fresh(
-                static () => (First: Result.Fail<object?>("First errored out"),
+            Gen.Constant((First: Result.Ok(first), Second: Result.Ok(second))),
+            Gen.Constant((First: Result.Fail<object?>(firstErrorMessage), Second: Result.Ok(second))),
+            Gen.Constant((First: Result.Ok(first), Second: Result.Fail<object?>(secondErrorMessage))),
+            Gen.Constant(
+                (First: Result.Fail<object?>("First errored out"),
                     Second: Result.Fail<object?>("Second errored out"))));
     }
 }

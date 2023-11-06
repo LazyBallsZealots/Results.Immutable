@@ -1,4 +1,5 @@
 ﻿using FsCheck;
+using FsCheck.Fluent;
 using FsCheck.Xunit;
 
 namespace Results.Immutable.Tests.OptionTests;
@@ -8,7 +9,7 @@ public sealed class OptionTests
     [Property(DisplayName = "Some has appropriate value", MaxTest = 1000)]
     public Property SomeHasAdequateValue() =>
         Prop.ForAll(
-            Arb.Generate<int>()
+            ArbMap.Default.GeneratorFor<int>()
                 .Select(static i => (Option: Option.Some(i), ExpectedValue: i))
                 .ToArbitrary(),
             static tuple =>
@@ -22,7 +23,7 @@ public sealed class OptionTests
     [Property(DisplayName = "Match of some returns proper value", MaxTest = 1000)]
     public Property MatchOfSomeReturnsProperValue() =>
         Prop.ForAll(
-            Arb.Generate<int>()
+            ArbMap.Default.GeneratorFor<int>()
                 .Select(Option.Some)
                 .ToArbitrary(),
             static option =>
@@ -34,7 +35,7 @@ public sealed class OptionTests
     [Property(DisplayName = "Match of none returns proper value", MaxTest = 1000)]
     public Property MatchOfNoneReturnsProperValue() =>
         Prop.ForAll(
-            Arb.Generate<int>()
+            ArbMap.Default.GeneratorFor<int>()
                 .Select(static _ => Option.None<int>())
                 .ToArbitrary(),
             static option =>
@@ -46,7 +47,7 @@ public sealed class OptionTests
     [Property(DisplayName = "Match of some executes proper action", MaxTest = 1000)]
     public Property MatchOfSomeExecutesProperAction() =>
         Prop.ForAll(
-            Arb.Generate<int>()
+            ArbMap.Default.GeneratorFor<int>()
                 .Select(Option.Some)
                 .ToArbitrary(),
             static option =>
@@ -63,7 +64,7 @@ public sealed class OptionTests
     [Property(DisplayName = "Match of none executes proper action", MaxTest = 1000)]
     public Property MatchOfNoneExecutesProperAction() =>
         Prop.ForAll(
-            Arb.Generate<int>()
+            ArbMap.Default.GeneratorFor<int>()
                 .Select(static _ => Option.None<int>())
                 .ToArbitrary(),
             static option =>
