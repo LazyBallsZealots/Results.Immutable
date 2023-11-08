@@ -31,6 +31,12 @@ public record Error(
     }
 
     /// <summary>
+    ///     Creates a new <see cref="Error" /> with provided <paramref name="message" />.
+    /// </summary>
+    /// <param name="message">The message that describes the <see cref="Error" />.</param>
+    public static Error Create(string message) => new(message);
+
+    /// <summary>
     ///     With a new <see cref="Error" /> that will be added to the existing list of inner <see cref="Error" />s.
     /// </summary>
     /// <param name="message">A new message that describes the <see cref="Error" />.</param>

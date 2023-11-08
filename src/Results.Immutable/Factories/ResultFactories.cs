@@ -1,6 +1,4 @@
-﻿using static Results.Immutable.Collection.Collection;
-
-namespace Results.Immutable;
+﻿namespace Results.Immutable;
 
 public static class Result
 {
@@ -212,91 +210,6 @@ public static class Result
             ? new(errorsBuilder.ToImmutable())
             : new(Unit.Value);
     }
-
-    /// <summary>
-    ///     Creates a <see cref="Result{T}" /> based on the arguments.
-    /// </summary>
-    /// <param name="first">First result</param>
-    /// <param name="second">Second result</param>
-    /// <typeparam name="T1">Type of the first result</typeparam>
-    /// <typeparam name="T2">Type of the second result</typeparam>
-    public static Result<(T1, T2)> Zip<T1, T2>(Result<T1> first, Result<T2> second) =>
-        (first.Some, second.Some) is var ((v1), (v2)) ? new((v1, v2)) : new(ConcatLists(first.Errors, second.Errors));
-
-    /// <summary>
-    ///     Creates a <see cref="Result{T}" /> based on the arguments.
-    /// </summary>
-    /// <param name="first">First result</param>
-    /// <param name="second">Second result</param>
-    /// <param name="third">Third result</param>
-    /// <typeparam name="T1">Type of the first result</typeparam>
-    /// <typeparam name="T2">Type of the second result</typeparam>
-    /// <typeparam name="T3">Type of the third result</typeparam>
-    public static Result<(T1, T2, T3)> Zip<T1, T2, T3>(
-        Result<T1> first,
-        Result<T2> second,
-        Result<T3> third) =>
-        (first.Some, second.Some, third.Some) is var ((v1), (v2), (v3))
-            ? new((v1, v2, v3))
-            : new(
-                ConcatLists(
-                    first.Errors,
-                    second.Errors,
-                    third.Errors));
-
-    /// <summary>
-    ///     Creates a <see cref="Result{T}" /> based on the arguments.
-    /// </summary>
-    /// <param name="first">First result</param>
-    /// <param name="second">Second result</param>
-    /// <param name="third">Third result</param>
-    /// <param name="fourth">Fourth result</param>
-    /// <typeparam name="T1">Type of the first result</typeparam>
-    /// <typeparam name="T2">Type of the second result</typeparam>
-    /// <typeparam name="T3">Type of the third result</typeparam>
-    /// <typeparam name="T4">Type of the fourth result</typeparam>
-    public static Result<(T1, T2, T3, T4)> Zip<T1, T2, T3, T4>(
-        Result<T1> first,
-        Result<T2> second,
-        Result<T3> third,
-        Result<T4> fourth) =>
-        (first.Some, second.Some, third.Some, fourth.Some) is var ((v1), (v2), (v3), (v4))
-            ? new((v1, v2, v3, v4))
-            : new(
-                ConcatLists(
-                    first.Errors,
-                    second.Errors,
-                    third.Errors,
-                    fourth.Errors));
-
-    /// <summary>
-    ///     Creates a <see cref="Result{T}" /> based on the arguments.
-    /// </summary>
-    /// <param name="first">First result</param>
-    /// <param name="second">Second result</param>
-    /// <param name="third">Third result</param>
-    /// <param name="fourth">Fourth result</param>
-    /// <param name="fifth">Fifth result</param>
-    /// <typeparam name="T1">Type of the first result</typeparam>
-    /// <typeparam name="T2">Type of the second result</typeparam>
-    /// <typeparam name="T3">Type of the third result</typeparam>
-    /// <typeparam name="T4">Type of the fourth result</typeparam>
-    /// <typeparam name="T5">Type of the fifth result</typeparam>
-    public static Result<(T1, T2, T3, T4, T5)> Zip<T1, T2, T3, T4, T5>(
-        Result<T1> first,
-        Result<T2> second,
-        Result<T3> third,
-        Result<T4> fourth,
-        Result<T5> fifth) =>
-        (first.Some, second.Some, third.Some, fourth.Some, fifth.Some) is var ((v1), (v2), (v3), (v4), (v5))
-            ? new((v1, v2, v3, v4, v5))
-            : new(
-                ConcatLists(
-                    first.Errors,
-                    second.Errors,
-                    third.Errors,
-                    fourth.Errors,
-                    fifth.Errors));
 
     /// <summary>
     ///     Attempts to perform a <paramref name="func" />;
