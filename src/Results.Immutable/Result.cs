@@ -8,7 +8,7 @@ namespace Results.Immutable;
 ///     A structure representing the result of an operation.
 /// </summary>
 /// <typeparam name="T">Type of the value associated with this <see cref="Result{T}" />.</typeparam>
-public readonly partial struct Result<T> : IEquatable<Result<T>>
+public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult<T>
 {
     private readonly ImmutableList<Error>? errors;
 
@@ -49,33 +49,19 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
         Some = null;
     }
 
-    /// <summary>
-    ///     Gets the boolean indicator whether this <see cref="Result{T}" />
-    ///     represents a failed operation.
-    ///     A failed operation does not contain a value, and may contain errors.
-    /// </summary>
+    /// <inheritdoc />
     public bool IsErrored => Some is null;
 
-    /// <inheritdoc cref="Result{T}.IsErrored" />
+    /// <inheritdoc />
     public bool HasFailed => Some is null;
 
-    /// <summary>
-    ///     Gets the boolean indicator whether this <see cref="Result{T}" />
-    ///     represents a successful operation.
-    ///     An OK operation contains a value, no errors are present.
-    /// </summary>
+    /// <inheritdoc />
     public bool IsOk => Some is not null;
 
-    /// <inheritdoc cref="Result{T}.IsOk" />
+    /// <inheritdoc />
     public bool HasSucceeded => Some is not null;
 
-    /// <summary>
-    ///     Gets an <see cref="ImmutableList{T}" /> of <see cref="Error" />s
-    ///     associated with this <see cref="Result{T}" />.
-    /// </summary>
-    /// <remarks>
-    ///     This list will be empty for successful results.
-    /// </remarks>
+    /// <inheritdoc />
     public ImmutableList<Error> Errors => errors ?? ImmutableList<Error>.Empty;
 
     /// <summary>
