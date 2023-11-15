@@ -8,7 +8,7 @@ namespace Results.Immutable.Tests.ExtensionsTests;
 
 public sealed class AsyncProjectionsTests
 {
-    private static ValueTask<Result<Unit>> SuccessfulAsyncResult => new(Result.Ok());
+    private static ValueTask<Result<Unit>> SuccessfulAsyncResult => ValueTask.FromResult(Result.Ok());
 
     [Fact(DisplayName = "No-op projection of a task of successful result of unit should return a result of unit")]
     public async Task NoOpProjectionOfASuccessfulTaskOfUnitShouldReturnAResultOfUnit() =>
@@ -22,7 +22,7 @@ public sealed class AsyncProjectionsTests
         const string errorMessage = "An error";
         var fail = Result.Fail(errorMessage);
 
-        var result = await new ValueTask<Result<Unit>>(fail)
+        var result = await ValueTask.FromResult(fail)
             .Select(ThrowException);
 
         result.Should()
@@ -38,7 +38,7 @@ public sealed class AsyncProjectionsTests
 
     [Fact(DisplayName = "No-op asynchronous projection of multiple async results should return a result of unit")]
     public async Task NoOpProjectionOfMultipleResultsShouldReturnResultOfUnit() =>
-        (await SuccessfulAsyncResult.SelectMany(static _ => new ValueTask<Result<Unit>>(Result.Ok())))
+        (await SuccessfulAsyncResult.SelectMany(static _ => ValueTask.FromResult(Result.Ok())))
         .Should()
         .Be(Result.Ok());
 
@@ -66,60 +66,113 @@ public sealed class AsyncProjectionsTests
 
     [Property(
         DisplayName =
-            "Projecting two asynchronous results should return a matching result based on final selector")]
-    public Property ProjectingTwoAsyncResultsShouldReturnAMatchingResultBasedOnFinalSelector() =>
+            "Projecting two successful asynchronous results should return a successful result based on final selector")]
+    public Property ProjectingTwoSuccessfulAsyncResultsShouldReturnASuccess() =>
         Prop.ForAll(
             SelectMany.Generator()
+                .Where(static tuple => tuple.FirstResult.HasSucceeded && tuple.SecondResult.HasSucceeded)
                 .ToArbitrary(),
             static async tuple =>
             {
                 var (first, second, selector, finalValue) = tuple;
 
-                return (first, second) switch
-                {
-                    ({ IsOk: true, }, { IsOk: true, }) => await Combine(
-                            first,
-                            second,
-                            selector) is { Some.Value: var value, } &&
-                        value?.Equals(finalValue) is true or null,
-                    ({ HasFailed: true, }, _) => await Combine(
-                            first,
-                            second,
-                            selector) is var failedResult &&
-                        failedResult.HasError(static (Error e) => e.Message == "First errored out"),
-                    _ => await Combine(
-                            first,
-                            second,
-                            selector) is var failedResult &&
-                        failedResult.HasError(static (Error e) => e.Message == "Second errored out"),
-                };
+                return await Combine(
+                        first,
+                        second,
+                        selector) is { Some.Value: var value, } &&
+                    value?.Equals(finalValue) is true or null;
             });
 
     [Property(
         DisplayName =
-            "Projecting two asynchronous results should return a matching result based on final selector (query syntax)")]
-    public Property ProjectingTwoAsyncResultsWithQuerySyntaxShouldReturnAMatchingResultBasedOnFinalSelector() =>
+            "Projecting a failed asynchronous result and another asynchronous result should return a failure")]
+    public Property ProjectingAFailedAsynchronousResultAndASecondAsyncResultShouldReturnAFailure() =>
         Prop.ForAll(
             SelectMany.Generator()
+                .Where(static tuple => tuple.FirstResult.HasFailed)
+                .ToArbitrary(),
+            static async tuple =>
+            {
+                var (first, second, selector, _) = tuple;
+
+                return await Combine(
+                        first,
+                        second,
+                        selector) is var failedResult &&
+                    failedResult.HasError<Error>(static e => e.Message == "First errored out");
+            });
+
+    [Property(
+        DisplayName =
+            "Projecting a successful asynchronous result and a failed asynchronous result should return a failure")]
+    public Property ProjectingASuccessfulAsynchronousResultAndAFailedAsyncResultShouldReturnAFailure() =>
+        Prop.ForAll(
+            SelectMany.Generator()
+                .Where(static tuple => tuple.FirstResult.HasSucceeded && tuple.SecondResult.HasFailed)
+                .ToArbitrary(),
+            static async tuple =>
+            {
+                var (first, second, selector, _) = tuple;
+
+                return await Combine(
+                        first,
+                        second,
+                        selector) is var failedResult &&
+                    failedResult.HasError<Error>(static e => e.Message == "Second errored out");
+            });
+
+    [Property(
+        DisplayName =
+            "Projecting two successful asynchronous results should return a successful result based on final selector (query syntax)")]
+    public Property ProjectingTwoSuccessfulAsyncResultsWithQuerySyntaxShouldReturnASuccess() =>
+        Prop.ForAll(
+            SelectMany.Generator()
+                .Where(static tuple => tuple.FirstResult.HasSucceeded && tuple.SecondResult.HasSucceeded)
                 .ToArbitrary(),
             static async tuple =>
             {
                 var (first, second, selector, finalValue) = tuple;
 
-                return (first, second) switch
-                {
-                    ({ IsOk: true, }, { IsOk: true, }) => await CombineWithQuery() is { Some.Value: var value, } &&
-                        value?.Equals(finalValue) is true or null,
-                    ({ HasFailed: true, }, _) => await CombineWithQuery() is var failedResult &&
-                        failedResult.HasError(static (Error e) => e.Message == "First errored out"),
-                    _ => await CombineWithQuery() is var failedResult &&
-                        failedResult.HasError(static (Error e) => e.Message == "Second errored out"),
-                };
+                return await CombineWithQuery(
+                        first,
+                        second,
+                        selector) is { Some.Value: var value, } &&
+                    value?.Equals(finalValue) is true or null;
+            });
 
-                ValueTask<Result<object?>> CombineWithQuery() =>
-                    from initialValue in ToValueTask(first)
-                    from intermediateValue in ToValueTask(second)
-                    select selector(initialValue, intermediateValue);
+    [Property(DisplayName = "Projecting asynchronous failed result and any other async result should return a failure")]
+    public Property ProjectingAnAsyncFailedResultAndAnyOtherAsyncResultShouldReturnAFailure() =>
+        Prop.ForAll(
+            SelectMany.Generator()
+                .Where(static tuple => tuple.FirstResult.HasFailed)
+                .ToArbitrary(),
+            static async tuple =>
+            {
+                var (first, second, selector, _) = tuple;
+
+                return await CombineWithQuery(
+                        first,
+                        second,
+                        selector) is var failedResult &&
+                    failedResult.HasError<Error>(static e => e.Message == "First errored out");
+            });
+
+    [Property(
+        DisplayName = "Projecting asynchronous successful result and an asynchronous failure should return a failure")]
+    public Property ProjectingAsynchronousSuccessAndAsyncFailureShouldReturnAFailure() =>
+        Prop.ForAll(
+            SelectMany.Generator()
+                .Where(static tuple => tuple.FirstResult.HasSucceeded && tuple.SecondResult.HasFailed)
+                .ToArbitrary(),
+            static async tuple =>
+            {
+                var (first, second, selector, _) = tuple;
+
+                return await CombineWithQuery(
+                        first,
+                        second,
+                        selector) is var failedResult &&
+                    failedResult.HasError<Error>(static e => e.Message == "Second errored out");
             });
 
     private static async ValueTask<Result<object?>> Combine(
@@ -133,6 +186,14 @@ public sealed class AsyncProjectionsTests
                 .SelectMany(
                     _ => ToValueTask(second),
                     selector);
+
+    private static ValueTask<Result<object?>> CombineWithQuery(
+        Result<object?> first,
+        Result<object?> second,
+        Func<object?, object?, object?> selector) =>
+        from initialValue in ToValueTask(first)
+        from intermediateValue in ToValueTask(second)
+        select selector(initialValue, intermediateValue);
 
     private static ValueTask<Result<object?>> ToValueTask(Result<object?> result) => new(result);
 }

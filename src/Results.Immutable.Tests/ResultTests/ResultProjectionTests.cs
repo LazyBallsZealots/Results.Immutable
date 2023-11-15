@@ -55,27 +55,49 @@ public sealed class ResultProjectionTests
             .Should()
             .Be(SuccessfulResult);
 
-    [Property(
-        DisplayName = "Projecting two results should return a success or a failure, depending on initial results")]
+    [Property(DisplayName = "Projecting two successful results should return a success")]
     public Property BindingOnTwoSuccessfulResultsShouldReturnASuccessfulResultWithAProperValue() =>
         Prop.ForAll(
             SelectMany.Generator()
+                .Where(static tuple => tuple.FirstResult.HasSucceeded && tuple.SecondResult.HasSucceeded)
                 .ToArbitrary(),
             static tuple =>
             {
                 var (first, second, selector, finalValue) = tuple;
 
-                return (first, second) switch
-                {
-                    ({ IsOk: true, }, { IsOk: true, }) => first.SelectMany(_ => second, selector) is
-                        {
-                            Some.Value: var selectedValue,
-                        } &&
-                        selectedValue?.Equals(finalValue) is true or null,
-                    ({ IsErrored: true, }, _) => first.SelectMany(_ => second, selector) is var failedResult &&
-                        failedResult.HasError(static (Error e) => e.Message == "First errored out"),
-                    (_, _) => first.SelectMany(_ => second, selector) is var failedResult &&
-                        failedResult.HasError(static (Error e) => e.Message == "Second errored out"),
-                };
+                return first.SelectMany(_ => second, selector) is { Some.Value: var selectedValue, } &&
+                    selectedValue?.Equals(finalValue) is true or null;
+            });
+
+    [Property(
+        DisplayName =
+            "Projecting two results, of which first is a failure, returns a failure indicating the first result has failed")]
+    public Property ProjectingAFailureAndASuccessShouldReturnFailure() =>
+        Prop.ForAll(
+            SelectMany.Generator()
+                .Where(static tuple => tuple.FirstResult.HasFailed)
+                .ToArbitrary(),
+            static tuple =>
+            {
+                var (first, second, selector, _) = tuple;
+
+                return first.SelectMany(_ => second, selector) is var failedResult &&
+                    failedResult.HasError(static (Error e) => e.Message == "First errored out");
+            });
+
+    [Property(
+        DisplayName =
+            "Projecting two results, of which second is a failure, returns a failure indicating the second result has failed")]
+    public Property ProjectionASuccessAndAFailureShouldReturnFailure() =>
+        Prop.ForAll(
+            SelectMany.Generator()
+                .Where(static tuple => tuple.FirstResult.HasSucceeded && tuple.SecondResult.HasFailed)
+                .ToArbitrary(),
+            static tuple =>
+            {
+                var (first, second, selector, _) = tuple;
+
+                return first.SelectMany(_ => second, selector) is var failedResult &&
+                    failedResult.HasError(static (Error e) => e.Message == "Second errored out");
             });
 }

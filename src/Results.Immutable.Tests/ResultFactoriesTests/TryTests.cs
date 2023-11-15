@@ -71,12 +71,12 @@ public sealed class TryTests
             ArbMap.Default.ArbFor<object?>(),
             static async data =>
             {
-                var result = await Result.TryAsync(async () => await new ValueTask<object?>(data));
+                var result = await Result.TryAsync(() => ValueTask.FromResult(data));
 
                 return (result, data) switch
                 {
                     ({ Some.Value: null, }, null) => true,
-                    ({ Some.Value: var value, }, var obj) => value.Equals(obj),
+                    ({ Some.Value: var value, }, var obj) => value?.Equals(obj) is true or null,
                     _ => false,
                 };
             });
