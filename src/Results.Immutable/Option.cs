@@ -6,8 +6,7 @@
 public readonly record struct Option
 {
     /// <summary>
-    ///     Represents the <paramref name="value" />
-    ///     as an option.
+    ///     Represents the <paramref name="value" /> as an option.
     /// </summary>
     /// <typeparam name="T">Type of the value</typeparam>
     /// <param name="value">Value to associate with the option/</param>
@@ -22,6 +21,30 @@ public readonly record struct Option
     ///     A new instance of <see cref="Immutable.Option{T}" /> without value.
     /// </returns>
     public static Option<T> None<T>() => new();
+
+    /// <summary>
+    ///     Creates an <see cref="Option{T}" /> from a nullable reference.
+    ///     In case of <see langword="null" />, returns <see cref="None{T}" />,
+    ///     otherwise returns <see cref="Some{T}" />.
+    /// </summary>
+    /// <param name="value">A nullable reference.</param>
+    /// <typeparam name="T">Type of the reference.</typeparam>
+    /// <returns>The new <see cref="Option{T}" /> where the <typeparamref name="T" /> is no longer nullable.</returns>
+    public static Option<T> SomeIfNotNull<T>(T? value)
+        where T : class =>
+        value is not null ? Some(value) : None<T>();
+
+    /// <summary>
+    ///     Creates an <see cref="Option{T}" /> from a <see cref="Nullable{T}" /> value.
+    ///     In case of <see langword="null" />, returns <see cref="None{T}" />,
+    ///     otherwise returns <see cref="Some{T}" />.
+    /// </summary>
+    /// <typeparam name="T">A type of the value.</typeparam>
+    /// <param name="value">The nullable value.</param>
+    /// <returns>The new <see cref="Option{T}" /> where the <typeparamref name="T" /> is no longer nullable.</returns>
+    public static Option<T> SomeIfNotNull<T>(T? value)
+        where T : struct =>
+        value is not null ? Some(value.Value) : None<T>();
 }
 
 /// <typeparam name="T">Generic type of the value.</typeparam>
@@ -52,34 +75,6 @@ public readonly partial record struct Option<T>
     /// </summary>
     /// <seealso cref="IsSome" />
     public bool IsNone => !Some.HasValue;
-
-    /// <summary>
-    ///     Gets the value associated with this <see cref="Option{T}" />.
-    ///     In case of <see cref="Option{T}.IsNone" />, returns the default value of <typeparamref name="T" />.
-    ///     This property is <strong>unsafe</strong> to use then <typeparamref name="T" /> is a nullable reference type,
-    ///     and non-nullable value types.
-    ///     It is not possible to determine whether the value is null or None.
-    /// </summary>
-    /// <example>
-    ///     This is a safe usage.
-    ///     <code>
-    ///         var option = Option.Some("hello");
-    ///         option.ValueOrDefault; // "hello"
-    ///     </code>
-    /// </example>
-    /// <example>
-    ///     These are not a safe usage.
-    ///     <code>
-    ///         var option = Option.Some&lt;string&gt;(null);
-    ///         option.ValueOrDefault; // null, same as Option.None&lt;string&gt;()
-    ///         var option2 = Option.None&lt;int&gt;();
-    ///         option2.ValueOrDefault; // 0
-    ///     </code>
-    /// </example>
-    /// <value>The value associated with this <see cref="Option{T}" /> or default value of <typeparamref name="T" />.</value>
-    public T? ValueOrDefault => Some is var (value) ? value : default;
-
-    public static implicit operator Option<T>(T value) => new(value);
 
     /// <summary>
     ///     Gets the value associated with this <see cref="Option{T}" />.
@@ -161,4 +156,13 @@ public readonly partial record struct Option<T>
             matchNone();
         }
     }
+
+    /// <summary>
+    ///     Returns a string representation of this <see cref="Option{T}" />.
+    ///     Ideally, only for debug purposes or testing purposes.
+    /// </summary>
+    public override string ToString() =>
+        Some is var (value)
+            ? $"{nameof(Option)}<{typeof(T).Name}>.{nameof(Some)}({value})"
+            : $"{nameof(Option)}<{typeof(T).Name}>.{nameof(Option.None)}";
 }

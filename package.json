@@ -16,7 +16,6 @@
     "src/*"
   ],
   "scripts": {
-    "build": "dotnet build src/Results.Immutable.sln",
     "test": "dotnet test src/Results.Immutable.sln",
     "postinstall": "yarn husky install"
   }

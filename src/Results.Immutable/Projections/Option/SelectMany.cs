@@ -3,7 +3,7 @@
 public readonly partial record struct Option<T>
 {
     public Option<TOut> Select<TOut>(Func<T, TOut> selector) =>
-        Some is var (value) ? selector(value) : Option.None<TOut>();
+        Some is var (value) ? Option.Some(selector(value)) : Option.None<TOut>();
 
     /// <summary>
     ///     Projects the possible value to a new <see cref="Option{T}" />.
@@ -47,7 +47,7 @@ public readonly partial record struct Option<T>
         Some is var (value) &&
         combinator(value)
             .Some is var (value1)
-            ? selector(value, value1)
+            ? Option.Some(selector(value, value1))
             : Option.None<TOut>();
 
     /// <summary>

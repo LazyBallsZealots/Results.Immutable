@@ -224,6 +224,15 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult
     /// <inheritdoc />
     public IResult WithErrors(ImmutableList<Error> errors) => new Result<T>(errors);
 
+    /// <summary>
+    ///     Returns a <see cref="string" /> representation of this <see cref="Result{T}" />.
+    ///     Ideally, only for debug purposes or testing purposes.
+    /// </summary>
+    public override string ToString() =>
+        Some is var (value)
+            ? $"{nameof(Result)}<{typeof(T).Name}>.{nameof(Result.Ok)}({value})"
+            : $"{nameof(Result)}<{typeof(T).Name}>.{nameof(Result.Fail)}(Count: {Errors.Count}, First: {Errors[0].Message})";
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Result<T> left, Result<T> right) => left.Equals(right);
 
