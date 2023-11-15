@@ -2,19 +2,8 @@ using Results.Immutable.Metadata;
 
 namespace Results.Immutable;
 
-/// <summary>
-///     A structure representing the result of an operation.
-///     The usage of <see cref="Result{T}" /> is generally recommended.
-///     This interface is only useful for boxing the <see cref="IResult{T}" />.
-/// </summary>
-/// <typeparam name="T">Type of the value associated with this <see cref="IResult{T}" />.</typeparam>
-public interface IResult<T>
+public interface IResult
 {
-    /// <summary>
-    ///     The possible value of the this <see cref="IResult{T}" />.
-    /// </summary>
-    public Some<T>? Some { get; }
-
     /// <summary>
     ///     Gets the boolean indicator whether this <see cref="IResult{T}" />
     ///     represents a failed operation.
@@ -43,4 +32,18 @@ public interface IResult<T>
     ///     This list will be empty for successful results.
     /// </remarks>
     public ImmutableList<Error> Errors { get; }
+}
+
+/// <summary>
+///     A structure representing the result of an operation.
+///     The usage of <see cref="Result{T}" /> is generally recommended.
+///     This interface is only useful for boxing the <see cref="IResult{T}" />.
+/// </summary>
+/// <typeparam name="T">Type of the value associated with this <see cref="IResult{T}" />.</typeparam>
+public interface IResult<T> : IResult
+{
+    /// <summary>
+    ///     The possible value of the this <see cref="IResult{T}" />.
+    /// </summary>
+    public Some<T>? Some { get; }
 }
