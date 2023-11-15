@@ -1,5 +1,4 @@
-﻿using Results.Immutable.Metadata;
-using static Results.Immutable.Collection.Collection;
+﻿using static Results.Immutable.Collection.Collection;
 
 namespace Results.Immutable;
 

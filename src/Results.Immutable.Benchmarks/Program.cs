@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Results.Immutable;
-using Results.Immutable.Metadata;
 
 BenchmarkRunner.Run<ResultBenchmarks>();
 
