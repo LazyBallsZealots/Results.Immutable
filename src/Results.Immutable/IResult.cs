@@ -1,5 +1,3 @@
-using Results.Immutable.Metadata;
-
 namespace Results.Immutable;
 
 /// <summary>

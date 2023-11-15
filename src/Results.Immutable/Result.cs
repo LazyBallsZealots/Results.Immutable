@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 using Results.Immutable.Extensions;
-using Results.Immutable.Metadata;
 
 namespace Results.Immutable;
 
