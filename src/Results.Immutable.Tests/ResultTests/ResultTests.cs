@@ -177,6 +177,15 @@ public sealed class ResultTests
                 });
     }
 
+    [Fact(DisplayName = "Replaces the errors and forget the type error but keep down-casting possible")]
+    public void ReplacesTheErrorsAndForgetTheTypeErrorButKeepDownCastingPossible()
+    {
+        var result = Result.Fail(new ErrorA("Hello"));
+        var boxed = result.WithErrors(ImmutableList.Create(new Error("Good bye")));
+        ((Result<Unit>)boxed).Should()
+            .BeEquivalentTo(Result.Fail(new Error("Good bye")));
+    }
+
     private sealed record ErrorA : Error
     {
         public ErrorA(string message)

@@ -7,7 +7,7 @@ namespace Results.Immutable;
 ///     A structure representing the result of an operation.
 /// </summary>
 /// <typeparam name="T">Type of the value associated with this <see cref="Result{T}" />.</typeparam>
-public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult<T>
+public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult
 {
     private readonly ImmutableList<Error>? errors;
 
@@ -220,6 +220,9 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult<T>
 
         return hashCode.ToHashCode();
     }
+
+    /// <inheritdoc />
+    public IResult WithErrors(ImmutableList<Error> errors) => new Result<T>(errors);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Result<T> left, Result<T> right) => left.Equals(right);
