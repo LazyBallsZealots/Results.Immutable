@@ -32,6 +32,10 @@ public interface IResult
     ///     This list will be empty for successful results.
     /// </remarks>
     public ImmutableList<Error> Errors { get; }
+
+    static abstract IResult Fail(params string[] errorMessages);
+
+    static abstract IResult Fail(params Error[] newErrors);
 }
 
 /// <summary>
@@ -45,5 +49,5 @@ public interface IResult<T> : IResult
     /// <summary>
     ///     The possible value of the this <see cref="IResult{T}" />.
     /// </summary>
-    public Some<T>? Some { get; }
+    Some<T>? Some { get; }
 }

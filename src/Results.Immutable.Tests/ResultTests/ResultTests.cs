@@ -8,7 +8,7 @@ public sealed class ResultTests
         var result = new Result<Unit>();
 
         result.Should()
-            .BeEquivalentTo(Result.Fail<Unit>("Constructed result"));
+            .BeEquivalentTo(Result.Fail<Unit>());
     }
 
     [Fact(DisplayName = "Adds an error to a successful result")]

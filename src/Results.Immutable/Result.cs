@@ -22,7 +22,7 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult<T>
     /// </summary>
     public Result()
     {
-        errors = ImmutableList.Create(new Error("Constructed result"));
+        errors = ImmutableList<Error>.Empty;
     }
 
     /// <summary>
@@ -75,7 +75,8 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult<T>
     ///     A new <see cref="Result{T}" /> with an <see cref="Error" />,
     ///     containing provided <paramref name="errorMessage" />.
     /// </returns>
-    public Result<T> AddError(string errorMessage) => AddError(new Error(errorMessage));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public IResult<T> AddError(string errorMessage) => AddError(new Error(errorMessage));
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with a provided <paramref name="error" />.
@@ -86,7 +87,8 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult<T>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="error" />.
     /// </returns>
-    public Result<T> AddError(Error error) =>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public IResult<T> AddError(Error error) =>
         AddErrors(
             new[]
             {
@@ -105,7 +107,8 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult<T>
     ///     A new <see cref="Result{T}" /> with <see cref="Error" />s,
     ///     built from <paramref name="errorMessages" />.
     /// </returns>
-    public Result<T> AddErrors(IEnumerable<string> errorMessages) =>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public IResult<T> AddErrors(IEnumerable<string> errorMessages) =>
         AddErrors(errorMessages.Select(static errorMessage => new Error(errorMessage)));
 
     /// <summary>
@@ -117,7 +120,8 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult<T>
     /// <returns>
     ///     A new <see cref="Result{T}" /> with provided <paramref name="newErrors" />.
     /// </returns>
-    public Result<T> AddErrors(IEnumerable<Error> newErrors) => new(Errors.AddRange(newErrors));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public IResult<T> AddErrors(IEnumerable<Error> newErrors) => new Result<T>(Errors.AddRange(newErrors));
 
     /// <summary>
     ///     Returns a <see cref="bool" /> value indicating whether
@@ -221,6 +225,15 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult<T>
 
         return hashCode.ToHashCode();
     }
+
+    public static IResult Fail(params string[] errorMessages)
+    {
+        return Fail(
+            errorMessages.Select(static message => new Error(message))
+                .ToArray());
+    }
+
+    public static IResult Fail(params Error[] newErrors) => Result.Fail<T>(newErrors);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Result<T> left, Result<T> right) => left.Equals(right);

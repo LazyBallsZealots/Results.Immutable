@@ -30,7 +30,7 @@ public class ResultBenchmarks
     [Benchmark]
     public Result<string> SelectOnSuccessWithoutReasonsWhichShouldNotAllocate() =>
         Result.Ok(value)
-            .Select(static _ => Result.Ok(aNewValue));
+            .SelectMany(static _ => Result.Ok(aNewValue));
 
     [Benchmark]
     public ImmutableList<Error> ErrorsForFailedResult() => ImmutableList.Create(Error);
@@ -41,5 +41,5 @@ public class ResultBenchmarks
     [Benchmark]
     public Result<string> SelectOnFailureWhichShouldAllocateJustTheErrorsList() =>
         Result.Fail(Error)
-            .Select(static _ => Result.Ok(value));
+            .SelectMany(static _ => Result.Ok(value));
 }
