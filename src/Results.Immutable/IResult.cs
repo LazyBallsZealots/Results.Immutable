@@ -1,18 +1,13 @@
 namespace Results.Immutable;
 
 /// <summary>
-///     A structure representing the result of an operation.
+///     A value representing the result of an operation.
 ///     The usage of <see cref="Result{T}" /> is generally recommended.
-///     This interface is only useful for boxing the <see cref="IResult{T}" />.
+///     This interface is only useful for boxing the <see cref="Result{T}" />
+///     in a way that makes it content inaccessible.
 /// </summary>
-/// <typeparam name="T">Type of the value associated with this <see cref="IResult{T}" />.</typeparam>
-public interface IResult<T>
+public interface IResult
 {
-    /// <summary>
-    ///     The possible value of the this <see cref="IResult{T}" />.
-    /// </summary>
-    public Some<T>? Some { get; }
-
     /// <summary>
     ///     Gets the boolean indicator whether this <see cref="IResult{T}" />
     ///     represents a failed operation.
@@ -20,7 +15,7 @@ public interface IResult<T>
     /// </summary>
     public bool IsErrored { get; }
 
-    /// <inheritdoc cref="IResult{T}.IsErrored" />
+    /// <inheritdoc cref="IsErrored" />
     public bool HasFailed { get; }
 
     /// <summary>
@@ -30,7 +25,7 @@ public interface IResult<T>
     /// </summary>
     public bool IsOk { get; }
 
-    /// <inheritdoc cref="IResult{T}.IsOk" />
+    /// <inheritdoc cref="IsOk" />
     public bool HasSucceeded { get; }
 
     /// <summary>
@@ -41,4 +36,14 @@ public interface IResult<T>
     ///     This list will be empty for successful results.
     /// </remarks>
     public ImmutableList<Error> Errors { get; }
+
+    /// <summary>
+    ///     Creates a new failed <see cref="IResult" /> with the provided <paramref name="errors" />.
+    ///     This is the same as <see cref="Result.Fail(IEnumerable{Error})" /> but losing the type information.
+    /// </summary>
+    /// <remarks>
+    ///     It must return an object of the same type. It is safe to downcast.
+    /// </remarks>
+    /// <param name="errors">The new <see cref="ImmutableList{T}" /> of <see cref="Error" />s.</param>
+    IResult WithErrors(ImmutableList<Error> errors);
 }
