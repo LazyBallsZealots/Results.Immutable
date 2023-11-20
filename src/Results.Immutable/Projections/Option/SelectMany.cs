@@ -1,6 +1,6 @@
 ﻿namespace Results.Immutable;
 
-public readonly partial record struct Option<T>
+public readonly partial struct Option<T>
 {
     public Option<TOut> Select<TOut>(Func<T, TOut> selector) =>
         Some is var (value) ? selector(value) : Option.None<TOut>();

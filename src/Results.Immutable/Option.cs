@@ -1,32 +1,10 @@
-﻿namespace Results.Immutable;
+﻿using System.Runtime.CompilerServices;
 
-/// <summary>
-///     Represents an optional value.
-/// </summary>
-public readonly record struct Option
-{
-    /// <summary>
-    ///     Represents the <paramref name="value" />
-    ///     as an option.
-    /// </summary>
-    /// <typeparam name="T">Type of the value</typeparam>
-    /// <param name="value">Value to associate with the option/</param>
-    /// <returns>A new instance of <see cref="Immutable.Option{T}" /> with a value.</returns>
-    public static Option<T> Some<T>(T value) => new(value);
-
-    /// <summary>
-    ///     Represents the lack of value.
-    /// </summary>
-    /// <typeparam name="T">Type of the value.</typeparam>
-    /// <returns>
-    ///     A new instance of <see cref="Immutable.Option{T}" /> without value.
-    /// </returns>
-    public static Option<T> None<T>() => new();
-}
+namespace Results.Immutable;
 
 /// <typeparam name="T">Generic type of the value.</typeparam>
-/// <inheritdoc cref="Option" />
-public readonly partial record struct Option<T>
+/// <inheritdoc cref="OptionFactories" />
+public readonly partial struct Option<T>: IEquatable<Option<T>>
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="Option{T}" /> struct.
@@ -161,4 +139,18 @@ public readonly partial record struct Option<T>
             matchNone();
         }
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(Option<T> other) => Nullable.Equals(Some, other.Some);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override bool Equals(object? obj) => obj is Option<T> other && Equals(other);
+
+    public override int GetHashCode() => Some.GetHashCode();
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(Option<T> left, Option<T> right) => left.Equals(right);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(Option<T> left, Option<T> right) => !(left == right);
 }
