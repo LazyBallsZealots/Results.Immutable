@@ -2,8 +2,9 @@ name: PR build
 
 on:
   pull_request:
-    branches: [ "main" ]
-    paths: [ "src/**/*" ]
+    branches: ["main"]
+    paths: ["src/**/*"]
+  workflow_dispatch:
 
 permissions:
   pull-requests: write
@@ -11,6 +12,9 @@ permissions:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        version: ['6.0', '7.0']
     name: PR build
     runs-on: ubuntu-latest
     steps:
@@ -19,9 +23,7 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: |
-            6.x
-            7.x
+          dotnet-version: ${{ matrix.version }}
           dotnet-quality: 'ga'
 
       - name: Install dependencies
@@ -29,27 +31,21 @@ jobs:
         working-directory: src
 
       - name: Build
-        run: dotnet build Results.Immutable.sln --configuration Debug --no-restore
+        run: dotnet build Results.Immutable.sln --configuration Debug --no-restore -f net${{ matrix.version }}
         working-directory: src
 
       - name: Test & analyze coverage
-        run: dotnet test Results.Immutable.sln --no-build --collect:"XPlat Code Coverage" --results-directory ./coverage
+        run: dotnet test -c Debug -f net${{ matrix.version }} -p:coverletOutput=../coverage/lcov.info -p:CollectCoverage=true -p:CoverletOutputFormat=lcov -p:Exclude=\"\" **/*[Tt]ests.csproj
         working-directory: src
 
-      - name: Coverage Summary Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: src/coverage/**/coverage.cobertura.xml
-          badge: true
-          fail_below_min: true
-          format: markdown
-          hide_complexity: true
-          output: both
-          thresholds: '80 95'
+      - name: Setup LCOV
+        uses: hrishikesh-kadam/setup-lcov@v1
 
-      - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request'
+      - name: Record LCOV
+        uses: zgosalvez/github-actions-report-lcov@v4.1.2
         with:
-          recreate: true
-          path: code-coverage-results.md
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          coverage-files: ./src/coverage/lcov.*.info
+          minimum-coverage: 85
+          update-comment: true
+    

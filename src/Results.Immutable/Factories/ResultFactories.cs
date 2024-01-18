@@ -241,7 +241,7 @@ public static class Result
         Func<T> func,
         Func<Exception, Error>? catchHandler = null)
     {
-        catchHandler ??= ExceptionHandler;
+        catchHandler ??= e => new ExceptionalError(e);
 
         try
         {
@@ -281,7 +281,7 @@ public static class Result
         Func<ValueTask> func,
         Func<Exception, Error>? catchHandler = null)
     {
-        catchHandler ??= ExceptionHandler;
+        catchHandler ??= e => new ExceptionalError(e);
 
         try
         {
@@ -322,7 +322,7 @@ public static class Result
         Func<ValueTask<T>> func,
         Func<Exception, Error>? catchHandler = null)
     {
-        catchHandler ??= ExceptionHandler;
+        catchHandler ??= e => new ExceptionalError(e);
 
         try
         {
@@ -334,5 +334,5 @@ public static class Result
         }
     }
 
-    private static Error ExceptionHandler(Exception exception) => new ExceptionalError(exception);
+    // private static Error ExceptionHandler(Exception exception) => new ExceptionalError(exception);
 }
