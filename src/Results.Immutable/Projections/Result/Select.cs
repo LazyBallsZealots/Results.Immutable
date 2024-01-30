@@ -16,10 +16,6 @@ public readonly partial struct Result<T>
     ///     A <see cref="Result{T}" />, wrapping <typeparamref name="TNew" />
     ///     instance.
     /// </returns>
-    /// <remarks>
-    ///     This overload disregards the <see cref="Option" /> of this
-    ///     <see cref="Result{T}" />.
-    /// </remarks>
     public Result<TNew> Select<TNew>(Func<T, TNew> selector) =>
         Some is var (v) ? new(selector(v)) : new Result<TNew>(errors);
 }
