@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.2](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@0.1.0-alpha.1...Results.Immutable@0.1.0-alpha.2) (2024-01-30)
+
+### Bug Fixes
+
+- add license expression to main .csproj file ([02c260f](https://github.com/LazyBallsZealots/Results.Immutable/commit/02c260fbc62cf3dc01518e068867defb4a1837e1))
+
+### Features
+
+- add WithErrors and IResult interface ([0093056](https://github.com/LazyBallsZealots/Results.Immutable/commit/0093056f7630d0375be23a679e17d45ca019b57b))
+- add ZipWith/ZipWithAsync and convert Zip to extension methods ([8ca923c](https://github.com/LazyBallsZealots/Results.Immutable/commit/8ca923c8466fa98705a2985677a83398c2ccaa1b))
+- convert between result and option ([1c73084](https://github.com/LazyBallsZealots/Results.Immutable/commit/1c730846cf1603e19fd52c5dec463a5537395d98))
+
 # 0.1.0-alpha.1 (2023-11-14)
 
 ### Features
