@@ -1,7 +1,4 @@
-﻿using FsCheck;
-using FsCheck.Fluent;
-using FsCheck.Xunit;
-using static Results.Immutable.Tests.ResultFactoriesTests.ResultMatching;
+﻿using static Results.Immutable.Tests.ResultFactoriesTests.ResultMatching;
 
 namespace Results.Immutable.Tests.ResultFactoriesTests;
 
@@ -65,19 +62,15 @@ public sealed class TryTests
         static ValueTask<Unit> RunTask() => new(Unit.Value);
     }
 
-    [Property(DisplayName = "TryAsync returns a failed result with an exceptional error if a generic task throws")]
-    public Property TryAsyncReturnsAFailedResultWithAnExceptionalErrorIfTheGenericTaskThrows() =>
-        Prop.ForAll(
-            ArbMap.Default.ArbFor<object?>(),
-            static async data =>
-            {
-                var result = await Result.TryAsync(async () => await new ValueTask<object?>(data));
+    [Fact(DisplayName = "TryAsync returns a failed result with an exceptional error if a generic task throws")]
+    public async Task TryAsyncReturnsAFailedResultWithAnExceptionalErrorIfTheGenericTaskThrows()
+    {
+        var exceptionToThrow = new InvalidOperationException("Generic async whoopsie!");
 
-                return (result, data) switch
-                {
-                    ({ Some.Value: null, }, null) => true,
-                    ({ Some.Value: var value, }, var obj) => value.Equals(obj),
-                    _ => false,
-                };
-            });
+        (await Result.TryAsync(ThrowAsync))
+            .Should()
+            .Match<Result<Unit>>(r => r.HasError<ExceptionalError>(ee => ee.CausedBy.Equals(exceptionToThrow)));
+
+        ValueTask<Unit> ThrowAsync() => throw exceptionToThrow;
+    }
 }
