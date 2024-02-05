@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.3](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@0.1.0-alpha.2...Results.Immutable@0.1.0-alpha.3) (2024-02-05)
+
+### Features
+
+- add .NET 8 to the list of supported frameworks ([97c989c](https://github.com/LazyBallsZealots/Results.Immutable/commit/97c989c4a31a8df403bc1b2ceef6f57166ee7a7b))
+- add sync-to-async projections for generic ValueTasks ([f4dd6b8](https://github.com/LazyBallsZealots/Results.Immutable/commit/f4dd6b8987aa3e1ba5b3abe962bfa2e47a43be96))
+
 # [0.1.0-alpha.2](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@0.1.0-alpha.1...Results.Immutable@0.1.0-alpha.2) (2024-01-30)
 
 ### Bug Fixes
