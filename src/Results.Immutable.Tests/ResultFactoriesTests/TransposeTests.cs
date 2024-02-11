@@ -48,6 +48,44 @@ public sealed class TransposeTests
             .Should()
             .Match<Result<Unit>>(static r => r.HasSucceeded);
 
+    [Fact(DisplayName = "Merger of a list of successful results is a success")]
+    public void MergingAListOfSuccessfulResultsIsSuccessful() =>
+        Enumerable.Repeat(Result.Ok(), 10)
+            .Merge()
+            .HasSucceeded
+            .Should()
+            .BeTrue();
+
+    [Property(DisplayName = "Merger of a list of multiple successful results returns success")]
+    public Property MergingAListOfMultipleSuccessesReturnsSuccess() =>
+        Prop.ForAll(
+            Gen.Constant(Result.Ok())
+                .NonEmptyListOf()
+                .ToArbitrary(),
+            static list => list.Merge()
+                .HasSucceeded);
+
+    [Property(DisplayName = "Merger of a list which contains at least one failure is a failure")]
+    public Property MergingAListOfMultipleResultsWithAtLeastOneFailureIsAFailure() =>
+        Prop.ForAll(
+            Gen.OneOf(
+                    Gen.Constant(Result.Ok()),
+                    Gen.Constant(Result.Fail("Errored out!")))
+                .NonEmptyListOf()
+                .Where(static list => list.Any(static r => r.HasFailed))
+                .ToArbitrary(),
+            static list => list.Merge()
+                .HasFailed);
+
+    [Fact(DisplayName = "Merger of successful Result params is a success")]
+    public void MergingTwoSuccessfulResultsIsASuccess() =>
+        Result.Merge(
+                Result.Ok(),
+                Result.Ok())
+            .HasSucceeded
+            .Should()
+            .BeTrue();
+
     [Property(
         DisplayName = "Transposition of successful Result params is successful",
         MaxTest = 1000)]
@@ -65,7 +103,7 @@ public sealed class TransposeTests
             });
 
     [Property(
-        DisplayName = "Merger of Result params is a failure if any of them is a failure",
+        DisplayName = "Transposition of Result params is a failure if any of them is a failure",
         MaxTest = 1000)]
     public Property TransposingOfResultsIsAFailureIfAnyOfThemIsAFailure() =>
         Prop.ForAll(

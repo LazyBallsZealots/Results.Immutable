@@ -181,6 +181,9 @@ public static class Result
             : new(valuesBuilder.ToImmutable());
     }
 
+    /// <inheritdoc cref="Merge(IReadOnlyCollection{Result{Unit}})" />
+    public static Result<Unit> Merge(params Result<Unit>[] results) => Merge(Array.AsReadOnly(results));
+
     /// <summary>
     ///     Merges all <paramref name="results" />
     ///     into one <see cref="Result{T}" />,
