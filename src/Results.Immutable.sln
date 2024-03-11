@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Results.Immutable", "Result
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Results.Immutable.Tests", "Results.Immutable.Tests\Results.Immutable.Tests.csproj", "{0D38628C-9E21-448F-82E9-C68EBCF7022E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Results.Immutable.Extensions.FluentAssertions", "Results.Immutable.Extensions.FluentAssertions\Results.Immutable.Extensions.FluentAssertions.csproj", "{398D83C2-CB90-43CF-B07F-DA35EAB51F7E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Results.Immutable.Extensions.FluentAssertions.Tests", "Results.Immutable.Extensions.FluentAssertions.Tests\Results.Immutable.Extensions.FluentAssertions.Tests.csproj", "{02223A73-EAF1-4754-B6BB-96193D5ACB02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{0D38628C-9E21-448F-82E9-C68EBCF7022E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D38628C-9E21-448F-82E9-C68EBCF7022E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D38628C-9E21-448F-82E9-C68EBCF7022E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{398D83C2-CB90-43CF-B07F-DA35EAB51F7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{398D83C2-CB90-43CF-B07F-DA35EAB51F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{398D83C2-CB90-43CF-B07F-DA35EAB51F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{398D83C2-CB90-43CF-B07F-DA35EAB51F7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02223A73-EAF1-4754-B6BB-96193D5ACB02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02223A73-EAF1-4754-B6BB-96193D5ACB02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02223A73-EAF1-4754-B6BB-96193D5ACB02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02223A73-EAF1-4754-B6BB-96193D5ACB02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
