@@ -30,6 +30,11 @@ jobs:
             -p:SymbolPackageFormat=snupkg \
             -c Release \
             -o ./nugets
+          dotnet pack src/Results.Immutable.Extensions.FluentAssertions/Results.Immutable.Extensions.FluentAssertions.csproj \
+            --include-symbols \
+            -p:SymbolPackageFormat=snupkg \
+            -c Release \
+            -o ./nugets
         name: dotnet pack
       - run: |
           dotnet nuget push "./nugets/*" \
