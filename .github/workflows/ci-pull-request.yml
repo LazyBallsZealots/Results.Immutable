@@ -2,8 +2,8 @@ name: PR build
 
 on:
   pull_request:
-    branches: [ "main" ]
-    paths: [ "src/**/*" ]
+    branches: ["main"]
+    paths: ["src/**/*"]
 
 permissions:
   pull-requests: write
@@ -23,7 +23,10 @@ jobs:
             6.x
             7.x
             8.x
-          dotnet-quality: 'ga'
+          dotnet-quality: "ga"
+
+      - name: Restore tools
+        run: dotnet tool restore
 
       - name: Install dependencies
         run: dotnet restore Results.Immutable.sln
@@ -34,19 +37,19 @@ jobs:
         working-directory: src
 
       - name: Test & analyze coverage
-        run: dotnet test Results.Immutable.sln --no-build --collect:"XPlat Code Coverage" --results-directory ./coverage
+        run: dotnet tool run dotnet-coverage collect "dotnet test --no-build" -f cobertura -o coverage/cobertura.xml -s dotnet-coverage.xml
         working-directory: src
 
       - name: Coverage Summary Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: src/coverage/**/coverage.cobertura.xml
+          filename: src/coverage/cobertura.xml
           badge: true
           fail_below_min: true
           format: markdown
           hide_complexity: true
           output: both
-          thresholds: '80 95'
+          thresholds: "80 95"
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
