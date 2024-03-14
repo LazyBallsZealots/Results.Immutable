@@ -2,20 +2,20 @@ namespace Results.Immutable.Extensions.FluentAssertions.Tests;
 
 public class OptionTest
 {
-    [Fact(DisplayName = "Be some with some")]
-    public void BeSomeWithSome() =>
+    [Fact(DisplayName = "Contains a value with some")]
+    public void ContainsValueWithSome() =>
         Option.Some(5)
             .Should()
-            .BeSome()
+            .ContainValue()
             .Which.Should()
             .Be(5);
 
-    [Fact(DisplayName = "Be some with none")]
-    public void BeSomeWithNone()
+    [Fact(DisplayName = "Contains a value with none")]
+    public void ContainsValueWithNone()
     {
         var act = () => Option.None<int>()
             .Should()
-            .BeSome("yes");
+            .ContainValue("yes");
 
         act.Should()
             .Throw<Exception>()
