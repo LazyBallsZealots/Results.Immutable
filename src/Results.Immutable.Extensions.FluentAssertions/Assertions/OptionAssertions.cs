@@ -14,7 +14,7 @@ public class OptionAssertions<T> : OptionAssertions<T, OptionAssertions<T>>
     ///     Initializes a new instance of the <see cref="OptionAssertions{T}" /> class.
     /// </summary>
     /// <param name="subject">The <see cref="Option{T}" /> to assert.</param>
-    public OptionAssertions(Option<T> subject)
+    protected internal OptionAssertions(Option<T> subject)
         : base(subject)
     {
     }
@@ -31,7 +31,7 @@ public class OptionAssertions<TSubject, TAssertions> : ObjectAssertions<Option<T
     ///     Initializes a new instance of the <see cref="OptionAssertions{T}" /> class.
     /// </summary>
     /// <param name="subject">The <see cref="Option{T}" /> to assert.</param>
-    public OptionAssertions(Option<TSubject> subject)
+    protected internal OptionAssertions(Option<TSubject> subject)
         : base(subject)
     {
     }
@@ -39,7 +39,8 @@ public class OptionAssertions<TSubject, TAssertions> : ObjectAssertions<Option<T
     protected override string Identifier => nameof(Option<TSubject>);
 
     /// <summary>
-    ///     Asserts that the <see cref="Option{T}" /> contains a value.
+    ///     Asserts that the <see cref="Option{T}" /> contains a value and returns
+    ///     an <see cref="AndWhichConstraint{TAssertions, TSubject}" /> for further assertions.
     /// </summary>
     /// <param name="because">
     ///     A formatted phrase as is supported by <see cref="string.Format(string,object[])" /> explaining why the assertion
@@ -48,7 +49,7 @@ public class OptionAssertions<TSubject, TAssertions> : ObjectAssertions<Option<T
     /// <param name="becauseArgs">
     ///     Zero or more objects to format using the placeholders in <paramref name="because" />.
     /// </param>
-    public AndWhichConstraint<TAssertions, TSubject> BeSome(string because = "", params object[] becauseArgs)
+    public AndWhichConstraint<TAssertions, TSubject> ContainValue(string because = "", params object[] becauseArgs)
     {
         if (Subject.Some is var (some))
         {

@@ -2,46 +2,46 @@
 
 public class ResultTest
 {
-    [Fact(DisplayName = "Be ok with ok")]
-    public void BeOkWithOk() =>
+    [Fact(DisplayName = "Contains value with ok")]
+    public void ContainsValueWithOk() =>
         Result.Ok(5)
             .Should()
-            .BeOk()
+            .ContainValue()
             .Which.Should()
             .Be(5);
 
-    [Fact(DisplayName = "Be ok with error")]
-    public void BeOkWithError()
+    [Fact(DisplayName = "Contains value with error")]
+    public void ContainsValueWithError()
     {
         var act = () => Result.Fail<int>("anything")
             .Should()
-            .BeOk("no");
+            .ContainValue("no");
 
         act.Should()
             .Throw<Exception>()
             .WithMessage("Expected result to be ok because no, but found error.");
     }
 
-    [Fact(DisplayName = "Be failed with ok")]
-    public void BeFailedWithOk()
+    [Fact(DisplayName = "Contains errors with ok")]
+    public void ContainsErrorsWithOk()
     {
         var act = () => Result.Ok(5)
             .Should()
-            .BeFailed("no");
+            .ContainErrors("no");
 
         act.Should()
             .Throw<Exception>()
             .WithMessage("Expected result to be failed because no, but found ok.");
     }
 
-    [Fact(DisplayName = "Be failed with error")]
-    public void BeFailedWithError() =>
+    [Fact(DisplayName = "Contains errors with error")]
+    public void ContainsErrorsWithError() =>
         Result.Fail<int>("anything")
             .Should()
-            .BeFailed();
+            .ContainErrors();
 
-    [Fact(DisplayName = "Contain error of type with ok")]
-    public void ContainErrorOfTypeWithOk()
+    [Fact(DisplayName = "Contains errors of type with ok")]
+    public void ContainsErrorOfTypeWithOk()
     {
         var act = () => Result.Ok(5)
             .Should()
@@ -52,8 +52,8 @@ public class ResultTest
             .WithMessage($"Expected result to contain errors of type {typeof(MyError)} because no, but found none.");
     }
 
-    [Fact(DisplayName = "Contain error of type with another type of error")]
-    public void ContainErrorOfTypeWithAnotherTypeOfError()
+    [Fact(DisplayName = "Contains errors of type with another type of error")]
+    public void ContainsErrorOfTypeWithAnotherTypeOfError()
     {
         var act = () => Result.Fail<int>("anything")
             .Should()
@@ -64,8 +64,8 @@ public class ResultTest
             .WithMessage($"Expected result to contain errors of type {typeof(MyError)} because no, but found none.");
     }
 
-    [Fact(DisplayName = "Contain error of type with error")]
-    public void ContainErrorOfTypeWithError() =>
+    [Fact(DisplayName = "Contains error of type with error")]
+    public void ContainsErrorOfTypeWithError() =>
         Result.Fail<int>(new MyError("important"))
             .Should()
             .ContainErrorsOfType<MyError>()

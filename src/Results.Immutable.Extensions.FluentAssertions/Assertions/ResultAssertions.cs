@@ -15,7 +15,7 @@ public class ResultAssertions<T> : ResultAssertions<T, ResultAssertions<T>>
     ///     Initializes a new instance of the <see cref="ResultAssertions{T}" /> class.
     /// </summary>
     /// <param name="subject">The <see cref="Result{T}" /> to assert.</param>
-    public ResultAssertions(Result<T> subject)
+    protected internal ResultAssertions(Result<T> subject)
         : base(subject)
     {
     }
@@ -28,7 +28,7 @@ public class ResultAssertions<TSubject, TAssertions> : ObjectAssertions<Result<T
     ///     Initializes a new instance of the <see cref="ResultAssertions{T}" /> class.
     /// </summary>
     /// <param name="subject">The <see cref="Result{T}" /> to assert.</param>
-    public ResultAssertions(Result<TSubject> subject)
+    protected internal ResultAssertions(Result<TSubject> subject)
         : base(subject)
     {
     }
@@ -36,7 +36,8 @@ public class ResultAssertions<TSubject, TAssertions> : ObjectAssertions<Result<T
     protected override string Identifier => nameof(Result<TSubject>);
 
     /// <summary>
-    ///     Asserts that the <see cref="Result{T}" /> contains a value.
+    ///     Asserts that the <see cref="Result{T}" /> contains a value and returns
+    ///     an <see cref="AndWhichConstraint{TAssertions, TSubject}" /> for further assertions.
     /// </summary>
     /// <param name="because">
     ///     A formatted phrase as is supported by <see cref="string.Format(string,object[])" /> explaining why the assertion
@@ -45,7 +46,7 @@ public class ResultAssertions<TSubject, TAssertions> : ObjectAssertions<Result<T
     /// <param name="becauseArgs">
     ///     Zero or more objects to format using the placeholders in <paramref name="because" />.
     /// </param>
-    public AndWhichConstraint<TAssertions, TSubject> BeOk(string because = "", params object[] becauseArgs)
+    public AndWhichConstraint<TAssertions, TSubject> ContainValue(string because = "", params object[] becauseArgs)
     {
         if (Subject.Some is var (some))
         {
@@ -60,7 +61,9 @@ public class ResultAssertions<TSubject, TAssertions> : ObjectAssertions<Result<T
     }
 
     /// <summary>
-    ///     Asserts that the <see cref="Result{T}" /> does not contain a value.
+    ///     Asserts that the <see cref="Result{T}" /> does not contain a value, and returns
+    ///     an <see cref="AndWhichConstraint{TAssertions, TSubject}" /> for further assertions about the errors.
+    ///     ///
     /// </summary>
     /// <param name="because">
     ///     A formatted phrase as is supported by <see cref="string.Format(string,object[])" /> explaining why the assertion
@@ -69,7 +72,7 @@ public class ResultAssertions<TSubject, TAssertions> : ObjectAssertions<Result<T
     /// <param name="becauseArgs">
     ///     Zero or more objects to format using the placeholders in <paramref name="because" />.
     /// </param>
-    public AndWhichConstraint<TAssertions, ImmutableList<Error>> BeFailed(
+    public AndWhichConstraint<TAssertions, ImmutableList<Error>> ContainErrors(
         string because = "",
         params object[] becauseArgs)
     {
@@ -82,7 +85,8 @@ public class ResultAssertions<TSubject, TAssertions> : ObjectAssertions<Result<T
     }
 
     /// <summary>
-    ///     Asserts that the <see cref="Result{T}" /> contains errors of type <typeparamref name="TError" />.
+    ///     Asserts that the <see cref="Result{T}" /> contains errors of type <typeparamref name="TError" />,
+    ///     and returns an <see cref="AndWhichConstraint{TAssertions, TSubject}" /> for further assertions.
     /// </summary>
     /// <typeparam name="TError">
     ///     The type of the error.
