@@ -911,6 +911,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"Results.Immutable.Extensions.FluentAssertions@workspace:src/Results.Immutable.Extensions.FluentAssertions":
+  version: 0.0.0-use.local
+  resolution: "Results.Immutable.Extensions.FluentAssertions@workspace:src/Results.Immutable.Extensions.FluentAssertions"
+  languageName: unknown
+  linkType: soft
+
 "Results.Immutable@workspace:src/Results.Immutable":
   version: 0.0.0-use.local
   resolution: "Results.Immutable@workspace:src/Results.Immutable"
@@ -5000,12 +5006,6 @@ __metadata:
   checksum: f877dd8741796b909f2a82454ec111afb84eb45890eb49ac947d87991379406b3b83ff9673a46012fca0d7844bb989f45cc5b788254cf1a39b6b5a9659de0630
   languageName: node
   linkType: hard
-
-"results-immutable-extensions-fluent-assertions@workspace:src/Results.Immutable.Extensions.FluentAssertions":
-  version: 0.0.0-use.local
-  resolution: "results-immutable-extensions-fluent-assertions@workspace:src/Results.Immutable.Extensions.FluentAssertions"
-  languageName: unknown
-  linkType: soft
 
 "results-immutable-workspaces@workspace:.":
   version: 0.0.0-use.local
