@@ -1,8 +1,8 @@
 {
-  "name": "results-immutable-extensions-fluent-assertions",
+  "name": "Results.Immutable.Extensions.FluentAssertions",
   "private": true,
   "version": "0.1.0-alpha.4",
   "scripts": {
-    "version": "node ../../scripts/version.mjs; git add Results.Immutable.Extensions.FluentAssertions.csproj"
+    "version": "node ../../scripts/version.mjs && git add Results.Immutable.Extensions.FluentAssertions.csproj"
   }
 }
