@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.5](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@0.1.0-alpha.4...Results.Immutable@0.1.0-alpha.5) (2024-04-01)
+
+### Bug Fixes
+
+- adjust versioning scripts to fail if the csproj file cannot be modified ([a2127f5](https://github.com/LazyBallsZealots/Results.Immutable/commit/a2127f52bed88864c44b2d2903bce8a7980a30b5))
+
 # [0.1.0-alpha.4](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@0.1.0-alpha.3...Results.Immutable@0.1.0-alpha.4) (2024-02-27)
 
 ### Features
