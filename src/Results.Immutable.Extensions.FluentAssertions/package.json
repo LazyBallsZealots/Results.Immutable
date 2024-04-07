@@ -6,6 +6,6 @@
     "version": "node ../../scripts/version.mjs && git add Results.Immutable.Extensions.FluentAssertions.csproj"
   },
   "devDependencies": {
-    "Results.Immutable": "^0.1.0-alpha.5"
+    "Results.Immutable": "0.1.0-alpha.5"
   }
 }
