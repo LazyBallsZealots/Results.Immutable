@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.0](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@0.1.0-alpha.5...Results.Immutable@1.0.0-alpha.0) (2024-04-09)
+
+### Features
+
+- implement synchronous projections for tasks of generic Results ([92aa606](https://github.com/LazyBallsZealots/Results.Immutable/commit/92aa6069222e440be044ca75506a1436c9969595))
+
+### BREAKING CHANGES
+
+- renames and changes signatures
+  of existing ValueTask extensions.
+
 # [0.1.0-alpha.5](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@0.1.0-alpha.4...Results.Immutable@0.1.0-alpha.5) (2024-04-01)
 
 ### Bug Fixes
