@@ -33,4 +33,32 @@ public static class ResultOptionConvertExtensions
     /// <typeparam name="T">The type of the <see cref="Option{T}" />.</typeparam>
     public static Result<T> ToResult<T>(this Option<T> option, Func<Error> errorFactory) =>
         option.Some is var (value) ? Result.Ok(value) : Result.Fail<T>(errorFactory());
+
+    /// <summary>
+    ///     Transposes an <see cref="Option{Result{T}}" /> to a <see cref="Result{Option{T}}" />,
+    ///     keeping the <see cref="Result{T}.Error" /> of the inner <see cref="Result{T}" />.
+    /// </summary>
+    /// <param name="option">The <see cref="Option{Result{T}}" /> to transpose.</param>
+    /// <typeparam name="T">The type of the value.</typeparam>
+    public static Result<Option<T>> Transpose<T>(this Option<Result<T>> option) =>
+        option switch
+        {
+            { Some.Value.Some.Value: var value, } => Result.Ok(Option.Some(value)),
+            { Some.Value.Errors: var errors, } => Result.Fail<Option<T>>(errors),
+            _ => Result.Ok(Option.None<T>()),
+        };
+
+    /// <summary>
+    ///     Transposes a <see cref="Result{Option{T}}" /> to an <see cref="Option{Result{T}}" />,
+    ///     keeping the <see cref="Result{T}.Error" /> of the outer <see cref="Result{T}" />.
+    /// </summary>
+    /// <param name="result">The <see cref="Result{Option{T}}" /> to transpose.</param>
+    /// <typeparam name="T">The type of the value.</typeparam>
+    public static Option<Result<T>> Transpose<T>(this Result<Option<T>> result) =>
+        result switch
+        {
+            { Some.Value.Some.Value: var value, } => Option.Some(Result.Ok(value)),
+            { Some.Value.Some: null, } => Option.None<Result<T>>(),
+            _ => Option.Some(Result.Fail<T>(result.Errors)),
+        };
 }
