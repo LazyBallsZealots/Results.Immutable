@@ -43,4 +43,46 @@ public sealed class ResultOptionConvertExtensionsTests
             .ToResult(() => Error.Create("error"))
             .Should()
             .Be(Result.Fail<int>("error"));
+
+    [Fact(DisplayName = "Transposes an option to a result with value")]
+    public void TransposesAnOptionToAResultWithValue() =>
+        Option.Some(Result.Ok(5))
+            .Transpose()
+            .Should()
+            .Be(Result.Ok(Option.Some(5)));
+
+    [Fact(DisplayName = "Transposes a option to a result with errors")]
+    public void TransposesAnOptionToAResultWithErrors() =>
+        Option.Some(Result.Fail<int>("cow"))
+            .Transpose()
+            .Should()
+            .Be(Result.Fail<Option<int>>("cow"));
+
+    [Fact(DisplayName = "Transposes a option to a result with none")]
+    public void TransposesAnOptionToAResultWithNone() =>
+        Option.None<Result<int>>()
+            .Transpose()
+            .Should()
+            .Be(Result.Ok(Option.None<int>()));
+
+    [Fact(DisplayName = "Transposes a result to an option with value")]
+    public void TransposesAResultToAnOptionWithValue() =>
+        Result.Ok(Option.Some(5))
+            .Transpose()
+            .Should()
+            .Be(Option.Some(Result.Ok(5)));
+
+    [Fact(DisplayName = "Transposes a result to an option with errors")]
+    public void TransposesAResultToAnOptionWithErrors() =>
+        Result.Fail<Option<int>>("monkey")
+            .Transpose()
+            .Should()
+            .Be(Option.Some(Result.Fail<int>("monkey")));
+
+    [Fact(DisplayName = "Transposes a result to an option with none")]
+    public void TransposesAResultToAnOptionWithNone() =>
+        Result.Ok(Option.None<int>())
+            .Transpose()
+            .Should()
+            .Be(Option.None<Result<int>>());
 }
