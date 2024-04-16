@@ -117,6 +117,71 @@ public sealed class OptionTransformationTests
             .Be(0);
     }
 
+    [Fact(DisplayName = "Asynchronously projects an existing option")]
+    public async Task AsynchronouslyProjectsAnOption()
+    {
+        var asyncOption = new ValueTask<Option<int>>(Option.Some(1));
+        var result = await asyncOption.SelectAsync(static x => new ValueTask<int>(x + 1));
+
+        result.Should()
+            .Be(Option.Some(2));
+    }
+
+    [Fact(DisplayName = "Asynchronously projects Option.None")]
+    public async Task AsynchronouslyProjectsOptionNone()
+    {
+        var asyncOption = new ValueTask<Option<int>>(Option.None<int>());
+        var result = await asyncOption.SelectAsync(ThrowAsync<int, int>);
+
+        result.Should()
+            .Be(Option.None<int>());
+    }
+
+    [Fact(DisplayName = "Projects and flattens async option")]
+    public async Task ProjectsAndFlattensAsyncOption()
+    {
+        var asyncOption = new ValueTask<Option<int>>(Option.Some(1));
+        var result = await asyncOption.SelectMany(static i => Option.Some(i + 2));
+
+        result.Should()
+            .Be(Option.Some(3));
+    }
+
+    [Fact(DisplayName = "Projects and flattens async Option.None")]
+    public async Task ProjectsAndFlattensAsyncOptionNone()
+    {
+        var asyncNone = new ValueTask<Option<int>>(Option.None<int>());
+        var result = await asyncNone.SelectMany<int, int>(
+            _ => throw new InvalidOperationException("Projected Option.None!"));
+
+        result.Should()
+            .Be(Option.None<int>());
+    }
+
+    [Fact(DisplayName = "Asynchronously projects and flattens async option with intermediate selector")]
+    public async Task ProjectsAndFlattensAsyncOptionWithIntermediateSelector()
+    {
+        var asyncOption = new ValueTask<Option<int>>(Option.Some(1));
+        var result = await asyncOption.SelectManyAsync(
+            i => new ValueTask<Option<int>>(Option.Some(i + 2)),
+            static (initial, intermediate) => initial + intermediate);
+
+        result.Should()
+            .Be(Option.Some(4));
+    }
+
+    [Fact(DisplayName = "Asynchronously projects and flattens async Option.None with intermediate selector")]
+    public async Task ProjectsAndFlattensAsyncNoneWithIntermediateSelector()
+    {
+        var asyncNone = new ValueTask<Option<int>>(Option.None<int>());
+        var result = await asyncNone.SelectManyAsync<int, int, int>(
+            ThrowAsync<int, Option<int>>,
+            static (_, _) => throw new InvalidOperationException("Invoked selector for Option.None!"));
+
+        result.Should()
+            .Be(Option.None<int>());
+    }
+
     [Fact(DisplayName = "Filters in a value via a predicate")]
     public void FiltersInAValueViaAPredicate()
     {
@@ -153,4 +218,7 @@ public sealed class OptionTransformationTests
         fn.CallCount.Should()
             .Be(0);
     }
+
+    private static ValueTask<TOut> ThrowAsync<TIn, TOut>(TIn _) =>
+        throw new InvalidOperationException("Asynchronously projected Option.None!");
 }
