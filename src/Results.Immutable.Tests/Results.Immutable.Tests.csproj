@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="6.8.0" />
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="FsCheck" Version="3.0.0-rc1" />
     <PackageReference Include="FsCheck.Xunit" Version="3.0.0-rc1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Results.Immutable\Results.Immutable.csproj" />
+    <ProjectReference Include="..\Results.Immutable.Extensions.FluentAssertions\Results.Immutable.Extensions.FluentAssertions.csproj" />
   </ItemGroup>
 
 </Project>
