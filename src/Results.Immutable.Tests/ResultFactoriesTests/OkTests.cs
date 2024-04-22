@@ -95,4 +95,66 @@ public sealed class OkTests
             .Match<Result<Unit>>(
                 static r => r.HasFailed && r.HasError<RootError>(static e => e.Message == errorMessage));
     }
+
+    [Fact(DisplayName = "OkIfNotNull with error message returns successful result if the value is not null")]
+    public void OkIfNotNullWithErrorMessageReturnsSuccessfulResultIfTheValueIsNotNull() =>
+        Result.OkIfNotNull("kilo", "")
+            .Should()
+            .ContainValue()
+            .Which.Should()
+            .Be("kilo");
+
+    [Fact(DisplayName = "OkIfNotNull with error message returns failed result if the value is null")]
+    public void OkIfNotNullWithErrorMessageReturnsFailedResultIfTheValueIsNull() =>
+        Result.OkIfNotNull(null as string, "pound")
+            .Should()
+            .ContainErrors()
+            .Which.Should()
+            .ContainSingle()
+            .Which.Should()
+            .Be(new Error("pound"));
+
+    [Fact(DisplayName = "OkIfNotNull with error returns successful result if the value is not null")]
+    public void OkIfNotNullWithErrorReturnsSuccessfulResultIfTheValueIsNotNull() =>
+        Result.OkIfNotNull("kilo", new Error("pound"))
+            .Should()
+            .ContainValue()
+            .Which.Should()
+            .Be("kilo");
+
+    [Fact(DisplayName = "OkIfNotNull with error returns failed result if the value is null")]
+    public void OkIfNotNullWithErrorReturnsFailedResultIfTheValueIsNull() =>
+        Result.OkIfNotNull(null as string, new Error("pound"))
+            .Should()
+            .ContainErrors()
+            .Which.Should()
+            .ContainSingle()
+            .Which.Should()
+            .Be(new Error("pound"));
+
+    [Fact(DisplayName = "OkIfNotNull with error factory returns successful result if the value is not null")]
+    public void OkIfNotNullWithErrorFactoryReturnsSuccessfulResultIfTheValueIsNotNull()
+    {
+        var fn = new Fn<Error>(() => new("pound"));
+        Result.OkIfNotNull("kilo", fn)
+            .Should()
+            .ContainValue()
+            .Which.Should()
+            .Be("kilo");
+
+        fn.CallCount.Should()
+            .Be(0);
+    }
+
+    [Fact(DisplayName = "OkIfNotNull with error factory returns failed result if the value is null")]
+    public void OkIfNotNullWithErrorFactoryReturnsFailedResultIfTheValueIsNull()
+    {
+        Result.OkIfNotNull(null as string, () => new("pound"))
+            .Should()
+            .ContainErrors()
+            .Which.Should()
+            .ContainSingle()
+            .Which.Should()
+            .Be(new Error("pound"));
+    }
 }

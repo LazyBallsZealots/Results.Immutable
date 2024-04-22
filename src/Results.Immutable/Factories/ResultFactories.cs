@@ -58,6 +58,53 @@ public static class Result
         condition ? Ok() : Fail(errorFactory());
 
     /// <summary>
+    ///     Creates a successful <see cref="Result{T}" /> of <see cref="T" /> if the <paramref name="value" /> is not
+    ///     <see langword="null" />,
+    ///     otherwise - failure is returned.
+    /// </summary>
+    /// <typeparam name="T">Type of the value.</typeparam>
+    /// <param name="value">Value to check.</param>
+    /// <param name="errorMessage">An error message to associate with failed result.</param>
+    /// <returns>A <see cref="Result{T}" /> of <see cref="T" />, dependent on the <paramref name="value" />.</returns>
+    public static Result<T> OkIfNotNull<T>(T? value, string errorMessage)
+        where T : notnull =>
+        value is null
+            ? Fail<T>(errorMessage)
+            : Ok(value);
+
+    /// <summary>
+    ///     Creates a successful <see cref="Result{T}" /> of <see cref="T" /> if the <paramref name="value" /> is not
+    ///     <see langword="null" />,
+    ///     otherwise - failure is returned.
+    /// </summary>
+    /// <typeparam name="T">Type of the value.</typeparam>
+    /// <param name="value">Value to check.</param>
+    /// <param name="error">An <see cref="Error" /> to associate with failed result.</param>
+    /// <returns>A <see cref="Result{T}" /> of <see cref="T" />, dependent on the <paramref name="value" />.</returns>
+    public static Result<T> OkIfNotNull<T>(T? value, Error error)
+        where T : notnull =>
+        value is null
+            ? Fail<T>(error)
+            : Ok(value);
+
+    /// <summary>
+    ///     Creates a successful <see cref="Result{T}" /> of <see cref="T" /> if the <paramref name="value" /> is not
+    ///     <see langword="null" />,
+    ///     otherwise - failure is returned.
+    /// </summary>
+    /// <typeparam name="T">Type of the value.</typeparam>
+    /// <param name="value">Value to check.</param>
+    /// <param name="errorFactory">
+    ///     A <see cref="Func{T}" />, returning an <see cref="Error" /> instance.
+    /// </param>
+    /// <returns>A <see cref="Result{T}" /> of <see cref="T" />, dependent on the <paramref name="value" />.</returns>
+    public static Result<T> OkIfNotNull<T>(T? value, Func<Error> errorFactory)
+        where T : notnull =>
+        value is null
+            ? Fail<T>(errorFactory())
+            : Ok(value);
+
+    /// <summary>
     ///     Represents a failed operation.
     /// </summary>
     /// <param name="errorMessage">
