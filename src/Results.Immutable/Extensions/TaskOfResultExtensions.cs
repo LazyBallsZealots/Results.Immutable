@@ -82,7 +82,7 @@ public static class TaskOfResultExtensions
     ///     to project.
     /// </param>
     /// <param name="selector">
-    ///     Delgate used to project successful result.
+    ///     Delegate used to project successful result.
     /// </param>
     /// <returns>
     ///     A <see cref="ValueTask{T}" />,
