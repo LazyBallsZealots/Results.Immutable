@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.1](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@1.0.0-alpha.0...Results.Immutable@1.0.0-alpha.1) (2024-04-28)
+
+### Features
+
+- add OkIfNotNull for Result ([6635b2e](https://github.com/LazyBallsZealots/Results.Immutable/commit/6635b2efb877f36fc465d46d5ea8ead7d28baf93))
+- add SelectManyAsync for option ([da63c35](https://github.com/LazyBallsZealots/Results.Immutable/commit/da63c35573f7b118a6ece33ec7bf7f072bbf266e))
+- add transpose for `Option<Result<T>>` to `Result<Option<T>>` and otherwise ([bd33198](https://github.com/LazyBallsZealots/Results.Immutable/commit/bd3319859de897e01a482029794361910716d531))
+- added sync- and async projections to Option ([315b36c](https://github.com/LazyBallsZealots/Results.Immutable/commit/315b36ca6bfb8b3100a84ce313755237317eed87))
+
 # [1.0.0-alpha.0](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@0.1.0-alpha.5...Results.Immutable@1.0.0-alpha.0) (2024-04-09)
 
 ### Features
