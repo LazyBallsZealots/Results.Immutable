@@ -176,4 +176,90 @@ public sealed class FailTests
             .Match<Result<Unit>>(
                 static r => r.HasFailed && r.HasError<RootError>(static e => e.Message == errorMessage));
     }
+
+    [Fact(DisplayName = "FailIf returns a failed generic result if the condition is true")]
+    public void FailIfReturnsAFailedGenericResultIfTheConditionIsTrue()
+    {
+        var error = new Error("whoopsie!");
+
+        Result.FailIf(
+                true,
+                1,
+                error)
+            .Should()
+            .Match<Result<int>>(static r => r.HasFailed)
+            .And
+            .ContainErrors()
+            .Which
+            .Should()
+            .BeEquivalentTo(
+                new[]
+                {
+                    error,
+                });
+    }
+
+    [Fact(DisplayName = "FailIf returns a failed generic result with lazily evaluated error if the condition is true")]
+    public void FailIfReturnsAFailedGenericResultWithLazilyEvaluatedErrorIfTheConditionIsTrue()
+    {
+        var error = new Error("I'm lazy");
+
+        var fn = new Fn<Error>(() => error);
+
+        Result.FailIf(
+                true,
+                1,
+                fn)
+            .Should()
+            .Match<Result<int>>(static r => r.HasFailed)
+            .And
+            .ContainErrors()
+            .Which
+            .Should()
+            .BeEquivalentTo(
+                new[]
+                {
+                    error,
+                });
+
+        fn.CallCount.Should()
+            .Be(1);
+    }
+
+    [Fact(DisplayName = "FailIf returns a successful generic result if the condition is false")]
+    public void FailIfReturnsASuccessfulGenericResultIfTheConditionIsFalse()
+    {
+        const int value = 1;
+
+        Result.FailIf(
+                false,
+                value,
+                new Error("unreachable"))
+            .Should()
+            .ContainValue()
+            .Which
+            .Should()
+            .Be(value);
+    }
+
+    [Fact(
+        DisplayName =
+            "FailIf returns a successful generic result with lazily evaluated error if the condition is false")]
+    public void FailIfReturnsASuccessfulGenericResultWithLazilyEvaluatedErrorIfTheConditionIsFalse()
+    {
+        const int value = 1;
+        var fn = new Fn<Error>(() => new("unreachable"));
+
+        Result.FailIf(
+                false,
+                value,
+                fn)
+            .Should()
+            .Match<Result<int>>(static r => r.HasSucceeded)
+            .And
+            .ContainValue()
+            .Which
+            .Should()
+            .Be(value);
+    }
 }

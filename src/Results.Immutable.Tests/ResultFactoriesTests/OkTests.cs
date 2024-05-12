@@ -96,6 +96,81 @@ public sealed class OkTests
                 static r => r.HasFailed && r.HasError<RootError>(static e => e.Message == errorMessage));
     }
 
+    [Fact(DisplayName = "OkIf returns a successful generic result if the condition is true")]
+    public void OkIfReturnsGenericSuccessfulResultIfConditionIsTrue()
+    {
+        const int value = 1;
+
+        Result.OkIf(
+                true,
+                value,
+                new Error("unreachable"))
+            .Should()
+            .ContainValue()
+            .Which
+            .Should()
+            .Be(value);
+    }
+
+    [Fact(
+        DisplayName = "OkIf returns a successful generic result with lazily evaluated error if the condition is true")]
+    public void OkIfReturnsASuccessfulResultWithLazilyEvaluatedErrorIfTheConditionIsTrue()
+    {
+        const int value = 1;
+
+        var fn = new Fn<Error>(() => new("unreachable"));
+
+        Result.OkIf(
+                true,
+                value,
+                fn.Callable)
+            .Should()
+            .ContainValue()
+            .Which
+            .Should()
+            .Be(value);
+
+        fn.CallCount.Should()
+            .Be(0);
+    }
+
+    [Fact(DisplayName = "OkIf returns a failed generic result when the condition is false")]
+    public void OkIfReturnsAFailedResultWithAMatchingErrorIfTheConditionIsFalse()
+    {
+        var error = new Error("whoops!");
+
+        Result.OkIf(
+                false,
+                1,
+                error)
+            .Should()
+            .ContainErrors()
+            .Which
+            .Should()
+            .ContainSingle(single => single.Equals(error));
+    }
+
+    [Fact(DisplayName = "OkIf returns a failed generic result with lazily evaluated error when the condition is false")]
+    public void OkIfReturnsFailedGenericResultWithAMatchingErrorWhenTheConditionIsFalse()
+    {
+        var error = new Error("lazy whoopsie!");
+
+        var fn = new Fn<Error>(() => error);
+
+        Result.OkIf(
+                false,
+                1,
+                fn.Callable)
+            .Should()
+            .ContainErrors()
+            .Which
+            .Should()
+            .ContainSingle(single => single.Equals(error));
+
+        fn.CallCount.Should()
+            .Be(1);
+    }
+
     [Fact(DisplayName = "OkIfNotNull with error message returns successful result if the value is not null")]
     public void OkIfNotNullWithErrorMessageReturnsSuccessfulResultIfTheValueIsNotNull() =>
         Result.OkIfNotNull("kilo", "")
