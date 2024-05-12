@@ -26,9 +26,9 @@ public static class Result
     public static Result<T> Ok<T>(T value) => new(value);
 
     /// <summary>
-    ///     Creates a successful <see cref="Result{T}" />
-    ///     of <see cref="Unit" /> if the <paramref name="condition" />
-    ///     is <see langword="true" />, otherwise - failure is returned.
+    ///     Creates a successful <see cref="Result{T}" /> if the
+    ///     <paramref name="condition" /> is <see langword="true" />,
+    ///     otherwise - failure is returned.
     /// </summary>
     /// <param name="condition">Condition to check.</param>
     /// <param name="errorMessage">An error message to associate with failed result.</param>
@@ -38,8 +38,8 @@ public static class Result
     /// </returns>
     public static Result<Unit> OkIf(bool condition, string errorMessage) => condition ? Ok() : Fail<Unit>(errorMessage);
 
-    /// <inheritdoc cref="OkIf(bool, string)" />
     /// <param name="error">An <see cref="Error" /> to associate with failed result.</param>
+    /// <inheritdoc cref="OkIf(bool, string)" />
     public static Result<Unit> OkIf(bool condition, Error error) => condition ? Ok() : Fail<Unit>(error);
 
     /// <param name="errorMessageFactory">
@@ -56,6 +56,24 @@ public static class Result
     /// <inheritdoc cref="OkIf(bool, Error)" />
     public static Result<Unit> OkIf(bool condition, Func<Error> errorFactory) =>
         condition ? Ok() : Fail(errorFactory());
+
+    /// <typeparam name="T">Generic type of the result.</typeparam>
+    /// <param name="value">Value to associate with successful result.</param>
+    /// <inheritdoc cref="OkIf(bool,Error)" />
+    public static Result<T> OkIf<T>(
+        bool condition,
+        T value,
+        Error error) =>
+        condition ? Ok(value) : Fail<T>(error);
+
+    /// <typeparam name="T">Generic type of the result.</typeparam>
+    /// <param name="value">Value to associate with successful result.</param>
+    /// <inheritdoc cref="OkIf(bool,Func{Error})" />
+    public static Result<T> OkIf<T>(
+        bool condition,
+        T value,
+        Func<Error> errorFactory) =>
+        condition ? Ok(value) : Fail<T>(errorFactory());
 
     /// <summary>
     ///     Creates a successful <see cref="Result{T}" /> of <see cref="T" /> if the <paramref name="value" /> is not
@@ -125,23 +143,26 @@ public static class Result
     /// <inheritdoc cref="Fail(Error)" />
     public static Result<Unit> Fail(params Error[] errors) => new(errors.ToImmutableList());
 
+    /// <typeparam name="T">Generic type of the result.</typeparam>
     /// <inheritdoc cref="Fail(string)" />
     public static Result<T> Fail<T>(string errorMessage) => Fail<T>(new Error(errorMessage));
 
+    /// <typeparam name="T">Generic type of the result.</typeparam>
     /// <inheritdoc cref="Fail(Error)" />
     public static Result<T> Fail<T>(Error error) => new(ImmutableList.Create(error));
 
+    /// <typeparam name="T">Generic type of the result.</typeparam>
     /// <inheritdoc cref="Fail(IEnumerable{Error})" />
     public static Result<T> Fail<T>(IEnumerable<Error> errors) => new(errors.ToImmutableList());
 
+    /// <typeparam name="T">Generic type of the result.</typeparam>
     /// <inheritdoc cref="Fail(IEnumerable{Error})" />
     public static Result<T> Fail<T>(params Error[] errors) => new(errors.ToImmutableList());
 
     /// <summary>
-    ///     Creates a failed <see cref="Result{T}" />
-    ///     of <see cref="Unit" /> if the <paramref name="condition" />
-    ///     is <see langword="true" />, otherwise - successful result
-    ///     is returned.
+    ///     Creates a failed <see cref="Result{T}" /> if the
+    ///     <paramref name="condition" /> is <see langword="true" />,
+    ///     otherwise - successful result is returned.
     /// </summary>
     /// <param name="condition">Condition to check.</param>
     /// <param name="errorMessage">An error message to associate with failed result.</param>
@@ -180,7 +201,25 @@ public static class Result
     public static Result<Unit> FailIf(bool condition, Func<Error> errorFactory) =>
         condition ? Fail(errorFactory()) : Ok();
 
-    /// <inheritdoc cref="Result.Transpose{T}(IReadOnlyCollection{Result{T}})" />
+    /// <typeparam name="T">Generic type of the result.</typeparam>
+    /// <param name="value">Value to associate with successful result.</param>
+    /// <inheritdoc cref="FailIf(bool,Error)" />
+    public static Result<T> FailIf<T>(
+        bool condition,
+        T value,
+        Error error) =>
+        condition ? Fail<T>(error) : Ok(value);
+
+    /// <typeparam name="T">Generic type of the result.</typeparam>
+    /// <param name="value">Value to associate with successful result.</param>
+    /// <inheritdoc cref="FailIf(bool,Func{Error})" />
+    public static Result<T> FailIf<T>(
+        bool condition,
+        T value,
+        Func<Error> errorFactory) =>
+        condition ? Fail<T>(errorFactory()) : Ok(value);
+
+    /// <inheritdoc cref="Transpose{T}(IReadOnlyCollection{Result{T}})" />
     public static Result<ImmutableList<T>> Transpose<T>(params Result<T>[] results) =>
         Transpose((IReadOnlyCollection<Result<T>>)results);
 
