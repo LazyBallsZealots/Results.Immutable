@@ -14,5 +14,6 @@
     <IsPackable>true</IsPackable>
     <Version>0.1.0-alpha.2</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 </Project>
