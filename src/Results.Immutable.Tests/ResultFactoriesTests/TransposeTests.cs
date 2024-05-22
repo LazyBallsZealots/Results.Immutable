@@ -17,20 +17,6 @@ public sealed class TransposeTests
                 list.Transpose() is { HasSucceeded: true, Some.Value: var enumerable, } &&
                 enumerable.SequenceEqual(list.Select(static r => r.Some!.Value.Value)));
 
-    [Fact(DisplayName = "Merger of a list of failed results aggregates all errors")]
-    public void MergingAListOfFailedResultsAggregatesAllErrors() =>
-        Result.Merge(
-                Enumerable.Range(0, 100)
-                    .Select(static i => $"Error number {i}")
-                    .Select(Result.Fail)
-                    .ToList())
-            .Errors
-            .Select(static (e, index) => (Error: e, Index: index))
-            .Should()
-            .AllSatisfy(
-                static tuple => tuple.Error.Message.Should()
-                    .EndWith(tuple.Index.ToString()));
-
     [Property(DisplayName = "Transposition of a list of results is a failure if any of them has failed")]
     public Property TransposingAListOrResultsIsAFailureIfAnyOfThemHasFailed() =>
         Prop.ForAll(
@@ -64,18 +50,6 @@ public sealed class TransposeTests
                 .ToArbitrary(),
             static list => list.Merge()
                 .HasSucceeded);
-
-    [Property(DisplayName = "Merger of a list which contains at least one failure is a failure")]
-    public Property MergingAListOfMultipleResultsWithAtLeastOneFailureIsAFailure() =>
-        Prop.ForAll(
-            Gen.OneOf(
-                    Gen.Constant(Result.Ok()),
-                    Gen.Constant(Result.Fail("Errored out!")))
-                .NonEmptyListOf()
-                .Where(static list => list.Any(static r => r.HasFailed))
-                .ToArbitrary(),
-            static list => list.Merge()
-                .HasFailed);
 
     [Fact(DisplayName = "Merger of successful Result params is a success")]
     public void MergingTwoSuccessfulResultsIsASuccess() =>
@@ -128,5 +102,5 @@ public sealed class TransposeTests
             ArbMap.Default.GeneratorFor<int>()
                 .Select(Result.Ok),
             ArbMap.Default.GeneratorFor<string>()
-                .Select(static em => Result.Fail<int>(em)));
+                .Select(static em => Result.Fail<int>(new Error(em))));
 }

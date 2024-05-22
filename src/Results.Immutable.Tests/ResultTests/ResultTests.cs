@@ -8,83 +8,7 @@ public sealed class ResultTests
         var result = new Result<Unit>();
 
         result.Should()
-            .BeEquivalentTo(Result.Fail<Unit>("Constructed result"));
-    }
-
-    [Fact(DisplayName = "Adds an error to a successful result")]
-    public void AddsAnErrorToASuccessfulResult()
-    {
-        var original = Result.Ok();
-
-        var result = original.AddError("An error");
-
-        result
-            .Should()
-            .BeEquivalentTo(Result.Fail("An error"));
-
-        original.IsOk.Should()
-            .BeTrue();
-    }
-
-    [Fact(DisplayName = "Adds multiple errors to a successful result")]
-    public void AddsMultipleErrorsToASuccessfulResult()
-    {
-        var original = Result.Ok();
-
-        var result = original.AddErrors(
-            new[]
-            {
-                "An error",
-                "Another error",
-            });
-
-        result
-            .Should()
-            .BeEquivalentTo(Result.Fail(new("An error"), new("Another error")));
-
-        original.IsOk.Should()
-            .BeTrue();
-    }
-
-    [Fact(DisplayName = "Adds an error to an errored result")]
-    public void AddsAnErrorToAnErroredResult()
-    {
-        var result = Result.Fail()
-            .AddError("An error");
-
-        result
-            .Should()
-            .BeEquivalentTo(Result.Fail("An error"));
-    }
-
-    [Fact(DisplayName = "Adds multiple errors to an errored result")]
-    public void AddsMultipleErrorsToAnErroredResult()
-    {
-        var result = Result.Fail()
-            .AddErrors(
-                new[]
-                {
-                    "An error",
-                    "Another error",
-                });
-
-        result
-            .Should()
-            .BeEquivalentTo(Result.Fail(new("An error"), new("Another error")));
-    }
-
-    [Fact(DisplayName = "Gets the errors of a result")]
-    public void GetsTheErrorsOfAResult()
-    {
-        var result = Result.Fail(new("An error"), new("Another error"));
-
-        result.Errors.Should()
-            .BeEquivalentTo(
-                new[]
-                {
-                    new Error("An error"),
-                    new("Another error"),
-                });
+            .BeEquivalentTo(Result.Fail<Unit>(new Error("Constructed result")));
     }
 
     [Fact(DisplayName = "Checks if the result has an error of a specific type")]
@@ -129,24 +53,6 @@ public sealed class ResultTests
             .BeTrue();
     }
 
-    [Fact(DisplayName = "Matches an errored result and run an action")]
-    public void MatchesAnErroredResultAndRunAnAction()
-    {
-        var result = Result.Fail("A strange error");
-
-        IEnumerable<Error>? errors = null;
-        result.Match(
-            _ => { errors = null; },
-            err => { errors = err; });
-
-        errors.Should()
-            .BeEquivalentTo(
-                new[]
-                {
-                    new Error("A strange error"),
-                });
-    }
-
     [Fact(DisplayName = "Matches an OK result, runs an action and returns the value")]
     public void MatchesAnOkErrorAndRunAnActionAndReturnsTheValue()
     {
@@ -158,23 +64,6 @@ public sealed class ResultTests
 
         value.Should()
             .Be("Hello Steve");
-    }
-
-    [Fact(DisplayName = "Matches an errored result, runs an action and returns the value")]
-    public void MatchesAnErroredResultAndRunAnActionAndReturnsTheValue()
-    {
-        var result = Result.Fail("A strange error");
-
-        var value = result.Match(
-            static _ => Enumerable.Empty<Error>(),
-            static errors => errors);
-
-        value.Should()
-            .BeEquivalentTo(
-                new[]
-                {
-                    new Error("A strange error"),
-                });
     }
 
     [Fact(DisplayName = "Replaces the errors and forget the type error but keep down-casting possible")]

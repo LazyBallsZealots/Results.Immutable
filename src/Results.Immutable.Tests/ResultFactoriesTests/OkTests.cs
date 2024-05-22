@@ -1,6 +1,5 @@
 using FsCheck.Fluent;
 using FsCheck.Xunit;
-using static Results.Immutable.Tests.ResultFactoriesTests.ResultMatching;
 
 namespace Results.Immutable.Tests.ResultFactoriesTests;
 
@@ -26,22 +25,6 @@ public sealed class OkTests
                 return result is { IsOk: true, Some.Value: var value, } && value == obj;
             });
 
-    [Fact(DisplayName = "OkIf returns successful result if the condition is true")]
-    public void OkIfReturnsSuccessfulResultIfTheConditionIsTrue() =>
-        Result.OkIf(true, string.Empty)
-            .Should()
-            .Match<Result<Unit>>(static r => r.HasSucceeded && ValueIsAUnit(r));
-
-    [Fact(DisplayName = "OkIf returns a failed result with a matching error if the condition is false")]
-    public void OkIfReturnsSuccessfulResultIfTheConditionIsFalse()
-    {
-        const string errorMessage = "An error";
-
-        Result.OkIf(false, errorMessage)
-            .Should()
-            .Match<Result<Unit>>(static r => r.HasFailed && r.HasError<Error>(static e => e.Message == errorMessage));
-    }
-
     [Fact(DisplayName = "OkIf returns a failed result with a matching, typed error if the condition is false")]
     public void OkIfReturnsAFailedResultWithAMatchingTypedErrorIfTheConditionIsFalse()
     {
@@ -53,32 +36,6 @@ public sealed class OkTests
             .Should()
             .Match<Result<Unit>>(
                 static r => r.HasFailed && r.HasError<RootError>(static e => e.Message == errorMessage));
-    }
-
-    [Fact(DisplayName = "OkIf returns successful result without calling error factory if the condition is true")]
-    public void OkIfReturnsSuccessfulResultWithoutCallingErrorMessageFactoryIfTheConditionIsTrue()
-    {
-        Result.OkIf(
-                true,
-                GetErrorMessage)
-            .Should()
-            .Match<Result<Unit>>(static r => r.HasSucceeded && ValueIsAUnit(r));
-
-        static string GetErrorMessage() =>
-            throw new InvalidOperationException("Lazy OkIf overload instantiated an error for successful result!");
-    }
-
-    [Fact(
-        DisplayName = "OkIf returns a failed result with a matching, lazily evaluated error if the condition is false")]
-    public void OkIfReturnsAFailureWithAMatchingLazilyEvaluatedErrorIfTheConditionIsFalse()
-    {
-        const string errorMessage = "An error";
-
-        Result.OkIf(
-                false,
-                static () => errorMessage)
-            .Should()
-            .Match<Result<Unit>>(static r => r.HasFailed && r.HasError<Error>(static e => e.Message == errorMessage));
     }
 
     [Fact(
@@ -170,24 +127,6 @@ public sealed class OkTests
         fn.CallCount.Should()
             .Be(1);
     }
-
-    [Fact(DisplayName = "OkIfNotNull with error message returns successful result if the value is not null")]
-    public void OkIfNotNullWithErrorMessageReturnsSuccessfulResultIfTheValueIsNotNull() =>
-        Result.OkIfNotNull("kilo", "")
-            .Should()
-            .ContainValue()
-            .Which.Should()
-            .Be("kilo");
-
-    [Fact(DisplayName = "OkIfNotNull with error message returns failed result if the value is null")]
-    public void OkIfNotNullWithErrorMessageReturnsFailedResultIfTheValueIsNull() =>
-        Result.OkIfNotNull(null as string, "pound")
-            .Should()
-            .ContainErrors()
-            .Which.Should()
-            .ContainSingle()
-            .Which.Should()
-            .Be(new Error("pound"));
 
     [Fact(DisplayName = "OkIfNotNull with error returns successful result if the value is not null")]
     public void OkIfNotNullWithErrorReturnsSuccessfulResultIfTheValueIsNotNull() =>

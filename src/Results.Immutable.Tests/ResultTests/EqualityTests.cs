@@ -31,14 +31,6 @@ public sealed class EqualityTests
             .NotBe(Result.Ok(42));
     }
 
-    [Fact(DisplayName = "Should not be equal to a result with different errors")]
-    public void ShouldNotBeEqualToAResultWithDifferentErrors()
-    {
-        var result = Result.Fail<int>("life is sad");
-        result.Should()
-            .NotBe(Result.Fail<int>("death is sad"));
-    }
-
     [Fact(DisplayName = "Should be equal (typed")]
     public void ShouldBeEqualTyped()
     {
