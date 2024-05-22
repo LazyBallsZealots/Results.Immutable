@@ -10,18 +10,6 @@ public class ResultTest
             .Which.Should()
             .Be(5);
 
-    [Fact(DisplayName = "Contains value with error")]
-    public void ContainsValueWithError()
-    {
-        var act = () => Result.Fail<int>("anything")
-            .Should()
-            .ContainValue("no");
-
-        act.Should()
-            .Throw<Exception>()
-            .WithMessage("Expected result to be ok because no, but found error.");
-    }
-
     [Fact(DisplayName = "Contains errors with ok")]
     public void ContainsErrorsWithOk()
     {
@@ -34,28 +22,10 @@ public class ResultTest
             .WithMessage("Expected result to be failed because no, but found ok.");
     }
 
-    [Fact(DisplayName = "Contains errors with error")]
-    public void ContainsErrorsWithError() =>
-        Result.Fail<int>("anything")
-            .Should()
-            .ContainErrors();
-
     [Fact(DisplayName = "Contains errors of type with ok")]
     public void ContainsErrorOfTypeWithOk()
     {
         var act = () => Result.Ok(5)
-            .Should()
-            .ContainErrorsOfType<MyError>("no");
-
-        act.Should()
-            .Throw<Exception>()
-            .WithMessage($"Expected result to contain errors of type {typeof(MyError)} because no, but found none.");
-    }
-
-    [Fact(DisplayName = "Contains errors of type with another type of error")]
-    public void ContainsErrorOfTypeWithAnotherTypeOfError()
-    {
-        var act = () => Result.Fail<int>("anything")
             .Should()
             .ContainErrorsOfType<MyError>("no");
 

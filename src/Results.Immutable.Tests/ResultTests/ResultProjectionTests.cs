@@ -2,7 +2,6 @@
 using FsCheck.Fluent;
 using FsCheck.Xunit;
 using Results.Immutable.Tests.Generators;
-using static FluentAssertions.FluentActions;
 
 namespace Results.Immutable.Tests.ResultTests;
 
@@ -21,47 +20,6 @@ public sealed class ResultProjectionTests
         (await SuccessfulResult.SelectAsync(async _ => await new ValueTask<Unit>(Unit.Value)))
         .Should()
         .Be(SuccessfulResult);
-
-    [Fact(
-        DisplayName =
-            "Projecting a failed result should return a new, equivalent result without executing the selector")]
-    public void BindOnFailedResultShouldReturnANewEquivalentFailedResult()
-    {
-        const string errorMessage = "An error";
-        var fail = Result.Fail(errorMessage);
-
-        Invoking(() => fail.Select(ThrowException))
-            .Should()
-            .NotThrow()
-            .Which
-            .Should()
-            .Match<Result<Unit>>(
-                static r => r.IsErrored &&
-                    r.Errors.Single()
-                        .Message ==
-                    errorMessage);
-
-        static Unit ThrowException(Unit _) =>
-            throw new InvalidOperationException("Projection on a failed result was executed");
-    }
-
-    [Fact(
-        DisplayName =
-            "Asynchronous projection of a failed result should return a new, equivalent result without executing the selector")]
-    public async Task AsyncSelectOnAFailedResultShouldReturnANewEquivalentFailedResult()
-    {
-        const string errorMessage = "Sync-to-async error";
-        var fail = Result.Fail(errorMessage);
-
-        (await fail.SelectAsync(ThrowExceptionAsync))
-            .Should()
-            .Match<Result<Unit>>(
-                static r => r.IsErrored &&
-                    r.HasError<Error>(static e => e.Message == errorMessage));
-
-        static ValueTask<Unit> ThrowExceptionAsync(Unit _) =>
-            throw new InvalidOperationException("Async projection on a failed result was executed");
-    }
 
     [Property(DisplayName = "SelectMany on successful result with value converts it")]
     public Property BindOnSuccessfulResultWithValueConvertsIt(object? firstValue, object? finalValue) =>

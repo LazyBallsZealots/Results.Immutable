@@ -64,19 +64,6 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult
     public ImmutableList<Error> Errors => errors ?? ImmutableList<Error>.Empty;
 
     /// <summary>
-    ///     Creates a new <see cref="Result{T}" /> with an <see cref="Error" />,
-    ///     containing provided <paramref name="errorMessage" />.
-    /// </summary>
-    /// <param name="errorMessage">
-    ///     Message to provide to an <see cref="Error" />.
-    /// </param>
-    /// <returns>
-    ///     A new <see cref="Result{T}" /> with an <see cref="Error" />,
-    ///     containing provided <paramref name="errorMessage" />.
-    /// </returns>
-    public Result<T> AddError(string errorMessage) => AddError(new Error(errorMessage));
-
-    /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with a provided <paramref name="error" />.
     /// </summary>
     /// <param name="error">
@@ -91,21 +78,6 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult
             {
                 error,
             });
-
-    /// <summary>
-    ///     Creates a new <see cref="Result{T}" /> with <see cref="Error" />s
-    ///     built from provided <paramref name="errorMessages" />.
-    /// </summary>
-    /// <param name="errorMessages">
-    ///     A collection of error messages to build <see cref="Error" />
-    ///     instances from.
-    /// </param>
-    /// <returns>
-    ///     A new <see cref="Result{T}" /> with <see cref="Error" />s,
-    ///     built from <paramref name="errorMessages" />.
-    /// </returns>
-    public Result<T> AddErrors(IEnumerable<string> errorMessages) =>
-        AddErrors(errorMessages.Select(static errorMessage => new Error(errorMessage)));
 
     /// <summary>
     ///     Creates a new <see cref="Result{T}" /> with provided <paramref name="newErrors" />.
@@ -228,10 +200,17 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>, IResult
     ///     Returns a <see cref="string" /> representation of this <see cref="Result{T}" />.
     ///     Ideally, only for debug purposes or testing purposes.
     /// </summary>
-    public override string ToString() =>
-        Some is var (value)
+    public override string ToString()
+    {
+        return Some is var (value)
             ? $"{nameof(Result)}<{typeof(T).Name}>.{nameof(Result.Ok)}({value})"
-            : $"{nameof(Result)}<{typeof(T).Name}>.{nameof(Result.Fail)}(Count: {Errors.Count}, First: {Errors[0].Message})";
+            : $"{nameof(Result)}<{typeof(T).Name}>.{nameof(Result.Fail)}(Count: {Errors.Count}, " +
+            $"First: {GetFirstErrorMessage(Errors)})";
+
+        static string GetFirstErrorMessage(IList<Error> errors) =>
+            errors[0]
+                .Message;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Result<T> left, Result<T> right) => left.Equals(right);

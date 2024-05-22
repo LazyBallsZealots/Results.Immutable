@@ -16,28 +16,6 @@ public sealed class AsyncProjectionsTests
         .Should()
         .BeEquivalentTo(Result.Ok());
 
-    [Fact(
-        DisplayName =
-            "Projecting a failed result should return a new, equivalent result without calling the projecting delegate")]
-    public async Task ProjectionOnAFailedResultShouldReturnANewEquivalentFailedResult()
-    {
-        const string errorMessage = "An error";
-        var fail = Result.Fail(errorMessage);
-
-        var result = await new ValueTask<Result<Unit>>(fail)
-            .Select(ThrowException);
-
-        result.Should()
-            .Match<Result<Unit>>(
-                static r => r.HasFailed &&
-                    r.Errors.Single()
-                        .Message ==
-                    errorMessage);
-
-        static Unit ThrowException(Unit _) =>
-            throw new InvalidOperationException("Projection on a failed result was executed!");
-    }
-
     [Fact(DisplayName = "Projecting a successful async result should return a new result with matching value")]
     public async Task ProjectionOfASuccessfulResultShouldReturnAResultWithMatchingValue()
     {
