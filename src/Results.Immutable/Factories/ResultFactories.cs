@@ -1,4 +1,4 @@
-﻿namespace Results.Immutable;
+namespace Results.Immutable;
 
 public static class Result
 {
@@ -186,9 +186,9 @@ public static class Result
     /// <returns>
     ///     A <see cref="Result{T}" /> containing an aggregation of all the values of the input collection.
     /// </returns>
-    public static Result<ImmutableList<T>> Transpose<T>(IReadOnlyCollection<Result<T>> results)
+    public static Result<ImmutableList<T>> Transpose<T>(IEnumerable<Result<T>> results)
     {
-        if (results.Count == 0)
+        if (!results.Any())
         {
             return Ok(ImmutableList<T>.Empty);
         }
