@@ -31,7 +31,7 @@ public readonly partial struct Result<T>
     /// <param name="asyncSelector">Asynchronous bind delegate to execute.</param>
     /// <returns>
     ///     A <see cref="ValueTask{T}" />, representing the result of an asynchronous operation,
-    ///     wrapping <see cref="Result{T}"> of <typeparamref name="TNew" />.
+    ///     wrapping <see cref="Result{T}" /> of <typeparamref name="TNew" />.
     /// </returns>
     public async ValueTask<Result<TNew>> SelectAsync<TNew>(Func<T, ValueTask<TNew>> asyncSelector) =>
         Some is var (v) ? new(await asyncSelector(v)) : new(errors);
