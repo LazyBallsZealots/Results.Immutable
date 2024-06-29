@@ -18,6 +18,6 @@
   "scripts": {
     "test": "dotnet test src/Results.Immutable.sln",
     "postinstall": "yarn husky install",
-    "version": "yarn && git add yarn.lock"
+    "version": "yarn install --no-immutable && git add yarn.lock"
   }
 }
