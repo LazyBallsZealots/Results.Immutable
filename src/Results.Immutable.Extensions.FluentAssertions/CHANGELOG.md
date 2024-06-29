@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.3](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable.Extensions.FluentAssertions@0.1.0-alpha.2...Results.Immutable.Extensions.FluentAssertions@0.1.0-alpha.3) (2024-06-29)
+
+### Features
+
+- add sourcelink ([86fb920](https://github.com/LazyBallsZealots/Results.Immutable/commit/86fb920d6f01db909ad0d5a1b64520a42189cb0d))
+
 # [0.1.0-alpha.2](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable.Extensions.FluentAssertions@0.1.0-alpha.1...Results.Immutable.Extensions.FluentAssertions@0.1.0-alpha.2) (2024-04-28)
 
 **Note:** Version bump only for package Results.Immutable.Extensions.FluentAssertions
