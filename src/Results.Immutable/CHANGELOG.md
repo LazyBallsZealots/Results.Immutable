@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.2](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@1.0.0-alpha.1...Results.Immutable@1.0.0-alpha.2) (2024-06-30)
+
+- feat!: remove all Result-related methods with string overloads ([a9d06f3](https://github.com/LazyBallsZealots/Results.Immutable/commit/a9d06f38e60526b72aa884d84872e9f73d58c418))
+
+### Features
+
+- add `.Where` and `.WhereAsync` for `Result` ([236cf0b](https://github.com/LazyBallsZealots/Results.Immutable/commit/236cf0b8064774f4d8a989e43213cd3a30369d9b))
+- add generic OkIf / FailIf Result factories ([a55a112](https://github.com/LazyBallsZealots/Results.Immutable/commit/a55a11272cfa4170a39a896a351507a91755c534))
+- add member parsing/validation with an error that tracks its path ([7a315b7](https://github.com/LazyBallsZealots/Results.Immutable/commit/7a315b7468a855b5a254dca21a24a212bc6e276a))
+- add ParseEach extensions and IndexError for it ([c071cdc](https://github.com/LazyBallsZealots/Results.Immutable/commit/c071cdcbcd6a6002699dd2a04387b0e8b43436f5))
+- add sourcelink ([86fb920](https://github.com/LazyBallsZealots/Results.Immutable/commit/86fb920d6f01db909ad0d5a1b64520a42189cb0d))
+- allow to transpose IEnumerable ([d752697](https://github.com/LazyBallsZealots/Results.Immutable/commit/d752697692caf1ed9a554400acedc1ec6f5f89a0))
+- compatibility with aot required ([23dc47e](https://github.com/LazyBallsZealots/Results.Immutable/commit/23dc47e42b8dbd11c1f2fb3069f31865dc017f6c))
+
+### BREAKING CHANGES
+
+- significant reduction of available APIs
+
 # [1.0.0-alpha.1](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@1.0.0-alpha.0...Results.Immutable@1.0.0-alpha.1) (2024-04-28)
 
 ### Features

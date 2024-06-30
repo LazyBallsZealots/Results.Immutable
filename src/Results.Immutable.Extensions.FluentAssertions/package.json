@@ -1,11 +1,11 @@
 {
   "name": "Results.Immutable.Extensions.FluentAssertions",
   "private": true,
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "scripts": {
     "version": "node ../../scripts/version.mjs && git add Results.Immutable.Extensions.FluentAssertions.csproj"
   },
   "devDependencies": {
-    "Results.Immutable": "^1.0.0-alpha.1"
+    "Results.Immutable": "^1.0.0-alpha.2"
   }
 }
