@@ -1,4 +1,4 @@
-﻿namespace Results.Immutable.Member;
+namespace Results.Immutable.Member;
 
 /// <summary>
 ///     A set of extensions methods for enumerable types.
@@ -68,6 +68,35 @@ public static class EachParser
         return Result.Transpose(results);
     }
 
+    /// <summary>
+    ///     Parses each pair of a dictionary and returns a result containing <see cref="MemberError" />s with
+    ///     inner errors created by the <paramref name="parser" /> in case of failure and as member name the key.
+    ///     In case of success of each element, the result will contain the parsed values.
+    /// </summary>
+    /// <param name="values">The dictionary of values to parse/validate.</param>
+    /// <param name="parser">The parser for both keys and values.</param>
+    /// <param name="message">A message to add to the error in case of failure.</param>
+    /// <typeparam name="TValue">The type of the original values.</typeparam>
+    /// <typeparam name="TParsedKey">The type of the parsed keys.</typeparam>
+    /// <typeparam name="TParsedValue">The type of the parsed values.</typeparam>
+    /// <returns>A result containing the parsed values or their errors.</returns>
+    public static Result<ImmutableDictionary<TParsedKey, TParsedValue>> ParseEachPair<TValue, TParsedKey, TParsedValue>(
+        this IReadOnlyDictionary<string, TValue> values,
+        Func<KeyValuePair<string, TValue>, Result<KeyValuePair<TParsedKey, TParsedValue>>> parser,
+        string message = "")
+        where TParsedKey : notnull =>
+        ParseEach(
+                values,
+                parser,
+                (
+                    kv,
+                    _,
+                    e) => new MemberError(
+                    kv.Key,
+                    message,
+                    e))
+            .Select(pairs => ImmutableDictionary.CreateRange(pairs));
+
     /// <inheritdoc cref="ParseEach{TElement, TParsed}(IReadOnlyList{TElement}, Func{TElement, Result{TParsed}}, string)" />
     public static async ValueTask<Result<ImmutableList<TParsed>>> ParseEachAsync<TElement, TParsed>(
         this IReadOnlyList<TElement> values,
@@ -106,5 +135,28 @@ public static class EachParser
                 }));
 
         return Result.Transpose(results);
+    }
+
+    /// <inheritdoc
+    ///     cref="ParseEachPair{TValue, TParsedKey, TParsedValue}(IReadOnlyDictionary{string, TValue}, Func{KeyValuePair{string, TValue}, Result{KeyValuePair{TParsedKey, TParsedValue}}}, string)" />
+    public static async ValueTask<Result<ImmutableDictionary<TParsedKey, TParsedValue>>> ParseEachPairAsync<TValue,
+        TParsedKey, TParsedValue>(
+        this IReadOnlyDictionary<string, TValue> values,
+        Func<KeyValuePair<string, TValue>, ValueTask<Result<KeyValuePair<TParsedKey, TParsedValue>>>> parser,
+        string message = "")
+        where TParsedKey : notnull
+    {
+        var pairs = await ParseEachAsync(
+            values,
+            parser,
+            (
+                kv,
+                _,
+                e) => new MemberError(
+                kv.Key,
+                message,
+                e));
+
+        return pairs.Select(pairs => ImmutableDictionary.CreateRange(pairs));
     }
 }
