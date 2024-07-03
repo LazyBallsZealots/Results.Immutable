@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.3](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@1.0.0-alpha.2...Results.Immutable@1.0.0-alpha.3) (2024-07-03)
+
+### Features
+
+- add ParsePairs extensions ([0592867](https://github.com/LazyBallsZealots/Results.Immutable/commit/0592867f08288b126ba7b0bb21f74e4ac3e3d823))
+
 # [1.0.0-alpha.2](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@1.0.0-alpha.1...Results.Immutable@1.0.0-alpha.2) (2024-06-30)
 
 - feat!: remove all Result-related methods with string overloads ([a9d06f3](https://github.com/LazyBallsZealots/Results.Immutable/commit/a9d06f38e60526b72aa884d84872e9f73d58c418))
