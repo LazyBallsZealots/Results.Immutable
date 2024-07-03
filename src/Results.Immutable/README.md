@@ -101,3 +101,17 @@ var result = dictionary.ParsePairs(
 In case of errors, `MemberError`s will be returned with the `InnerErrors` of the `Error` returned by the parser, similar to `ParseMember`. The function for parsing can return a `Result` of `KeyValuePair` which its key can be of any type.
 
 For validating dictionaries which its keys are not of type `string`, use the `ParseEach` method and its variants.
+
+## Creating custom errors
+
+The true richness of this library lies in the ability to inform accurately the error of some operation. For this, it is advice to create your own error types instead of using the plain `Error` type included in this library. Said `Error` should be seen as a base type for more specific errors or as an inner error. It is a good practice to always create concrete types for your domain or infrastructure.
+
+It is advised to extend the type `Error<TError>` instead of `Error` to get a better developer experience thanks to its proper typing of method such as `WithRootCause`.
+
+Example:
+
+```cs
+private record PiggyBankError(
+    string Message,
+    ImmutableList<Error> InnerErrors) : Error<PiggyBankError>(Message, InnerErrors);
+```

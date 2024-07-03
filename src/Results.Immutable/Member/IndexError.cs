@@ -7,11 +7,11 @@ namespace Results.Immutable.Member;
 /// </summary>
 /// <param name="Index">The name of the member.</param>
 /// <param name="Message">A message that describes the error.</param>
-/// <param name="InnerErrors">Another errors that caused this error, related to members of the member.</param>
+/// <param name="InnerErrors">A list of errors that caused this error, related to item.</param>
 public record IndexError(
     int Index,
     string Message,
-    ImmutableList<Error> InnerErrors) : Error(Message, InnerErrors)
+    ImmutableList<Error> InnerErrors) : Error<IndexError>(Message, InnerErrors)
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="IndexError" /> class.
