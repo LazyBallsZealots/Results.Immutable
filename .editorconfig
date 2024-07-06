@@ -8,3 +8,6 @@ insert_final_newline = false
 charset = utf-8
 indent_style = space
 indent_size = 2
+
+# IDE0160: Convert to block scoped namespace
+csharp_style_namespace_declarations = file_scoped
