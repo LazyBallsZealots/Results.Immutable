@@ -362,7 +362,9 @@ MigrationBackup/
 .idea
 
 # VS Code
-.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 
 # Coverage
 src/coverage
