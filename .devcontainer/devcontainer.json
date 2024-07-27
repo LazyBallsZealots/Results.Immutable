@@ -1,0 +1,31 @@
+{
+	"name": "results-immutable",
+	"build": {
+        "dockerfile": "./Dockerfile",
+        "context": "."
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils": {
+            "username": "vscode",
+            "userUid": "1000",
+            "userGid": "1000",
+            "upgradePackages": "true"
+        },
+        "ghcr.io/devcontainers/features/node": {
+            "nvmVersion": "0.39.7"
+        },
+        "ghcr.io/devcontainers/features/dotnet:2": {
+            "additionalVersions": "7.0, 6.0"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-dotnettools.csdevkit",
+                "GitHub.vscode-pull-request-github",
+                "GitHub.vscode-github-actions"
+            ]
+        }
+    },
+	"postCreateCommand": "bash -i -c 'nvm install; echo 'Y' | yarn --immutable; dotnet restore src/Results.Immutable.sln; dotnet tool restore'"
+}
