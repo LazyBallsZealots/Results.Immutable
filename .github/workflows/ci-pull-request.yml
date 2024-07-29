@@ -37,7 +37,9 @@ jobs:
         working-directory: src
 
       - name: Test & analyze coverage
-        run: dotnet tool run dotnet-coverage collect "dotnet test --no-build" -f cobertura -o coverage/cobertura.xml -s dotnet-coverage.xml
+        run: |
+          dotnet test --no-build --no-restore && \
+          dotnet coverage merge *.cobertura.xml --recursive -o coverage/cobertura.xml -f cobertura
         working-directory: src
 
       - name: Coverage Summary Report
