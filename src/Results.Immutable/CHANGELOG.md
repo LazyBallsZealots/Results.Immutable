@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.4](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@1.0.0-alpha.3...Results.Immutable@1.0.0-alpha.4) (2024-08-19)
+
+### Features
+
+- add error projections ([6056236](https://github.com/LazyBallsZealots/Results.Immutable/commit/60562363337ab4462fee311729a2ffd66395ca27))
+- return concrete type when calling `WithRootCauses` instead of `Error` ([0d039ea](https://github.com/LazyBallsZealots/Results.Immutable/commit/0d039eaa1158b1ad92084ea02c2aa21bc8e28ac6))
+
+### BREAKING CHANGES
+
+- remove `Error.Create`
+
 # [1.0.0-alpha.3](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@1.0.0-alpha.2...Results.Immutable@1.0.0-alpha.3) (2024-07-03)
 
 ### Features
