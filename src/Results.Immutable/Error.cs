@@ -1,14 +1,24 @@
-﻿namespace Results.Immutable;
+﻿using System.Text.Json.Serialization;
+
+namespace Results.Immutable;
 
 /// <summary>
 ///     A piece of information that describes an expected failure in an operation.
 /// </summary>
-/// <param name="Message">A message that describes the error.</param>
-/// <param name="InnerErrors">A list of errors that caused this error.</param>
-public record Error(
-    string Message,
-    ImmutableList<Error> InnerErrors)
+public record Error
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Error" /> class.
+    /// </summary>
+    /// <param name="message">A message that describes the error.</param>
+    /// <param name="innerErrors">A list of errors that caused this error.</param>
+    [JsonConstructor]
+    public Error(string message, ImmutableList<Error> innerErrors)
+    {
+        Message = message;
+        InnerErrors = innerErrors;
+    }
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Error" /> class.
     /// </summary>
@@ -31,6 +41,16 @@ public record Error(
             ImmutableList<Error>.Empty)
     {
     }
+
+    /// <summary>
+    ///     Gets the error message.
+    /// </summary>
+    public string Message { get; init; }
+
+    /// <summary>
+    ///     Gets the list of errors causing this one to occur.
+    /// </summary>
+    public ImmutableList<Error> InnerErrors { get; init; }
 
     /// <summary>
     ///     With a new <see cref="Error" /> that will be added to the existing list of inner <see cref="Error" />s.

@@ -1,18 +1,30 @@
+using System.Text.Json.Serialization;
+
 namespace Results.Immutable.Member;
 
 /// <summary>
 ///     A piece of information that describes an expected failure in an operation related to a member of a type.
 ///     Generally used for direct members of a type, and yet it is possible to have nested members
-///     via the <paramref name="InnerErrors" /> parameter.
+///     via the <see cref="Error.InnerErrors" />.
 /// </summary>
-/// <param name="Index">The name of the member.</param>
-/// <param name="Message">A message that describes the error.</param>
-/// <param name="InnerErrors">A list of errors that caused this error, related to item.</param>
-public record IndexError(
-    int Index,
-    string Message,
-    ImmutableList<Error> InnerErrors) : Error<IndexError>(Message, InnerErrors)
+public record IndexError : Error<IndexError>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="IndexError" /> class.
+    /// </summary>
+    /// <param name="index">Index of the member.</param>
+    /// <param name="message">A message that describes the error.</param>
+    /// <param name="innerErrors">A list of errors that caused this error, related to item.</param>
+    [JsonConstructor]
+    public IndexError(
+        int index,
+        string message,
+        ImmutableList<Error> innerErrors)
+        : base(message, innerErrors)
+    {
+        Index = index;
+    }
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="IndexError" /> class.
     /// </summary>
@@ -25,4 +37,9 @@ public record IndexError(
             ImmutableList<Error>.Empty)
     {
     }
+
+    /// <summary>
+    ///     Gets the index of the member where this error occurred.
+    /// </summary>
+    public int Index { get; init; }
 }
