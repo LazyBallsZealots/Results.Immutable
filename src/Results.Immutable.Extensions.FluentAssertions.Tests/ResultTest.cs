@@ -1,6 +1,8 @@
-﻿namespace Results.Immutable.Extensions.FluentAssertions.Tests;
+﻿using Results.Immutable.Member;
 
-public class ResultTest
+namespace Results.Immutable.Extensions.FluentAssertions.Tests;
+
+public sealed class ResultTest
 {
     [Fact(DisplayName = "Contains value with ok")]
     public void ContainsValueWithOk() =>
@@ -13,7 +15,7 @@ public class ResultTest
     [Fact(DisplayName = "Contains errors with ok")]
     public void ContainsErrorsWithOk()
     {
-        var act = () => Result.Ok(5)
+        var act = static () => Result.Ok(5)
             .Should()
             .ContainErrors("no");
 
@@ -25,7 +27,7 @@ public class ResultTest
     [Fact(DisplayName = "Contains errors of type with ok")]
     public void ContainsErrorOfTypeWithOk()
     {
-        var act = () => Result.Ok(5)
+        var act = static () => Result.Ok(5)
             .Should()
             .ContainErrorsOfType<MyError>("no");
 
@@ -43,5 +45,43 @@ public class ResultTest
             .Should()
             .ContainSingle(static x => x.Message == "important");
 
-    private record MyError(string Message) : Error(Message);
+    [Fact(DisplayName = "Contains error of type with a hierarchy of errors")]
+    public void ContainsErrorsOfTypeWithNestedError() =>
+        Result.Fail<int>(new IndexError(0, "whoops!").WithRootCause(new MyError("The real reason")))
+            .Should()
+            .ContainErrorsOfType<MyError>()
+            .Which.Should()
+            .ContainSingle(static e => e.Message == "The real reason");
+
+    [Fact(DisplayName = "Contains top-level errors of given type with ok")]
+    public void ContainsTopLevelErrorsOfTypeWithOk()
+    {
+        var act = static () => Result.Ok()
+            .Should()
+            .ContainTopLevelErrorsOfType<Error>();
+
+        act.Should()
+            .Throw<Exception>();
+    }
+
+    [Fact(DisplayName = "Contains top-level errors of given type for failures not containing matching errors")]
+    public void ContainsTopLevelErrorsOfTypeWithFailureNotContainingMatchingErrors()
+    {
+        var act = static () => Result.Fail(new Error("Not my error!"))
+            .Should()
+            .ContainTopLevelErrorsOfType<MyError>();
+
+        act.Should()
+            .Throw<Exception>();
+    }
+
+    [Fact(DisplayName = "Contains top-level errors of given type for failure containing matching errors")]
+    public void ContainsTopLevelErrorsOfTypeWithFailureContainingMatchingErrors() =>
+        Result.Fail(new MyError("Whoooops!"))
+            .Should()
+            .ContainTopLevelErrorsOfType<MyError>()
+            .Which.Should()
+            .ContainSingle(static e => e.Message == "Whoooops!");
+
+    private sealed record MyError(string Message) : Error(Message);
 }

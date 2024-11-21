@@ -85,8 +85,8 @@ public class ResultAssertions<TSubject, TAssertions> : ObjectAssertions<Result<T
     }
 
     /// <summary>
-    ///     Asserts that the <see cref="Result{T}" /> contains errors of type <typeparamref name="TError" />,
-    ///     and returns an <see cref="AndWhichConstraint{TAssertions, TSubject}" /> for further assertions.
+    ///     Asserts that the <see cref="Result{T}" />'s error hierarchy contains errors
+    ///     of type <typeparamref name="TError" />.
     /// </summary>
     /// <typeparam name="TError">
     ///     The type of the error.
@@ -98,6 +98,14 @@ public class ResultAssertions<TSubject, TAssertions> : ObjectAssertions<Result<T
     /// <param name="becauseArgs">
     ///     Zero or more objects to format using the placeholders in <paramref name="because" />.
     /// </param>
+    /// <returns>
+    ///     <see cref="AndWhichConstraint{TAssertions, TSubject}" /> for further assertions on the matching
+    ///     <see cref="Error" />s.
+    /// </returns>
+    /// <remarks>
+    ///     This method traverses all error hierarchies to find instances of the matching type.
+    /// </remarks>
+    /// <seealso cref="ContainTopLevelErrorsOfType{TError}" />
     public AndWhichConstraint<TAssertions, IEnumerable<TError>> ContainErrorsOfType<TError>(
         string because = "",
         params object[] becauseArgs)
@@ -108,6 +116,55 @@ public class ResultAssertions<TSubject, TAssertions> : ObjectAssertions<Result<T
             .ForCondition(Subject.HasError<TError>())
             .FailWith(
                 "Expected {context:result} to contain errors of type {0}{reason}, but found none.",
+                typeof(TError));
+
+        return new(
+            (TAssertions)this,
+            Flatten(Subject.Errors)
+                .OfType<TError>());
+
+        static IEnumerable<Error> Flatten(IEnumerable<Error> errors)
+        {
+            var queue = new Queue<Error>(errors);
+            while (queue.TryDequeue(out var current))
+            {
+                yield return current;
+
+                current.InnerErrors.ForEach(queue.Enqueue);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Asserts that <see cref="Result{T}" /> contains top-level errors of type <typeparamref name="TError" />.
+    /// </summary>
+    /// <param name="because">
+    ///     A formatted phrase as is supported by <see cref="string.Format(string,object[])" /> explaining why the assertion
+    ///     is needed. If the phrase does not start with the word <i>because</i>, it is prepended automatically.
+    /// </param>
+    /// <param name="becauseArgs"></param>
+    /// Zero or more objects to format using the placeholders in
+    /// <paramref name="because" />
+    /// .
+    /// <typeparam name="TError">
+    ///     Type of the error to find.
+    /// </typeparam>
+    /// <returns>
+    ///     <see cref="AndWhichConstraint{TParentConstraint,TMatchedElement}" /> for further
+    ///     assertions on the filtered errors.
+    /// </returns>
+    /// ///
+    /// <seealso cref="ContainErrorsOfType{TError}" />
+    public AndWhichConstraint<TAssertions, IEnumerable<TError>> ContainTopLevelErrorsOfType<TError>(
+        string because = "",
+        params object[] becauseArgs)
+        where TError : Error
+    {
+        Execute.Assertion
+            .BecauseOf(because, becauseArgs)
+            .ForCondition(Subject.Errors.Any(static e => e is TError))
+            .FailWith(
+                "Expected {context:result} to contain top-level errors of type {0}{reason}, but found none.",
                 typeof(TError));
 
         return new(
