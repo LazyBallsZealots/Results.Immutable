@@ -915,11 +915,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "Results.Immutable.Extensions.FluentAssertions@workspace:src/Results.Immutable.Extensions.FluentAssertions"
   dependencies:
-    Results.Immutable: ^1.0.0-alpha.4
+    Results.Immutable: ^1.0.0-alpha.5
   languageName: unknown
   linkType: soft
 
-"Results.Immutable@^1.0.0-alpha.4, Results.Immutable@workspace:src/Results.Immutable":
+"Results.Immutable@^1.0.0-alpha.5, Results.Immutable@workspace:src/Results.Immutable":
   version: 0.0.0-use.local
   resolution: "Results.Immutable@workspace:src/Results.Immutable"
   languageName: unknown
