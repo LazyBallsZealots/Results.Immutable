@@ -203,17 +203,15 @@ public static class Result
     /// </returns>
     public static Result<ImmutableList<T>> Transpose<T>(IEnumerable<Result<T>> results)
     {
-        if (!results.Any())
-        {
-            return Ok(ImmutableList<T>.Empty);
-        }
-
-        var errorsBuilder = ImmutableList.CreateBuilder<Error>();
-        var valuesBuilder = ImmutableList.CreateBuilder<T>();
+        ImmutableList<Error>.Builder? errorsBuilder = null;
+        ImmutableList<T>.Builder? valuesBuilder = null;
         var isErrored = false;
 
         foreach (var result in results)
         {
+            errorsBuilder ??= ImmutableList.CreateBuilder<Error>();
+            valuesBuilder ??= ImmutableList.CreateBuilder<T>();
+
             if (result.Some is var (x))
             {
                 valuesBuilder.Add(x);
@@ -226,8 +224,8 @@ public static class Result
         }
 
         return isErrored
-            ? new(errorsBuilder.ToImmutable())
-            : new(valuesBuilder.ToImmutable());
+            ? new(errorsBuilder?.ToImmutable() ?? ImmutableList<Error>.Empty)
+            : new(valuesBuilder?.ToImmutable() ?? ImmutableList<T>.Empty);
     }
 
     /// <inheritdoc cref="Merge(IReadOnlyCollection{Result{Unit}})" />
