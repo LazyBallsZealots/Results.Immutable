@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Results.Immutable;
+using Results.Immutable.Member;
 
 BenchmarkRunner.Run<ResultBenchmarks>();
 
@@ -13,6 +14,8 @@ public class ResultBenchmarks
     private const string aNewValue = "A new string";
 
     private static readonly Error Error = new("Error message");
+
+    private static readonly ImmutableList<string> EmptyListToParse = ImmutableList<string>.Empty;
 
     [Benchmark]
     public Result<Unit> ResultOfUnitWhichShouldNotAllocate() => Result.Ok();
@@ -29,7 +32,7 @@ public class ResultBenchmarks
     [Benchmark]
     public Result<string> SelectOnSuccessWithoutReasonsWhichShouldNotAllocate() =>
         Result.Ok(value)
-            .Select(static _ => Result.Ok(aNewValue));
+            .SelectMany(static _ => Result.Ok(aNewValue));
 
     [Benchmark]
     public ImmutableList<Error> ErrorsForFailedResult() => ImmutableList.Create(Error);
@@ -40,5 +43,10 @@ public class ResultBenchmarks
     [Benchmark]
     public Result<string> SelectOnFailureWhichShouldAllocateJustTheErrorsList() =>
         Result.Fail(Error)
-            .Select(static _ => Result.Ok(value));
+            .SelectMany(static _ => Result.Ok(value));
+
+    [Benchmark]
+    public Result<ImmutableList<int>> ParseEachOfAnEmptyListShouldNotAllocate() =>
+        EmptyListToParse.ParseEach(
+            static s => int.TryParse(s, out var i) ? Result.Ok(i) : Result.Fail<int>(new Error("Can't parse!")));
 }
