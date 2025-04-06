@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.0](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable.Extensions.FluentAssertions@0.1.0-alpha.6...Results.Immutable.Extensions.FluentAssertions@1.0.0-alpha.0) (2025-04-06)
+
+### chore
+
+- remove deprecated .NET support ([435de15](https://github.com/LazyBallsZealots/Results.Immutable/commit/435de15ccd3afa21b934534b6f1ce9b945ab0f87))
+
+### BREAKING CHANGES
+
+- removed .NET 7 support
+
 # [0.1.0-alpha.6](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable.Extensions.FluentAssertions@0.1.0-alpha.5...Results.Immutable.Extensions.FluentAssertions@0.1.0-alpha.6) (2024-11-22)
 
 ### Bug Fixes
