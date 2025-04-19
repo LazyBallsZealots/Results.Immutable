@@ -42,4 +42,9 @@ public record IndexError : Error<IndexError>
     ///     Gets the index of the member where this error occurred.
     /// </summary>
     public int Index { get; init; }
+
+    public override string ToString() =>
+        $"Error {{ Index = {Index}" +
+        (string.IsNullOrWhiteSpace(Message) ? string.Empty : $", Message = {Message}") +
+        (InnerErrors.IsEmpty ? string.Empty : $", InnerErrors = {{ Count = {InnerErrors.Count} }}");
 }
