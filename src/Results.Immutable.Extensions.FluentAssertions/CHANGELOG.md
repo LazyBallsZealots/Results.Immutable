@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.1](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable.Extensions.FluentAssertions@1.0.0-alpha.0...Results.Immutable.Extensions.FluentAssertions@1.0.0-alpha.1) (2026-03-01)
+
+### Features
+
+- dotnet 10 support ([53d5888](https://github.com/LazyBallsZealots/Results.Immutable/commit/53d5888a668a975f3aed70077d55d23c333b578b))
+
 # [1.0.0-alpha.0](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable.Extensions.FluentAssertions@0.1.0-alpha.6...Results.Immutable.Extensions.FluentAssertions@1.0.0-alpha.0) (2025-04-06)
 
 ### chore

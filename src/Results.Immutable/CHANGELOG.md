@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.7](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@1.0.0-alpha.6...Results.Immutable@1.0.0-alpha.7) (2026-03-01)
+
+### Features
+
+- dotnet 10 support ([53d5888](https://github.com/LazyBallsZealots/Results.Immutable/commit/53d5888a668a975f3aed70077d55d23c333b578b))
+
 # [1.0.0-alpha.6](https://github.com/LazyBallsZealots/Results.Immutable/compare/Results.Immutable@1.0.0-alpha.5...Results.Immutable@1.0.0-alpha.6) (2025-04-06)
 
 ### Bug Fixes
