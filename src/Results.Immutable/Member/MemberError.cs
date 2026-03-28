@@ -7,6 +7,10 @@ namespace Results.Immutable.Member;
 ///     Generally used for direct members of a type, and yet it is possible to have nested members
 ///     via the <see cref="Error.InnerErrors" />.
 /// </summary>
+// [DebuggerDisplay(
+//     "Member = {Member}, " +
+//     "InnerErrors = \\{ Count = {InnerErrors.Count} \\}, " +
+//     "Message = {string.IsNullOrEmpty(Message) ? \"(empty)\" : Message}")]
 public record MemberError : Error<MemberError>
 {
     /// <summary>
@@ -42,4 +46,10 @@ public record MemberError : Error<MemberError>
     ///     Gets the name of the member.
     /// </summary>
     public string Member { get; init; }
+
+    /// <inheritdoc />
+    public override string ToString() =>
+        $"Error {{ Member = {Member}" +
+        (string.IsNullOrWhiteSpace(Message) ? string.Empty : $", Message = {Message}") +
+        (!InnerErrors.IsEmpty ? $", InnerErrors = {{ Count = {InnerErrors.Count} }}" : string.Empty);
 }
