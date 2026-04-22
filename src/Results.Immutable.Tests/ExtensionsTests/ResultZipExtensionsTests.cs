@@ -443,4 +443,89 @@ public sealed class ZipExtensionsTests
             .Should()
             .BeEquivalentTo(Result.Ok(15));
     }
+
+    [Property(DisplayName = "ZipWithMany is equivalent to zipping two results and flat-mapping them")]
+    public Property ZipWithManyReturnsAFlatMapOfTwoResults() =>
+        Prop.ForAll(
+            ResultOf<uint>.Generator()
+                .Two()
+                .Zip(ArbMap.Default.GeneratorFor<Func<uint, uint, Result<object>>>())
+                .ToArbitrary(),
+            static tuple =>
+            {
+                var ((first, second), zipper) = tuple;
+
+                return first.ZipWithMany(second, zipper) ==
+                    first.Zip(second)
+                        .SelectMany(t => zipper(t.Item1, t.Item2));
+            });
+
+    [Property(DisplayName = "ZipWithMany is equivalent to zipping three results and flat-mapping them")]
+    public Property ZipWithManyReturnsAFlatMapOfThreeResults() =>
+        Prop.ForAll(
+            ResultOf<uint>.Generator()
+                .Three()
+                .Zip(ArbMap.Default.GeneratorFor<Func<uint, uint, uint, Result<object>>>())
+                .ToArbitrary(),
+            static tuple =>
+            {
+                var ((first, second, third), zipper) = tuple;
+
+                return first.ZipWithMany(
+                        second,
+                        third,
+                        zipper) ==
+                    first.Zip(second, third)
+                        .SelectMany(
+                            t => zipper(
+                                t.Item1,
+                                t.Item2,
+                                t.Item3));
+            });
+
+    // Zipper has to be defined manually, because FsCheck throws an exception related to having no generator for IntPtr
+    // when generating Func<T1, T2, T3, T4, TR>
+    [Property(DisplayName = "ZipWithMany is equivalent to zipping four results and flat-mapping them")]
+    public Property ZipWithManyReturnsAFlatMapOfFourResults()
+    {
+        return Prop.ForAll(
+            ResultOf<uint>.Generator()
+                .Four()
+                .Zip(
+                    ArbMap.Default.GeneratorFor<Func<uint, uint, uint, uint>>()
+                        .Zip(ArbMap.Default.GeneratorFor<Func<uint, uint, Result<object>>>()))
+                .ToArbitrary(),
+            static tuple =>
+            {
+                var ((first, second, third, fourth), (zipper1, zipper2)) = tuple;
+
+                return first.ZipWithMany(
+                        second,
+                        third,
+                        fourth,
+                        Zipper) ==
+                    first.Zip(
+                            second,
+                            third,
+                            fourth)
+                        .SelectMany(
+                            t => Zipper(
+                                t.Item1,
+                                t.Item2,
+                                t.Item3,
+                                t.Item4));
+
+                Result<object> Zipper(
+                    uint v1,
+                    uint v2,
+                    uint v3,
+                    uint v4) =>
+                    zipper2(
+                        zipper1(
+                            v1,
+                            v2,
+                            v3),
+                        v4);
+            });
+    }
 }

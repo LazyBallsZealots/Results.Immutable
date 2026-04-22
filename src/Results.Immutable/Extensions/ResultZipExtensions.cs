@@ -301,7 +301,7 @@ public static class ZipExtensions
     /// <param name="third">Third result</param>
     /// <param name="fourth">Fourth result</param>
     /// <param name="fifth">Fifth result</param>
-    /// <param name="zipper">A function to zip the results into one</param>
+    /// <param name="zipper">A function to zip the result values into <typeparamref name="TR" />.</param>
     public static async ValueTask<Result<TR>> ZipWithAsync<T1, T2, T3, T4, T5, TR>(
         this Result<T1> first,
         Result<T2> second,
@@ -324,4 +324,96 @@ public static class ZipExtensions
                     third.Errors,
                     fourth.Errors,
                     fifth.Errors));
+
+    /// <summary>
+    ///     Joins two <see cref="Result{T}" /> and flat-maps their values into final <see cref="Result{T}" /> using the
+    ///     specified <paramref name="zipper" />.
+    /// </summary>
+    /// <param name="first">First result.</param>
+    /// <param name="second">Second result.</param>
+    /// <param name="zipper">Results' values zipper.</param>
+    /// <typeparam name="T1">First result type.</typeparam>
+    /// <typeparam name="T2">Second result type.</typeparam>
+    /// <typeparam name="TR">Final result type.</typeparam>
+    /// <returns>
+    ///     A <see cref="Result{T}" /> obtained through applying <paramref name="zipper" />
+    ///     over their values if they're successful. Otherwise, <see cref="Result{T}.Errors" />
+    ///     are merged and wrapped into the final <see cref="Result{T}" />.
+    /// </returns>
+    public static Result<TR> ZipWithMany<T1, T2, TR>(
+        this Result<T1> first,
+        Result<T2> second,
+        Func<T1, T2, Result<TR>> zipper) =>
+        (first.Some, second.Some) is var ((v1), (v2)) ? zipper(v1, v2) : new(ConcatLists(first.Errors, second.Errors));
+
+    /// <summary>
+    ///     Joins tree <see cref="Result{T}" />s and flat-maps their values into final <see cref="Result{T}" /> using specified
+    ///     <paramref name="zipper" />.
+    /// </summary>
+    /// <param name="first">First result.</param>
+    /// <param name="second">Second result.</param>
+    /// <param name="third">Third result.</param>
+    /// <param name="zipper">Results' values zipper.</param>
+    /// <typeparam name="T1">Type of the first result.</typeparam>
+    /// <typeparam name="T2">Type of the second result.</typeparam>
+    /// <typeparam name="T3">Type of the third result.</typeparam>
+    /// <typeparam name="TR">Type of the final result.</typeparam>
+    /// <returns>
+    ///     A <see cref="Result{T}" /> obtained through applying the <paramref name="zipper" />
+    ///     over the values of all provided results if they're successful. Otherwise, <see cref="Result{T}.Errors" />
+    ///     are merged and wrapped into the final <see cref="Result{T}" />.
+    /// </returns>
+    public static Result<TR> ZipWithMany<T1, T2, T3, TR>(
+        this Result<T1> first,
+        Result<T2> second,
+        Result<T3> third,
+        Func<T1, T2, T3, Result<TR>> zipper) =>
+        (first.Some, second.Some, third.Some) is var ((v1), (v2), (v3))
+            ? zipper(
+                v1,
+                v2,
+                v3)
+            : new(
+                ConcatLists(
+                    first.Errors,
+                    second.Errors,
+                    third.Errors));
+
+    /// <summary>
+    ///     Joins tree <see cref="Result{T}" />s and flat-maps their values into final <see cref="Result{T}" /> using specified
+    ///     <paramref name="zipper" />.
+    /// </summary>
+    /// <param name="first">First result.</param>
+    /// <param name="second">Second result.</param>
+    /// <param name="third">Third result.</param>
+    /// <param name="fourth">Fourth result.</param>
+    /// <param name="zipper">Results' values zipper.</param>
+    /// <typeparam name="T1">Type of the first result.</typeparam>
+    /// <typeparam name="T2">Type of the second result.</typeparam>
+    /// <typeparam name="T3">Type of the third result.</typeparam>
+    /// <typeparam name="T4">Type of the fourth result.</typeparam>
+    /// <typeparam name="TR">Type of the final result.</typeparam>
+    /// <returns>
+    ///     A <see cref="Result{T}" /> obtained through applying the <paramref name="zipper" />
+    ///     over the values of all provided results if they're successful. Otherwise, <see cref="Result{T}.Errors" />
+    ///     are merged and wrapped into the final <see cref="Result{T}" />.
+    /// </returns>
+    public static Result<TR> ZipWithMany<T1, T2, T3, T4, TR>(
+        this Result<T1> first,
+        Result<T2> second,
+        Result<T3> third,
+        Result<T4> fourth,
+        Func<T1, T2, T3, T4, Result<TR>> zipper) =>
+        (first.Some, second.Some, third.Some, fourth.Some) is var ((v1), (v2), (v3), (v4))
+            ? zipper(
+                v1,
+                v2,
+                v3,
+                v4)
+            : new(
+                ConcatLists(
+                    first.Errors,
+                    second.Errors,
+                    third.Errors,
+                    fourth.Errors));
 }
