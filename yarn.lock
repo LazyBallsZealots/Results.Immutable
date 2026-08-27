@@ -911,6 +911,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"Results.Immutable.Extensions.AwesomeAssertions@workspace:src/Results.Immutable.Extensions.AwesomeAssertions":
+  version: 0.0.0-use.local
+  resolution: "Results.Immutable.Extensions.AwesomeAssertions@workspace:src/Results.Immutable.Extensions.AwesomeAssertions"
+  dependencies:
+    Results.Immutable: ^1.0.0-alpha.7
+  languageName: unknown
+  linkType: soft
+
 "Results.Immutable.Extensions.FluentAssertions@workspace:src/Results.Immutable.Extensions.FluentAssertions":
   version: 0.0.0-use.local
   resolution: "Results.Immutable.Extensions.FluentAssertions@workspace:src/Results.Immutable.Extensions.FluentAssertions"
