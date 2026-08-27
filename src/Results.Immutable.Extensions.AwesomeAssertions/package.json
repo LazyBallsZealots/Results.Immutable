@@ -1,0 +1,11 @@
+{
+  "name": "Results.Immutable.Extensions.AwesomeAssertions",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "version": "node ../../scripts/version.mjs && git add Results.Immutable.Extensions.AwesomeAssertions.csproj"
+  },
+  "devDependencies": {
+    "Results.Immutable": "^1.0.0-alpha.7"
+  }
+}
