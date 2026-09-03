@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - "Results.Immutable/*"
+      - "Results.Immutable@*"
   workflow_dispatch:
 
 jobs:
@@ -34,6 +34,11 @@ jobs:
             -p:SymbolPackageFormat=snupkg \
             -c Release \
             -o ./nugets
+          dotnet pack src/Results.Immutable.Extensions.AwesomeAssertions/Results.Immutable.Extensions.AwesomeAssertions.csproj \
+            --include-symbols \
+            -p:SymbolPackageFormat=snupkg \
+            -c Release \
+            -o ./nugets     
         name: dotnet pack
       - run: |
           dotnet nuget push "./nugets/*" \
