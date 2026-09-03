@@ -44,6 +44,7 @@ jobs:
           dotnet nuget push "./nugets/*" \
             -k $NUGET_AUTH_TOKEN \
             -s https://api.nuget.org/v3/index.json
+            --skip-duplicate
         name: Nuget push
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.NUGET_KEY }}
