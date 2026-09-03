@@ -43,7 +43,7 @@ jobs:
       - run: |
           dotnet nuget push "./nugets/*" \
             -k $NUGET_AUTH_TOKEN \
-            -s https://api.nuget.org/v3/index.json
+            -s https://api.nuget.org/v3/index.json \
             --skip-duplicate
         name: Nuget push
         env:
