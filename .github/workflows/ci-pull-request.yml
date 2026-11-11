@@ -22,6 +22,7 @@ jobs:
           dotnet-version: |
             8.x
             10.x
+            11.x
           dotnet-quality: "ga"
 
       - name: Restore tools
