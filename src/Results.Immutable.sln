@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Results.Immutable.Extension
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Results.Immutable.Extensions.AwesomeAssertions.Tests", "Results.Immutable.Extensions.AwesomeAssertions.Tests\Results.Immutable.Extensions.AwesomeAssertions.Tests.csproj", "{46DE32D0-9E65-458B-83D6-CFAF4099F4DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Results.Immutable.Union", "Results.Immutable.Union\Results.Immutable.Union.csproj", "{C4D75809-216C-4AFD-89E4-7F2E408DFF7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Results.Immutable.Union.Tests", "Results.Immutable.Union.Tests\Results.Immutable.Union.Tests.csproj", "{ABA57D6A-39F1-489B-9FF0-BA21FB12D7C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{46DE32D0-9E65-458B-83D6-CFAF4099F4DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46DE32D0-9E65-458B-83D6-CFAF4099F4DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46DE32D0-9E65-458B-83D6-CFAF4099F4DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4D75809-216C-4AFD-89E4-7F2E408DFF7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4D75809-216C-4AFD-89E4-7F2E408DFF7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4D75809-216C-4AFD-89E4-7F2E408DFF7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4D75809-216C-4AFD-89E4-7F2E408DFF7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABA57D6A-39F1-489B-9FF0-BA21FB12D7C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABA57D6A-39F1-489B-9FF0-BA21FB12D7C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABA57D6A-39F1-489B-9FF0-BA21FB12D7C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABA57D6A-39F1-489B-9FF0-BA21FB12D7C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
