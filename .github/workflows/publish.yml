@@ -15,7 +15,7 @@ jobs:
       (startsWith(github.event.head_commit.message, 'Merge pull request') &&
       endsWith(github.event.head_commit.message, 'chore(release): publish'))
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@main
       - uses: actions/setup-dotnet@v3
