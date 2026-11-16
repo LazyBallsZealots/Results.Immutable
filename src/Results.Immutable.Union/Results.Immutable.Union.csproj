@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net11.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
+        <Version>0.0.0</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Results.Immutable.Common\Results.Immutable.Common.csproj" />
+    </ItemGroup>
+
+</Project>

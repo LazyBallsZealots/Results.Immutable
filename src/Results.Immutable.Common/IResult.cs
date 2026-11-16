@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace Results.Immutable;
 
 /// <summary>
@@ -29,7 +31,7 @@ public interface IResult
     public bool HasSucceeded { get; }
 
     /// <summary>
-    ///     Gets an <see cref="ImmutableList{T}" /> of <see cref="Error" />s
+    ///     Gets an <see cref="ImmutableList" /> of <see cref="Error" />s
     ///     associated with this <see cref="IResult{T}" />.
     /// </summary>
     /// <remarks>

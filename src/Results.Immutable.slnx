@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="Results.Immutable.Benchmarks/Results.Immutable.Benchmarks.csproj" />
+  <Project Path="Results.Immutable.Common/Results.Immutable.Common.csproj" />
+  <Project Path="Results.Immutable.Extensions.AwesomeAssertions.Tests/Results.Immutable.Extensions.AwesomeAssertions.Tests.csproj" />
+  <Project Path="Results.Immutable.Extensions.AwesomeAssertions/Results.Immutable.Extensions.AwesomeAssertions.csproj" />
+  <Project Path="Results.Immutable.Extensions.FluentAssertions.Tests/Results.Immutable.Extensions.FluentAssertions.Tests.csproj" />
+  <Project Path="Results.Immutable.Extensions.FluentAssertions/Results.Immutable.Extensions.FluentAssertions.csproj" />
+  <Project Path="Results.Immutable.Tests/Results.Immutable.Tests.csproj" />
+  <Project Path="Results.Immutable.Union.Tests/Results.Immutable.Union.Tests.csproj" />
+  <Project Path="Results.Immutable.Union/Results.Immutable.Union.csproj" />
+  <Project Path="Results.Immutable/Results.Immutable.csproj" />
+</Solution>

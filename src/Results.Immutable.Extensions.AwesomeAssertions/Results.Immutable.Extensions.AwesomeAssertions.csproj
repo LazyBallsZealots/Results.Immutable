@@ -10,8 +10,8 @@
     <Version>0.1.0-alpha.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AwesomeAssertions" Version="9.6.0"/>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
+    <PackageReference Include="AwesomeAssertions" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Results.Immutable\Results.Immutable.csproj"/>
