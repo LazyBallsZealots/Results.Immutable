@@ -1,11 +1,12 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Results.Immutable;
+namespace Results.Immutable.Union;
 
 [Union]
-public readonly struct Result<T> : IEquatable<Result<T>>, Result<T>.IUnionMembers
+public readonly struct Result<T> : IEquatable<Result<T>>
 {
     private readonly T? successValue;
 
@@ -13,21 +14,16 @@ public readonly struct Result<T> : IEquatable<Result<T>>, Result<T>.IUnionMember
 
     private readonly Tag tag;
 
-    public Result()
-    {
-        successValue = default;
-        errorsValue = null;
-        tag = Tag.Unknown;
-    }
-
-    private Result(T? value)
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public Result(T? value)
     {
         successValue = value;
         errorsValue = null;
-        tag = GetTagFrom(value);
+        tag = Tag.Value;
     }
 
-    private Result(ImmutableList<Error> errors)
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public Result(ImmutableList<Error> errors)
     {
         successValue = default;
         errorsValue = errors;
@@ -35,116 +31,168 @@ public readonly struct Result<T> : IEquatable<Result<T>>, Result<T>.IUnionMember
     }
 
     /// <summary>
-    ///     Gets the boolean indicator whether this <see cref="IResult{T}" />
+    ///     Gets the boolean indicator whether this <see cref="Result{T}" />
     ///     represents a failed operation.
     ///     A failed operation does not contain a value, and may contain errors.
     /// </summary>
-    public bool IsErrored => tag is Tag.Errors;
+    public bool IsErrored
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => tag is Tag.Errors;
+    }
 
     /// <inheritdoc cref="IsErrored" />
-    public bool HasFailed => IsErrored;
+    public bool HasFailed
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => IsErrored;
+    }
 
     /// <summary>
-    ///     Gets the boolean indicator whether this <see cref="IResult{T}" />
+    ///     Gets the boolean indicator whether this <see cref="Result{T}" />
     ///     represents a successful operation.
     ///     An OK operation contains a value, no errors are present.
     /// </summary>
-    public bool IsOk => tag is Tag.Value or Tag.NullValueType;
+    public bool IsOk
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => tag is Tag.Value;
+    }
 
     /// <inheritdoc cref="IsOk" />
-    public bool HasSucceeded => IsOk;
+    public bool HasSucceeded
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => IsOk;
+    }
 
-    object? IUnionMembers.Value =>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public object? Value =>
         tag switch
         {
-            Tag.Value or Tag.NullValueType => successValue,
+            Tag.Value => successValue,
             Tag.Errors => errorsValue,
             _ => null,
         };
 
     /// <remarks>
-    ///     <see cref="IUnionMembers.HasValue" /> has to return <see langword="false" />
-    ///     for successful <see cref="Result{T}" />s containing nullable <see cref="ValueType" />s.
+    ///     <see cref="HasValue" /> has to return <see langword="false" />
+    ///     for successful <see cref="Result{T}" />s containing <see langword="null" /> values.
     /// </remarks>
-    bool IUnionMembers.HasValue => tag is Tag.Value or Tag.Errors;
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public bool HasValue
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => tag is Tag.Errors || (tag is Tag.Value && successValue is not null);
+    }
 
-    bool IUnionMembers.TryGetValue(out T? value)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryGetValue(out T? value)
     {
         value = successValue;
         return IsOk;
     }
 
-    bool IUnionMembers.TryGetValue([NotNullWhen(true)] out ImmutableList<Error>? errors)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryGetValue([NotNullWhen(true)] out ImmutableList<Error>? errors)
     {
         errors = errorsValue;
         return IsErrored;
     }
 
-    /// <inheritdoc />
-    public override bool Equals(object? obj) =>
-        obj is Result<T> other &&
-        other.tag == tag &&
-        tag switch
-        {
-            Tag.Value or Tag.NullValueType => (successValue, other.successValue) switch
-            {
-                (null, null) => true,
-                ({ } first, { } second) => first.Equals(second),
-                _ => false,
-            },
-            Tag.Errors => other.errorsValue?.SequenceEqual(other.errorsValue) is true,
-            // default instances?
-            _ => this == default && other == default,
-        };
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryGetOk(out T? value) => TryGetValue(out value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryGetErrors([NotNullWhen(true)] out ImmutableList<Error>? errors) => TryGetValue(out errors);
 
     /// <inheritdoc />
-    public bool Equals(Result<T> other) => Equals(other as object);
+    public override bool Equals(object? obj) => obj is Result<T> other && Equals(other);
+
+    /// <inheritdoc />
+    public bool Equals(Result<T> other)
+    {
+        if (tag != other.tag)
+        {
+            return false;
+        }
+
+        return tag switch
+        {
+            Tag.Value =>
+                EqualityComparer<T>.Default.Equals(successValue, other.successValue),
+            Tag.Errors =>
+                ReferenceEquals(errorsValue, other.errorsValue) ||
+                (errorsValue is not null &&
+                    other.errorsValue is not null &&
+                    errorsValue.SequenceEqual(other.errorsValue)),
+            _ => true,
+        };
+    }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
-        hashCode.Add(successValue);
+        hashCode.Add(tag);
 
-        foreach (var error in errorsValue ?? [])
+        if (IsOk)
         {
-            hashCode.Add(error);
+            hashCode.Add(successValue);
+        }
+        else if (errorsValue is not null)
+        {
+            foreach (var error in errorsValue)
+            {
+                hashCode.Add(error);
+            }
         }
 
         return hashCode.ToHashCode();
     }
 
+    /// <inheritdoc />
+    public override string ToString() =>
+        tag switch
+        {
+            Tag.Value => $"Ok({successValue})",
+            Tag.Errors => $"Fail({errorsValue?.Count ?? 0} errors)",
+            _ => "Unknown",
+        };
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Result<T> left, Result<T> right) => left.Equals(right);
 
-    public static bool operator !=(Result<T> left, Result<T> right) => !(left == right);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(Result<T> left, Result<T> right) => !left.Equals(right);
 
-    private static Tag GetTagFrom(T? value) =>
-        typeof(T).IsAssignableTo(typeof(ValueType)) && value is null ? Tag.NullValueType : Tag.Value;
-
-    private enum Tag
+    private enum Tag : byte
     {
-        Unknown,
+        Value = 1,
 
-        Value,
-
-        Errors,
-
-        NullValueType,
+        Errors = 2,
     }
+}
 
-    public interface IUnionMembers
-    {
-        object? Value { get; }
+public static class Result
+{
+    /// <summary>
+    ///     Returns successful <see cref="Result{T}" />, containing provided <paramref name="value" />.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <typeparam name="T">Type of the value.</typeparam>
+    /// <returns>
+    ///     A successful <see cref="Result{T}" />.
+    /// </returns>
+    public static Result<T> Ok<T>(T value) => new(value);
 
-        bool HasValue { get; }
-
-        static Result<T> Create(T? value) => new(value);
-
-        static Result<T> Create(ImmutableList<Error> errors) => new(errors);
-
-        bool TryGetValue(out T? value);
-
-        bool TryGetValue([NotNullWhen(true)] out ImmutableList<Error>? errors);
-    }
+    /// <summary>
+    ///     Returns a failed <see cref="Result{T}" />, containing provided <paramref name="errors" />.
+    /// </summary>
+    /// <param name="errors"><see cref="Error" />s to be passed to the returned <see cref="Result{T}" />.</param>
+    /// <typeparam name="T">Type of the value.</typeparam>
+    /// <returns>
+    ///     A failed <see cref="Result{T}" />
+    /// </returns>
+    public static Result<T> Fail<T>(IEnumerable<Error> errors) => new(errors.ToImmutableList());
 }
