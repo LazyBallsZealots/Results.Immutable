@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 namespace Results.Immutable;
 
 [Union]
-public readonly struct Result<T> : IEquatable<Result<T>>, Result<T>.IUnionMembers
+public readonly struct Result<T> : IEquatable<Result<T>>, Result<T>.IUnionMembers, IResult
 {
     private readonly T? successValue;
 
@@ -53,6 +53,12 @@ public readonly struct Result<T> : IEquatable<Result<T>>, Result<T>.IUnionMember
 
     /// <inheritdoc cref="IsOk" />
     public bool HasSucceeded => IsOk;
+
+    /// <inheritdoc />
+    public ImmutableList<Error> Errors => errorsValue ?? [];
+
+    /// <inheritdoc />
+    public IResult WithErrors(ImmutableList<Error> errors) => IUnionMembers.Create(errors);
 
     object? IUnionMembers.Value =>
         tag switch
